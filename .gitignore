@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # No need to add PyCharm specific files.
-.idea
+.idea/
