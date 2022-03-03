@@ -11,3 +11,5 @@ I received a Keybow 2040 for Christmas and have a few projects in mind. I can pr
 
 Some of this can go into a library and main script on the keybow but for internet access
 I'll attach the keyboard to a Raspberry Pi. Pi scripts can live in this repository as well.
+
+The device github repository is here: https://github.com/pimoroni/pmk-circuitpython
