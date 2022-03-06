@@ -9,6 +9,6 @@ pmk = PMK(hardware)
 keys = pmk.keys
 
 while True:
-    for key_indexs in range(0, 15, 2):
-        pmk.keys[key_indexs].set_led(0, 255, 0)
+    for key_indexes in range(0, 15, 2):
+        pmk.keys[key_indexes].set_led(0, 255, 0)
         pmk.update()
