@@ -9,11 +9,11 @@ pmk = PMK(hardware)
 class Timer:
     def __init__(self):
         self.is_set = False
-        self.time_units = 0
-        self.number_of_units = 0
+        self.base_minutes = 0
+        self.multiplier = 0
 
     def start(self):
-        minutes = self.time_units * self.number_of_units
+        minutes = self.base_minutes * self.multiplier
         print(f"Timer set: {minutes} minutes")
         self.is_set = True
 
@@ -22,32 +22,32 @@ class Timer:
         return self.is_set
 
 
-class UnitsSelector:
-    def __init__(self, key, timer_to_set, units, colour):
+class BaseMinutesSelector:
+    def __init__(self, key, timer_to_set, minutes, colour):
         self._key = key
         self._key.set_led(*colour)
 
         self._timer = timer_to_set
-        self._units = units
+        self._minutes = minutes
 
         self._add_handler()
 
     def _add_handler(self):
         @pmk.on_press(self._key)
         def handler(unit_key):
-            self._timer.time_units = self._units
+            self._timer.base_minutes = self._minutes
             self._timer.start()
 
 
 timer = Timer()
 
-five_minute_selector = UnitsSelector(pmk.keys[0], timer, 5, (255, 0, 0))
-ten_minute_selector = UnitsSelector(pmk.keys[4], timer, 10, (0, 255, 0))
-fifteen_minute_selector = UnitsSelector(pmk.keys[8], timer, 15, (0, 0, 255))
+five_minute_selector = BaseMinutesSelector(pmk.keys[0], timer, 5, (255, 0, 0))
+ten_minute_selector = BaseMinutesSelector(pmk.keys[4], timer, 10, (0, 255, 0))
+fifteen_minute_selector = BaseMinutesSelector(pmk.keys[8], timer, 15, (0, 0, 255))
 
 
 # TODO User selects the number to multiply the units.
-timer.number_of_units = 3
+timer.multiplier = 3
 
 msg_shown = False
 while True:
