@@ -22,37 +22,32 @@ class Timer:
         return self.is_set
 
 
-# TODO Refactor this function.
-def show_unit_options():
-    five_min_key = pmk.keys[0]
-    ten_min_key = pmk.keys[4]
-    fifteen_min_key = pmk.keys[8]
+class UnitsSelector:
+    def __init__(self, key, timer_to_set, units, colour):
+        self._key = key
+        self._key.set_led(*colour)
 
-    five_min_key.set_led(255, 0, 0)
-    ten_min_key.set_led(0, 255, 0)
-    fifteen_min_key.set_led(0, 0, 255)
+        self._timer = timer_to_set
+        self._units = units
 
-    @pmk.on_press(five_min_key)
-    def five_handler(key):
-        timer.time_units = 5
-        timer.start()
+        self._add_handler()
 
-    @pmk.on_press(ten_min_key)
-    def ten_handler(key):
-        timer.time_units = 10
-        timer.start()
-
-    @pmk.on_press(fifteen_min_key)
-    def fifteen_handler(key):
-        timer.time_units = 15
-        timer.start()
+    def _add_handler(self):
+        @pmk.on_press(self._key)
+        def handler(unit_key):
+            self._timer.time_units = self._units
+            self._timer.start()
 
 
 timer = Timer()
 
+five_minute_selector = UnitsSelector(pmk.keys[0], timer, 5, (255, 0, 0))
+ten_minute_selector = UnitsSelector(pmk.keys[4], timer, 10, (0, 255, 0))
+fifteen_minute_selector = UnitsSelector(pmk.keys[8], timer, 15, (0, 0, 255))
+
+
 # TODO User selects the number to multiply the units.
 timer.number_of_units = 3
-show_unit_options()
 
 msg_shown = False
 while True:
