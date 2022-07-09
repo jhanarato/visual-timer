@@ -18,18 +18,18 @@ class Timer:
     when the total number of minutes has passed.
     """
     def __init__(self):
-        self.is_set = False
+        self.started = False
         self.minutes = 0
         self.multiplier = 0
 
     def start(self):
         minutes = self.minutes * self.multiplier
-        print(f"Timer set: {minutes} minutes")
-        self.is_set = True
+        print(f"Timer started: {minutes} minutes")
+        self.started = True
 
     def is_complete(self):
         # TODO Check if the time has elapsed.
-        return self.is_set
+        return self.started
 
 
 class MinutesSelector:
@@ -37,20 +37,18 @@ class MinutesSelector:
     Assign a handler to a single key to choose the number
     of minutes to be multiplied.
     """
-    def __init__(self, key, timer_to_set, minutes, colour):
+    def __init__(self, key, minutes, colour):
         self._key = key
         self._key.set_led(*key_colours[colour])
-
-        self._timer = timer_to_set
-        self._minutes = minutes
+        self.minutes = minutes
+        self.selected = False
 
         self._add_handler()
 
     def _add_handler(self):
         @pmk.on_press(self._key)
         def handler(unit_key):
-            self._timer.minutes = self._minutes
-            self._timer.start()
+            self.selected = True
 
 
 class MultiplierSelector:
@@ -66,17 +64,24 @@ class MultiplierSelector:
 timer = Timer()
 
 # Allow a choice of 5, 10 or 15 minutes. Red, green and blue respectively.
-five_minute_selector = MinutesSelector(pmk.keys[0], timer, 5, "red")
-ten_minute_selector = MinutesSelector(pmk.keys[4], timer, 10, "green")
-fifteen_minute_selector = MinutesSelector(pmk.keys[8], timer, 15, "blue")
-
-
+minute_selectors = [
+    MinutesSelector(pmk.keys[0], 5, "red"),
+    MinutesSelector(pmk.keys[4], 10, "green"),
+    MinutesSelector(pmk.keys[8], 15, "blue")
+]
 
 # TODO User selects the number to multiply the units.
 timer.multiplier = 3
 
 msg_shown = False
+
 while True:
+    for minute_selector in minute_selectors:
+        if minute_selector.selected:
+            timer.minutes = minute_selector.minutes
+            if not timer.started:
+                timer.start()
+
     # We only want to print the message once
     if not msg_shown and timer.is_complete():
         print("Time's up")
