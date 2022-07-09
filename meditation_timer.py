@@ -70,21 +70,27 @@ minute_selectors = [
     MinutesSelector(pmk.keys[8], 15, "blue")
 ]
 
-# TODO User selects the number to multiply the units.
-timer.multiplier = 3
 
-msg_shown = False
-
-while True:
+def selected_minutes():
     for minute_selector in minute_selectors:
         if minute_selector.selected:
-            timer.minutes = minute_selector.minutes
-            if not timer.started:
-                timer.start()
+            return minute_selector.minutes
+    return None
 
-    # We only want to print the message once
-    if not msg_shown and timer.is_complete():
-        print("Time's up")
-        msg_shown = True
+
+def reset_selectors():
+    for minute_selector in minute_selectors:
+        minute_selector.selected = False
+
+
+last_selected = None
+
+while True:
+    new_selected = selected_minutes()
+
+    if new_selected is not None and new_selected != last_selected:
+        print(f"Selected: {new_selected}")
+        last_selected = new_selected
+        reset_selectors()
 
     pmk.update()
