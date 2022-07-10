@@ -61,9 +61,9 @@ class MinutesMenu:
 
     def __init__(self):
         self._selectors = []
-
-    def add_item(self, selector):
-        self._selectors.append(selector)
+        self._selectors.append(MinutesSelector(pmk.keys[0], 5, "red"))
+        self._selectors.append(MinutesSelector(pmk.keys[4], 10, "green"))
+        self._selectors.append(MinutesSelector(pmk.keys[8], 15, "blue"))
 
     def get_minutes_selected(self):
         for selector in self._selectors:
@@ -86,32 +86,47 @@ class MultiplierSelector:
         pass
 
 
-# There is a single timer
-timer = Timer()
+class ValueChangedLogger:
+    def __init__(self, message_prefix):
+        self._old_value = None
+        self._message_prefix = message_prefix
 
-minutes_menu = MinutesMenu()
-
-minutes_menu.add_item(MinutesSelector(pmk.keys[0], 5, "red"))
-minutes_menu.add_item(MinutesSelector(pmk.keys[4], 10, "green"))
-minutes_menu.add_item(MinutesSelector(pmk.keys[8], 15, "blue"))
-
-last_selected = None
-
-
-def selection_changed():
-    if new_selected is None:
-        return False
-    if new_selected == last_selected:
-        return False
-    return True
+    def update_value(self, new_value):
+        if new_value is not None:
+            if self._old_value != new_value:
+                print(f"{self._message_prefix}: {new_value}")
+                self._old_value = new_value
 
 
-while True:
-    new_selected = minutes_menu.get_minutes_selected()
+def test_logger():
+    logger = ValueChangedLogger("Test Logger")
+    logger.update_value(1) # Print "Test Logger: 1"
+    logger.update_value(2)  # Print "Test Logger: 2"
+    logger.update_value(2)  # No output
+    logger.update_value(3)  # Print "Test Logger: 3"
 
-    if selection_changed():
-        print(f"Selected: {new_selected}")
-        last_selected = new_selected
-        minutes_menu.reset_menu()
 
-    pmk.update()
+def test_minutes_menu():
+    pass
+
+
+def run_forever():
+    minutes_menu = MinutesMenu()
+    last_selected = None
+    while True:
+        new_selected = minutes_menu.get_minutes_selected()
+        if new_selected is None:
+            continue
+        elif new_selected == last_selected:
+            continue
+        else:
+            last_selected = new_selected
+            minutes_menu.reset_menu()
+            print(f"Selected: {new_selected}")
+
+        pmk.update()
+
+
+test_logger()
+# test_minutes_menu()
+# run_forever()
