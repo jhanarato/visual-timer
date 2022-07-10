@@ -100,33 +100,25 @@ class ValueChangedLogger:
 
 def test_logger():
     logger = ValueChangedLogger("Test Logger")
-    logger.update_value(1) # Print "Test Logger: 1"
+    logger.update_value(1)  # Print "Test Logger: 1"
     logger.update_value(2)  # Print "Test Logger: 2"
     logger.update_value(2)  # No output
     logger.update_value(3)  # Print "Test Logger: 3"
 
 
 def test_minutes_menu():
-    pass
-
-
-def run_forever():
     minutes_menu = MinutesMenu()
-    last_selected = None
+    logger = ValueChangedLogger("Minutes")
     while True:
-        new_selected = minutes_menu.get_minutes_selected()
-        if new_selected is None:
-            continue
-        elif new_selected == last_selected:
-            continue
-        else:
-            last_selected = new_selected
-            minutes_menu.reset_menu()
-            print(f"Selected: {new_selected}")
-
+        minutes = minutes_menu.get_minutes_selected()
+        logger.update_value(minutes)
         pmk.update()
 
 
-test_logger()
-# test_minutes_menu()
+def run_forever():
+    pass
+
+
+#test_logger()
+test_minutes_menu()
 # run_forever()
