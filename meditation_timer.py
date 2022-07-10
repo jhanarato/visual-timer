@@ -17,6 +17,7 @@ class Timer:
     the number of keys selected, multiply the two and track
     when the total number of minutes has passed.
     """
+
     def __init__(self):
         self.started = False
         self.minutes = 0
@@ -37,18 +38,42 @@ class MinutesSelector:
     Assign a handler to a single key to choose the number
     of minutes to be multiplied.
     """
+
     def __init__(self, key, minutes, colour):
         self._key = key
         self._key.set_led(*key_colours[colour])
         self.minutes = minutes
         self.selected = False
 
-        self._add_handler()
+        self._enable_selection()
 
-    def _add_handler(self):
+    def _enable_selection(self):
         @pmk.on_press(self._key)
-        def handler(unit_key):
+        def select(choice_key):
             self.selected = True
+
+
+class MinutesMenu:
+    """
+    A group of keys allowing the selection of the number of minutes
+    to be multiplied.
+    """
+
+    def __init__(self):
+        self._selectors = []
+
+    def add_item(self, selector):
+        self._selectors.append(selector)
+
+    def get_minutes_selected(self):
+        for selector in self._selectors:
+            if selector.selected:
+                return selector.minutes
+        return None
+
+    def reset_menu(self):
+        for selector in self._selectors:
+            selector.selected = False
 
 
 class MultiplierSelector:
@@ -56,6 +81,7 @@ class MultiplierSelector:
     Setup keypress handlers to choose how many times to multiply
     the base number of minutes in order to select the total time.
     """
+
     def __init__(self):
         pass
 
@@ -63,34 +89,29 @@ class MultiplierSelector:
 # There is a single timer
 timer = Timer()
 
-# Allow a choice of 5, 10 or 15 minutes. Red, green and blue respectively.
-minute_selectors = [
-    MinutesSelector(pmk.keys[0], 5, "red"),
-    MinutesSelector(pmk.keys[4], 10, "green"),
-    MinutesSelector(pmk.keys[8], 15, "blue")
-]
+minutes_menu = MinutesMenu()
 
-
-def selected_minutes():
-    for minute_selector in minute_selectors:
-        if minute_selector.selected:
-            return minute_selector.minutes
-    return None
-
-
-def reset_selectors():
-    for minute_selector in minute_selectors:
-        minute_selector.selected = False
-
+minutes_menu.add_item(MinutesSelector(pmk.keys[0], 5, "red"))
+minutes_menu.add_item(MinutesSelector(pmk.keys[4], 10, "green"))
+minutes_menu.add_item(MinutesSelector(pmk.keys[8], 15, "blue"))
 
 last_selected = None
 
-while True:
-    new_selected = selected_minutes()
 
-    if new_selected is not None and new_selected != last_selected:
+def selection_changed():
+    if new_selected is None:
+        return False
+    if new_selected == last_selected:
+        return False
+    return True
+
+
+while True:
+    new_selected = minutes_menu.get_minutes_selected()
+
+    if selection_changed():
         print(f"Selected: {new_selected}")
         last_selected = new_selected
-        reset_selectors()
+        minutes_menu.reset_menu()
 
     pmk.update()
