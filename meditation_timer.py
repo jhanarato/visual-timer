@@ -86,39 +86,35 @@ class MultiplierSelector:
         pass
 
 
-class ValueChangedLogger:
-    def __init__(self, message_prefix):
+class ValueChangeMonitor:
+    def __init__(self):
         self._old_value = None
-        self._message_prefix = message_prefix
+        self._changed = False
 
     def update_value(self, new_value):
         if new_value is not None:
             if self._old_value != new_value:
-                print(f"{self._message_prefix}: {new_value}")
                 self._old_value = new_value
+                self._changed = True
 
-
-def test_logger():
-    logger = ValueChangedLogger("Test Logger")
-    logger.update_value(1)  # Print "Test Logger: 1"
-    logger.update_value(2)  # Print "Test Logger: 2"
-    logger.update_value(2)  # No output
-    logger.update_value(3)  # Print "Test Logger: 3"
+    def value_has_changed(self):
+        if self._changed:
+            self._changed = False
+            return True
+        else:
+            return False
 
 
 def test_minutes_menu():
     minutes_menu = MinutesMenu()
-    logger = ValueChangedLogger("Minutes")
+    monitor = ValueChangeMonitor()
     while True:
         minutes = minutes_menu.get_minutes_selected()
-        logger.update_value(minutes)
+        monitor.update_value(minutes)
+        if monitor.value_has_changed():
+            print(f"Minutes set to: {minutes}")
+            minutes_menu.reset_menu()
         pmk.update()
 
 
-def run_forever():
-    pass
-
-
-#test_logger()
 test_minutes_menu()
-# run_forever()
