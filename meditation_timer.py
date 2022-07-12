@@ -39,15 +39,15 @@ class MinutesSelector:
     of minutes to be multiplied.
     """
 
-    def __init__(self, key, minutes, colour):
+    def __init__(self, key, minutes):
         self._key = key
-        self._key.set_led(*key_colours[colour])
         self.minutes = minutes
         self.selected = False
 
-        self._enable_selection()
+    def set_colour(self, colour):
+        self._key.set_led(*key_colours[colour])
 
-    def _enable_selection(self):
+    def enable(self):
         @pmk.on_press(self._key)
         def select(choice_key):
             self.selected = True
@@ -61,9 +61,21 @@ class MinutesMenu:
 
     def __init__(self):
         self._selectors = []
-        self._selectors.append(MinutesSelector(pmk.keys[0], 5, "red"))
-        self._selectors.append(MinutesSelector(pmk.keys[4], 10, "green"))
-        self._selectors.append(MinutesSelector(pmk.keys[8], 15, "blue"))
+
+        five_selector = MinutesSelector(pmk.keys[0], 5)
+        five_selector.set_colour("red")
+        five_selector.enable()
+        self._selectors.append(five_selector)
+
+        ten_selector = MinutesSelector(pmk.keys[4], 10)
+        ten_selector.set_colour("green")
+        ten_selector.enable()
+        self._selectors.append(ten_selector)
+
+        fifteen_selector = MinutesSelector(pmk.keys[8], 15)
+        fifteen_selector.set_colour("blue")
+        fifteen_selector.enable()
+        self._selectors.append(fifteen_selector)
 
     def get_minutes_selected(self):
         for selector in self._selectors:
