@@ -39,8 +39,8 @@ class MinutesSelector:
     of minutes to be multiplied.
     """
 
-    def __init__(self, key, minutes):
-        self._key = key
+    def __init__(self, key_number, minutes):
+        self._key = pmk.keys[key_number]
         self.minutes = minutes
         self.selected = False
 
@@ -62,20 +62,23 @@ class MinutesMenu:
     def __init__(self):
         self._selectors = []
 
-        five_selector = MinutesSelector(pmk.keys[0], 5)
+        five_selector = MinutesSelector(key_number=0, minutes=5)
         five_selector.set_colour("red")
-        five_selector.enable()
         self._selectors.append(five_selector)
 
-        ten_selector = MinutesSelector(pmk.keys[4], 10)
+        ten_selector = MinutesSelector(key_number=4, minutes=10)
         ten_selector.set_colour("green")
-        ten_selector.enable()
         self._selectors.append(ten_selector)
 
-        fifteen_selector = MinutesSelector(pmk.keys[8], 15)
+        fifteen_selector = MinutesSelector(key_number=8, minutes=15)
         fifteen_selector.set_colour("blue")
-        fifteen_selector.enable()
         self._selectors.append(fifteen_selector)
+
+        self._enable_all_selectors()
+
+    def _enable_all_selectors(self):
+        for selector in self._selectors:
+            selector.enable()
 
     def get_minutes_selected(self):
         for selector in self._selectors:
