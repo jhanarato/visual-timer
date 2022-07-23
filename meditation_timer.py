@@ -10,10 +10,7 @@ key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
                "blue": (0, 0, 255),
                "cyan": (0, 255, 255),
-               "teal": (0, 128, 128),
-               "gold": (255, 215, 0),
-               "orange": (255, 165, 0),
-               "darkorange": (255, 140, 0)}
+               "orange": (255, 165, 0)}
 
 
 class Timer:
@@ -102,8 +99,18 @@ class MultiplierSelector:
     the base number of minutes in order to select the total time.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, key_number, multiplier):
+        self._key = pmk.keys[key_number]
+        self.multiplier = multiplier
+        self.selected = False
+
+    def set_colour(self, colour):
+        self._key.set_led(*key_colours[colour])
+
+    def enable(self):
+        @pmk.on_press(self._key)
+        def select(choice_key):
+            self.selected = True
 
 
 class ValueChangeMonitor:
@@ -137,4 +144,18 @@ def test_minutes_menu():
         pmk.update()
 
 
-test_minutes_menu()
+def test_multiplier_selector():
+    selector = MultiplierSelector(key_number=0, multiplier=1)
+    selector.set_colour("orange")
+    selector.enable()
+
+    message_printed = False
+    while True:
+        if selector.selected and not message_printed:
+            print(f"Multiplier {selector.multiplier} selected")
+            message_printed = True
+        pmk.update()
+
+
+test_multiplier_selector()
+# test_minutes_menu()
