@@ -1,3 +1,4 @@
+import time
 from pmk.platform.keybow2040 import Keybow2040 as Hardware
 from pmk import PMK
 
@@ -12,35 +13,15 @@ key_colours = {"red": (255, 0, 0),
                "cyan": (0, 255, 255),
                "orange": (255, 165, 0)}
 
-
-class Timer:
-    """
-    Once we know the number of minutes assigned per key and
-    the number of keys selected, multiply the two and track
-    when the total number of minutes has passed.
-    """
-
-    def __init__(self):
-        self.started = False
-        self.minutes = 0
-        self.multiplier = 0
-
-    def start(self):
-        minutes = self.minutes * self.multiplier
-        print(f"Timer started: {minutes} minutes")
-        self.started = True
-
-    def is_complete(self):
-        # TODO Check if the time has elapsed.
-        return self.started
+rotated_keys = {
+    0: 0,  1: 4,  2: 8,   3: 12,
+    4: 1,  5: 5,  6: 9,   7: 13,
+    8: 2,  9: 6,  10: 10, 11: 14,
+    12: 3, 13: 7, 14: 11, 15: 15
+}
 
 
 class MinutesMenu:
-    """
-    A group of keys allowing the selection of the number of minutes
-    to be multiplied.
-    """
-
     def __init__(self):
         self._selectors = []
 
@@ -73,6 +54,11 @@ class MinutesMenu:
             selector.selected = False
 
 
+class MultiplierMenu:
+    def __init__(self):
+        self.selectors = []
+
+
 class IntegerSelector:
     def __init__(self, key_number, integer_value):
         self._key = pmk.keys[key_number]
@@ -86,6 +72,28 @@ class IntegerSelector:
         @pmk.on_press(self._key)
         def select(choice_key):
             self.selected = True
+
+
+class Timer:
+    """
+    Once we know the number of minutes assigned per key and
+    the number of keys selected, multiply the two and track
+    when the total number of minutes has passed.
+    """
+
+    def __init__(self):
+        self.started = False
+        self.minutes = 0
+        self.multiplier = 0
+
+    def start(self):
+        minutes = self.minutes * self.multiplier
+        print(f"Timer started: {minutes} minutes")
+        self.started = True
+
+    def is_complete(self):
+        # TODO Check if the time has elapsed.
+        return self.started
 
 
 class ValueChangeMonitor:
@@ -132,5 +140,20 @@ def test_integer_selector():
         pmk.update()
 
 
+def test_rotated_keys():
+    turn_on = True
+    while True:
+        for key in rotated_keys:
+            if turn_on:
+                pmk.keys[rotated_keys[key]].set_led(0, 255, 0)
+            else:
+                pmk.keys[rotated_keys[key]].set_led(0, 0, 0)
+            time.sleep(0.2)
+            pmk.update()
+
+        turn_on = not turn_on
+
+
 # test_integer_selector()
-test_minutes_menu()
+# test_minutes_menu()
+test_rotated_keys()
