@@ -8,7 +8,12 @@ pmk = PMK(hardware)
 # Shortcuts for various switch LED colours
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
-               "blue": (0, 0, 255)}
+               "blue": (0, 0, 255),
+               "cyan": (0, 255, 255),
+               "teal": (0, 128, 128),
+               "gold": (255, 215, 0),
+               "orange": (255, 165, 0),
+               "darkorange": (255, 140, 0)}
 
 
 class Timer:
