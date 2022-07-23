@@ -93,15 +93,10 @@ class MinutesMenu:
             selector.selected = False
 
 
-class MultiplierSelector:
-    """
-    Setup keypress handlers to choose how many times to multiply
-    the base number of minutes in order to select the total time.
-    """
-
-    def __init__(self, key_number, multiplier):
+class IntegerSelector:
+    def __init__(self, key_number, integer_value):
         self._key = pmk.keys[key_number]
-        self.multiplier = multiplier
+        self.integer_value = integer_value
         self.selected = False
 
     def set_colour(self, colour):
@@ -144,18 +139,18 @@ def test_minutes_menu():
         pmk.update()
 
 
-def test_multiplier_selector():
-    selector = MultiplierSelector(key_number=0, multiplier=1)
+def test_integer_selector():
+    selector = IntegerSelector(key_number=0, integer_value=1)
     selector.set_colour("orange")
     selector.enable()
 
     message_printed = False
     while True:
         if selector.selected and not message_printed:
-            print(f"Multiplier {selector.multiplier} selected")
+            print(f"Integer {selector.integer_value} selected")
             message_printed = True
         pmk.update()
 
 
-test_multiplier_selector()
+test_integer_selector()
 # test_minutes_menu()
