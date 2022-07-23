@@ -35,26 +35,6 @@ class Timer:
         return self.started
 
 
-class MinutesSelector:
-    """
-    Assign a handler to a single key to choose the number
-    of minutes to be multiplied.
-    """
-
-    def __init__(self, key_number, minutes):
-        self._key = pmk.keys[key_number]
-        self.minutes = minutes
-        self.selected = False
-
-    def set_colour(self, colour):
-        self._key.set_led(*key_colours[colour])
-
-    def enable(self):
-        @pmk.on_press(self._key)
-        def select(choice_key):
-            self.selected = True
-
-
 class MinutesMenu:
     """
     A group of keys allowing the selection of the number of minutes
@@ -64,15 +44,15 @@ class MinutesMenu:
     def __init__(self):
         self._selectors = []
 
-        five_selector = MinutesSelector(key_number=0, minutes=5)
+        five_selector = IntegerSelector(key_number=0, integer_value=5)
         five_selector.set_colour("red")
         self._selectors.append(five_selector)
 
-        ten_selector = MinutesSelector(key_number=4, minutes=10)
+        ten_selector = IntegerSelector(key_number=4, integer_value=10)
         ten_selector.set_colour("green")
         self._selectors.append(ten_selector)
 
-        fifteen_selector = MinutesSelector(key_number=8, minutes=15)
+        fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
         fifteen_selector.set_colour("blue")
         self._selectors.append(fifteen_selector)
 
@@ -85,7 +65,7 @@ class MinutesMenu:
     def get_minutes_selected(self):
         for selector in self._selectors:
             if selector.selected:
-                return selector.minutes
+                return selector.integer_value
         return None
 
     def reset_menu(self):
@@ -152,5 +132,5 @@ def test_integer_selector():
         pmk.update()
 
 
-test_integer_selector()
-# test_minutes_menu()
+# test_integer_selector()
+test_minutes_menu()
