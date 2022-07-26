@@ -70,7 +70,6 @@ class MultiplierMenu:
             self._selectors.append(selector)
 
     def _set_colour(self):
-        # TODO Only keys up to the selected value should be lit.
         for selector in self._selectors:
             selector.set_colour("cyan")
 
@@ -92,11 +91,11 @@ class MultiplierMenu:
         selected_key_number = 0
         for selector in self._selectors:
             if selector.selected:
-                selected_key_number = selector.key_number
+                selected_key_number = RotatedKeys.pmk_to_rotated(selector.key_number)
                 break
 
         for selector in self._selectors:
-            if selector.key_number >= selected_key_number:
+            if RotatedKeys.pmk_to_rotated(selector.key_number) <= selected_key_number:
                 selector.set_colour("cyan")
             else:
                 selector.set_colour("none")
@@ -202,7 +201,7 @@ def test_multiplier_menu():
         multiplier = menu.get_multiplier_selected()
         monitor.update_value(multiplier)
         if monitor.value_has_changed():
-            # menu.show_selection()
+            menu.show_selection()
             print(f"Multiplier set to: {multiplier}")
             menu.reset_menu()
         pmk.update()
