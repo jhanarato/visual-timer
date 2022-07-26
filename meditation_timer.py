@@ -56,7 +56,36 @@ class MinutesMenu:
 
 class MultiplierMenu:
     def __init__(self):
-        self.selectors = []
+        self._selectors = []
+        self._add_selectors()
+        self._set_colour()
+        self._enable_all_selectors()
+
+    def _add_selectors(self):
+        for key_number in rotated_keys:
+            rotated_key_number = rotated_keys[key_number]
+            selector = IntegerSelector(key_number=rotated_key_number,
+                                       integer_value=key_number + 1)
+            self._selectors.append(selector)
+
+    def _set_colour(self):
+        # TODO Only keys up to the selected value should be lit.
+        for selector in self._selectors:
+            selector.set_colour("cyan")
+
+    def _enable_all_selectors(self):
+        for selector in self._selectors:
+            selector.enable()
+
+    def get_multiplier_selected(self):
+        for selector in self._selectors:
+            if selector.selected:
+                return selector.integer_value
+        return None
+
+    def reset_menu(self):
+        for selector in self._selectors:
+            selector.selected = False
 
 
 class IntegerSelector:
@@ -127,6 +156,19 @@ def test_minutes_menu():
         pmk.update()
 
 
+def test_multiplier_menu():
+    menu = MultiplierMenu()
+    monitor = ValueChangeMonitor()
+
+    while True:
+        multiplier = menu.get_multiplier_selected()
+        monitor.update_value(multiplier)
+        if monitor.value_has_changed():
+            print(f"Multiplier set to: {multiplier}")
+            menu.reset_menu()
+        pmk.update()
+
+
 def test_integer_selector():
     selector = IntegerSelector(key_number=0, integer_value=1)
     selector.set_colour("orange")
@@ -156,4 +198,5 @@ def test_rotated_keys():
 
 # test_integer_selector()
 # test_minutes_menu()
-test_rotated_keys()
+test_multiplier_menu()
+# test_rotated_keys()
