@@ -11,7 +11,8 @@ key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
                "blue": (0, 0, 255),
                "cyan": (0, 255, 255),
-               "orange": (255, 165, 0)}
+               "orange": (255, 165, 0),
+               "none": (0, 0, 0)}
 
 rotated_keys = {
     0: 0,  1: 4,  2: 8,   3: 12,
@@ -62,10 +63,10 @@ class MultiplierMenu:
         self._enable_all_selectors()
 
     def _add_selectors(self):
-        for key_number in rotated_keys:
-            rotated_key_number = rotated_keys[key_number]
-            selector = IntegerSelector(key_number=rotated_key_number,
-                                       integer_value=key_number + 1)
+        for pmk_number in range(0, 16):
+            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
+            selector = IntegerSelector(key_number=pmk_number,
+                                       integer_value=rotated_number + 1)
             self._selectors.append(selector)
 
     def _set_colour(self):
@@ -87,11 +88,48 @@ class MultiplierMenu:
         for selector in self._selectors:
             selector.selected = False
 
+    def show_selection(self):
+        selected_key_number = 0
+        for selector in self._selectors:
+            if selector.selected:
+                selected_key_number = selector.key_number
+                break
+
+        for selector in self._selectors:
+            if selector.key_number >= selected_key_number:
+                selector.set_colour("cyan")
+            else:
+                selector.set_colour("none")
+
+
+class RotatedKeys:
+    _pmk_to_rotated_map = {
+        0: 0, 1: 4, 2: 8, 3: 12,
+        4: 1, 5: 5, 6: 9, 7: 13,
+        8: 2, 9: 6, 10: 10, 11: 14,
+        12: 3, 13: 7, 14: 11, 15: 15
+    }
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def pmk_to_rotated(actual):
+        return RotatedKeys._pmk_to_rotated_map[actual]
+
+    @staticmethod
+    def rotated_to_pmk(rotated):
+        actual_list = list(RotatedKeys._pmk_to_rotated_map.keys())
+        rotated_list = list(RotatedKeys._pmk_to_rotated_map.values())
+        index = rotated_list.index(rotated)
+        return actual_list[index]
+
 
 class IntegerSelector:
     def __init__(self, key_number, integer_value):
-        self._key = pmk.keys[key_number]
+        self.key_number = key_number
         self.integer_value = integer_value
+        self._key = pmk.keys[key_number]
         self.selected = False
 
     def set_colour(self, colour):
@@ -164,6 +202,7 @@ def test_multiplier_menu():
         multiplier = menu.get_multiplier_selected()
         monitor.update_value(multiplier)
         if monitor.value_has_changed():
+            # menu.show_selection()
             print(f"Multiplier set to: {multiplier}")
             menu.reset_menu()
         pmk.update()
@@ -183,13 +222,15 @@ def test_integer_selector():
 
 
 def test_rotated_keys():
+    print("Test 1")
     turn_on = True
     while True:
-        for key in rotated_keys:
+        for pmk_number in range(0, 16):
+            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
             if turn_on:
-                pmk.keys[rotated_keys[key]].set_led(0, 255, 0)
+                pmk.keys[rotated_number].set_led(0, 255, 0)
             else:
-                pmk.keys[rotated_keys[key]].set_led(0, 0, 0)
+                pmk.keys[rotated_number].set_led(0, 0, 0)
             time.sleep(0.2)
             pmk.update()
 
