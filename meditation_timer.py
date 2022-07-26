@@ -14,12 +14,28 @@ key_colours = {"red": (255, 0, 0),
                "orange": (255, 165, 0),
                "none": (0, 0, 0)}
 
-rotated_keys = {
-    0: 0,  1: 4,  2: 8,   3: 12,
-    4: 1,  5: 5,  6: 9,   7: 13,
-    8: 2,  9: 6,  10: 10, 11: 14,
-    12: 3, 13: 7, 14: 11, 15: 15
-}
+
+class RotatedKeys:
+    _pmk_to_rotated_map = {
+        0: 0, 1: 4, 2: 8, 3: 12,
+        4: 1, 5: 5, 6: 9, 7: 13,
+        8: 2, 9: 6, 10: 10, 11: 14,
+        12: 3, 13: 7, 14: 11, 15: 15
+    }
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def pmk_to_rotated(actual):
+        return RotatedKeys._pmk_to_rotated_map[actual]
+
+    @staticmethod
+    def rotated_to_pmk(rotated):
+        actual_list = list(RotatedKeys._pmk_to_rotated_map.keys())
+        rotated_list = list(RotatedKeys._pmk_to_rotated_map.values())
+        index = rotated_list.index(rotated)
+        return actual_list[index]
 
 
 class MinutesMenu:
@@ -99,29 +115,6 @@ class MultiplierMenu:
                 selector.set_colour("cyan")
             else:
                 selector.set_colour("none")
-
-
-class RotatedKeys:
-    _pmk_to_rotated_map = {
-        0: 0, 1: 4, 2: 8, 3: 12,
-        4: 1, 5: 5, 6: 9, 7: 13,
-        8: 2, 9: 6, 10: 10, 11: 14,
-        12: 3, 13: 7, 14: 11, 15: 15
-    }
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def pmk_to_rotated(actual):
-        return RotatedKeys._pmk_to_rotated_map[actual]
-
-    @staticmethod
-    def rotated_to_pmk(rotated):
-        actual_list = list(RotatedKeys._pmk_to_rotated_map.keys())
-        rotated_list = list(RotatedKeys._pmk_to_rotated_map.values())
-        index = rotated_list.index(rotated)
-        return actual_list[index]
 
 
 class IntegerSelector:
