@@ -42,25 +42,11 @@ class MinutesMenu:
     def __init__(self):
         self._selectors = []
 
-        five_selector = IntegerSelector(key_number=0, integer_value=5)
-        five_selector.set_colour("red")
-        self._selectors.append(five_selector)
+    def add_selector(self, selector):
+        self._selectors.append(selector)
+        selector.enable()
 
-        ten_selector = IntegerSelector(key_number=4, integer_value=10)
-        ten_selector.set_colour("green")
-        self._selectors.append(ten_selector)
-
-        fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
-        fifteen_selector.set_colour("blue")
-        self._selectors.append(fifteen_selector)
-
-        self._enable_all_selectors()
-
-    def _enable_all_selectors(self):
-        for selector in self._selectors:
-            selector.enable()
-
-    def get_minutes_selected(self):
+    def get_selected_value(self):
         for selector in self._selectors:
             if selector.selected:
                 return selector.integer_value
@@ -74,26 +60,12 @@ class MinutesMenu:
 class MultiplierMenu:
     def __init__(self):
         self._selectors = []
-        self._add_selectors()
-        self._set_colour()
-        self._enable_all_selectors()
 
-    def _add_selectors(self):
-        for pmk_number in range(0, 16):
-            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
-            selector = IntegerSelector(key_number=pmk_number,
-                                       integer_value=rotated_number + 1)
-            self._selectors.append(selector)
+    def add_selector(self, selector):
+        self._selectors.append(selector)
+        selector.enable()
 
-    def _set_colour(self):
-        for selector in self._selectors:
-            selector.set_colour("cyan")
-
-    def _enable_all_selectors(self):
-        for selector in self._selectors:
-            selector.enable()
-
-    def get_multiplier_selected(self):
+    def get_selected_value(self):
         for selector in self._selectors:
             if selector.selected:
                 return selector.integer_value
@@ -176,9 +148,22 @@ class ValueChangeMonitor:
 
 def test_minutes_menu():
     minutes_menu = MinutesMenu()
+
+    five_selector = IntegerSelector(key_number=0, integer_value=5)
+    five_selector.set_colour("red")
+    minutes_menu.add_selector(five_selector)
+
+    ten_selector = IntegerSelector(key_number=4, integer_value=10)
+    ten_selector.set_colour("green")
+    minutes_menu.add_selector(ten_selector)
+
+    fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
+    fifteen_selector.set_colour("blue")
+    minutes_menu.add_selector(fifteen_selector)
+
     monitor = ValueChangeMonitor()
     while True:
-        minutes = minutes_menu.get_minutes_selected()
+        minutes = minutes_menu.get_selected_value()
         monitor.update_value(minutes)
         if monitor.value_has_changed():
             print(f"Minutes set to: {minutes}")
@@ -188,10 +173,17 @@ def test_minutes_menu():
 
 def test_multiplier_menu():
     menu = MultiplierMenu()
+    for pmk_number in range(0, 16):
+        rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
+        selector = IntegerSelector(key_number=pmk_number,
+                                   integer_value=rotated_number + 1)
+        selector.set_colour("cyan")
+        menu.add_selector(selector)
+
     monitor = ValueChangeMonitor()
 
     while True:
-        multiplier = menu.get_multiplier_selected()
+        multiplier = menu.get_selected_value()
         monitor.update_value(multiplier)
         if monitor.value_has_changed():
             menu.show_selection()
