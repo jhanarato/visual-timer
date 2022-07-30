@@ -78,7 +78,7 @@ class MultiplierMenu:
     def show_selection(self):
         selected_key = self.get_selected_key()
         for selector in self._selectors:
-            if selector.get_rotated_key_number() <= selected_key.get_rotated_key_number():
+            if selector.integer_value <= selected_key.integer_value:
                 selector.led_on()
             else:
                 selector.led_off()
@@ -234,6 +234,6 @@ def test_rotated_keys():
 
 
 # test_integer_selector()
-test_minutes_menu()
-# test_multiplier_menu()
+# test_minutes_menu()
+test_multiplier_menu()
 # test_rotated_keys()
