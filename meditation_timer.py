@@ -44,7 +44,7 @@ class MinutesMenu:
 
     def add_selector(self, selector):
         self._selectors.append(selector)
-        selector.enable()
+        selector.enable_keypress()
 
     def get_selected_value(self):
         for selector in self._selectors:
@@ -63,7 +63,7 @@ class MultiplierMenu:
 
     def add_selector(self, selector):
         self._selectors.append(selector)
-        selector.enable()
+        selector.enable_keypress()
 
     def get_selected_value(self):
         for selector in self._selectors:
@@ -76,17 +76,18 @@ class MultiplierMenu:
             selector.selected = False
 
     def show_selection(self):
-        selected_key_number = 0
+        selected_key = self.get_selected_key()
+        for selector in self._selectors:
+            if selector.get_rotated_key_number() <= selected_key.get_rotated_key_number():
+                selector.led_on()
+            else:
+                selector.led_off()
+
+    def get_selected_key(self):
         for selector in self._selectors:
             if selector.selected:
-                selected_key_number = RotatedKeys.pmk_to_rotated(selector.key_number)
-                break
-
-        for selector in self._selectors:
-            if RotatedKeys.pmk_to_rotated(selector.key_number) <= selected_key_number:
-                selector.set_colour("cyan")
-            else:
-                selector.set_colour("none")
+                return selector
+        return None
 
 
 class IntegerSelector:
@@ -95,14 +96,28 @@ class IntegerSelector:
         self.integer_value = integer_value
         self._key = pmk.keys[key_number]
         self.selected = False
+        self.led_off()
 
     def set_colour(self, colour):
+        self._colour = colour
         self._key.set_led(*key_colours[colour])
 
-    def enable(self):
+    def get_rotated_key_number(self):
+        return RotatedKeys.pmk_to_rotated(self.key_number)
+
+    def value_is_up_to(self, highest):
+        return self.integer_value >= highest
+
+    def enable_keypress(self):
         @pmk.on_press(self._key)
         def select(choice_key):
             self.selected = True
+
+    def led_on(self):
+        self.set_colour(self._colour)
+
+    def led_off(self):
+        self.set_colour("none")
 
 
 class Timer:
@@ -195,7 +210,7 @@ def test_multiplier_menu():
 def test_integer_selector():
     selector = IntegerSelector(key_number=0, integer_value=1)
     selector.set_colour("orange")
-    selector.enable()
+    selector.enable_keypress()
 
     message_printed = False
     while True:
@@ -222,6 +237,6 @@ def test_rotated_keys():
 
 
 # test_integer_selector()
-# test_minutes_menu()
-test_multiplier_menu()
+test_minutes_menu()
+# test_multiplier_menu()
 # test_rotated_keys()
