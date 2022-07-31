@@ -96,11 +96,11 @@ class IntegerSelector:
         self.integer_value = integer_value
         self._key = pmk.keys[key_number]
         self.selected = False
-        self.led_off()
+        self._on_colour = "none"
+        self._off_colour = "none"
 
     def set_colour(self, colour):
-        self._colour = colour
-        self._key.set_led(*key_colours[colour])
+        self._on_colour = colour
 
     def get_rotated_key_number(self):
         return RotatedKeys.pmk_to_rotated(self.key_number)
@@ -111,10 +111,10 @@ class IntegerSelector:
             self.selected = True
 
     def led_on(self):
-        self.set_colour(self._colour)
+        self._key.set_led(*key_colours[self._on_colour])
 
     def led_off(self):
-        self.set_colour("none")
+        self._key.set_led(*key_colours[self._off_colour])
 
 
 class Timer:
