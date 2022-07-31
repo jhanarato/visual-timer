@@ -27,11 +27,11 @@ class RotatedKeys:
         pass
 
     @staticmethod
-    def pmk_to_rotated(actual):
+    def keypad_index_to_rotated(actual):
         return RotatedKeys._pmk_to_rotated_map[actual]
 
     @staticmethod
-    def rotated_to_pmk(rotated):
+    def rotated_to_keypad_index(rotated):
         actual_list = list(RotatedKeys._pmk_to_rotated_map.keys())
         rotated_list = list(RotatedKeys._pmk_to_rotated_map.values())
         index = rotated_list.index(rotated)
@@ -45,16 +45,21 @@ class MenuMaker:
     def make_minutes_menu(self):
         menu = Menu()
 
-        five_selector = IntegerSelector(key_number=0, integer_value=5)
+        five_selector = IntegerSelector(key_number=0,
+                                        integer_value=5)
+
+        ten_selector = IntegerSelector(key_number=4,
+                                       integer_value=10)
+
+        fifteen_selector = IntegerSelector(key_number=8,
+                                           integer_value=15)
+
         five_selector.set_colour("red")
-        menu.add_selector(five_selector)
-
-        ten_selector = IntegerSelector(key_number=4, integer_value=10)
         ten_selector.set_colour("green")
-        menu.add_selector(ten_selector)
-
-        fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
         fifteen_selector.set_colour("blue")
+
+        menu.add_selector(five_selector)
+        menu.add_selector(ten_selector)
         menu.add_selector(fifteen_selector)
 
         menu.light_all_selectors()
@@ -64,10 +69,12 @@ class MenuMaker:
     def make_multiplier_menu(self):
         menu = Menu()
 
-        for pmk_number in range(0, 16):
-            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
-            selector = IntegerSelector(key_number=pmk_number,
-                                       integer_value=rotated_number + 1)
+        for keypad_index in range(0, 16):
+            rotated_key_number = RotatedKeys.keypad_index_to_rotated(keypad_index)
+            integer_value = rotated_key_number + 1
+
+            selector = IntegerSelector(key_number=keypad_index,
+                                       integer_value=integer_value)
             selector.set_colour("cyan")
             menu.add_selector(selector)
 
@@ -124,7 +131,7 @@ class IntegerSelector:
         self._on_colour = colour
 
     def get_rotated_key_number(self):
-        return RotatedKeys.pmk_to_rotated(self.key_number)
+        return RotatedKeys.keypad_index_to_rotated(self.key_number)
 
     def enable_keypress(self):
         @pmk.on_press(self._key)
@@ -228,7 +235,7 @@ def test_rotated_keys():
     turn_on = True
     while True:
         for pmk_number in range(0, 16):
-            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
+            rotated_number = RotatedKeys.keypad_index_to_rotated(pmk_number)
             if turn_on:
                 pmk.keys[rotated_number].set_led(0, 255, 0)
             else:
@@ -240,6 +247,6 @@ def test_rotated_keys():
 
 
 # test_minutes_menu()
-# test_multiplier_menu()
+test_multiplier_menu()
 # test_integer_selector()
-test_rotated_keys()
+# test_rotated_keys()
