@@ -38,7 +38,7 @@ class RotatedKeys:
         return actual_list[index]
 
 
-class MinutesMenu:
+class Menu:
     def __init__(self):
         self._selectors = []
 
@@ -56,28 +56,11 @@ class MinutesMenu:
         for selector in self._selectors:
             selector.selected = False
 
-    def light_all_selectors(self):
-        for selector in self._selectors:
-            selector.led_on()
-
-
-class MultiplierMenu:
-    def __init__(self):
-        self._selectors = []
-
-    def add_selector(self, selector):
-        self._selectors.append(selector)
-        selector.enable_keypress()
-
-    def get_selected_value(self):
+    def get_selected_key(self):
         for selector in self._selectors:
             if selector.selected:
-                return selector.integer_value
+                return selector
         return None
-
-    def reset_menu(self):
-        for selector in self._selectors:
-            selector.selected = False
 
     def light_keys_up_to_selected_value(self):
         selected_key = self.get_selected_key()
@@ -87,11 +70,9 @@ class MultiplierMenu:
             else:
                 selector.led_off()
 
-    def get_selected_key(self):
+    def light_all_selectors(self):
         for selector in self._selectors:
-            if selector.selected:
-                return selector
-        return None
+            selector.led_on()
 
 
 class IntegerSelector:
@@ -163,7 +144,7 @@ class ValueChangeMonitor:
 
 
 def test_minutes_menu():
-    minutes_menu = MinutesMenu()
+    minutes_menu = Menu()
 
     five_selector = IntegerSelector(key_number=0, integer_value=5)
     five_selector.set_colour("red")
@@ -190,7 +171,7 @@ def test_minutes_menu():
 
 
 def test_multiplier_menu():
-    menu = MultiplierMenu()
+    menu = Menu()
     for pmk_number in range(0, 16):
         rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
         selector = IntegerSelector(key_number=pmk_number,
@@ -240,6 +221,6 @@ def test_rotated_keys():
 
 
 # test_integer_selector()
-# test_minutes_menu()
-test_multiplier_menu()
+test_minutes_menu()
+# test_multiplier_menu()
 # test_rotated_keys()
