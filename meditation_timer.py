@@ -65,10 +65,9 @@ class MenuMaker:
         menu = Menu()
 
         for index in range(0, 16):
-            integer_value = index + 1
-
             selector = IntegerSelector(rotated_key_index=index,
-                                       integer_value=integer_value)
+                                       integer_value=index + 1)
+
             selector.set_colour("cyan")
             menu.add_selector(selector)
 
@@ -113,14 +112,6 @@ class Menu:
 
 
 class IntegerSelector:
-    def __init__(self, key_index, integer_value):
-        self.key_index = key_index
-        self.integer_value = integer_value
-        self._key = pmk.keys[key_index]
-        self.selected = False
-        self._on_colour = "none"
-        self._off_colour = "none"
-
     def __init__(self, rotated_key_index, integer_value):
         self.key_index = RotatedKeys.rotated_to_keypad_index(rotated_key_index)
         self.integer_value = integer_value
@@ -248,7 +239,7 @@ def test_rotated_keys():
         turn_on = not turn_on
 
 
-# test_minutes_menu()
-test_multiplier_menu()
+test_minutes_menu()
+# test_multiplier_menu()
 # test_integer_selector()
 # test_rotated_keys()
