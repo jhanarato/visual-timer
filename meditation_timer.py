@@ -38,6 +38,42 @@ class RotatedKeys:
         return actual_list[index]
 
 
+class MenuMaker:
+    def __init__(self):
+        pass
+
+    def make_minutes_menu(self):
+        menu = Menu()
+
+        five_selector = IntegerSelector(key_number=0, integer_value=5)
+        five_selector.set_colour("red")
+        menu.add_selector(five_selector)
+
+        ten_selector = IntegerSelector(key_number=4, integer_value=10)
+        ten_selector.set_colour("green")
+        menu.add_selector(ten_selector)
+
+        fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
+        fifteen_selector.set_colour("blue")
+        menu.add_selector(fifteen_selector)
+
+        menu.light_all_selectors()
+
+        return menu
+
+    def make_multiplier_menu(self):
+        menu = Menu()
+
+        for pmk_number in range(0, 16):
+            rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
+            selector = IntegerSelector(key_number=pmk_number,
+                                       integer_value=rotated_number + 1)
+            selector.set_colour("cyan")
+            menu.add_selector(selector)
+
+        return menu
+
+
 class Menu:
     def __init__(self):
         self._selectors = []
@@ -144,40 +180,22 @@ class ValueChangeMonitor:
 
 
 def test_minutes_menu():
-    minutes_menu = Menu()
-
-    five_selector = IntegerSelector(key_number=0, integer_value=5)
-    five_selector.set_colour("red")
-    minutes_menu.add_selector(five_selector)
-
-    ten_selector = IntegerSelector(key_number=4, integer_value=10)
-    ten_selector.set_colour("green")
-    minutes_menu.add_selector(ten_selector)
-
-    fifteen_selector = IntegerSelector(key_number=8, integer_value=15)
-    fifteen_selector.set_colour("blue")
-    minutes_menu.add_selector(fifteen_selector)
-
-    minutes_menu.light_all_selectors()
+    maker = MenuMaker()
+    menu = maker.make_minutes_menu()
 
     monitor = ValueChangeMonitor()
     while True:
-        minutes = minutes_menu.get_selected_value()
+        minutes = menu.get_selected_value()
         monitor.update_value(minutes)
         if monitor.value_has_changed():
             print(f"Minutes set to: {minutes}")
-            minutes_menu.reset_menu()
+            menu.reset_menu()
         pmk.update()
 
 
 def test_multiplier_menu():
-    menu = Menu()
-    for pmk_number in range(0, 16):
-        rotated_number = RotatedKeys.pmk_to_rotated(pmk_number)
-        selector = IntegerSelector(key_number=pmk_number,
-                                   integer_value=rotated_number + 1)
-        selector.set_colour("cyan")
-        menu.add_selector(selector)
+    maker = MenuMaker()
+    menu = maker.make_multiplier_menu()
 
     monitor = ValueChangeMonitor()
 
@@ -195,6 +213,7 @@ def test_integer_selector():
     selector = IntegerSelector(key_number=0, integer_value=1)
     selector.set_colour("orange")
     selector.enable_keypress()
+    selector.led_on()
 
     message_printed = False
     while True:
@@ -220,7 +239,7 @@ def test_rotated_keys():
         turn_on = not turn_on
 
 
-# test_integer_selector()
-test_minutes_menu()
+# test_minutes_menu()
 # test_multiplier_menu()
-# test_rotated_keys()
+# test_integer_selector()
+test_rotated_keys()
