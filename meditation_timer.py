@@ -56,6 +56,10 @@ class MinutesMenu:
         for selector in self._selectors:
             selector.selected = False
 
+    def light_all_selectors(self):
+        for selector in self._selectors:
+            selector.led_on()
+
 
 class MultiplierMenu:
     def __init__(self):
@@ -75,7 +79,7 @@ class MultiplierMenu:
         for selector in self._selectors:
             selector.selected = False
 
-    def show_selection(self):
+    def light_keys_up_to_selected_value(self):
         selected_key = self.get_selected_key()
         for selector in self._selectors:
             if selector.integer_value <= selected_key.integer_value:
@@ -173,6 +177,8 @@ def test_minutes_menu():
     fifteen_selector.set_colour("blue")
     minutes_menu.add_selector(fifteen_selector)
 
+    minutes_menu.light_all_selectors()
+
     monitor = ValueChangeMonitor()
     while True:
         minutes = minutes_menu.get_selected_value()
@@ -198,7 +204,7 @@ def test_multiplier_menu():
         multiplier = menu.get_selected_value()
         monitor.update_value(multiplier)
         if monitor.value_has_changed():
-            menu.show_selection()
+            menu.light_keys_up_to_selected_value()
             print(f"Multiplier set to: {multiplier}")
             menu.reset_menu()
         pmk.update()
