@@ -1,5 +1,10 @@
-from pmk.platform.keybow2040 import Keybow2040 as Hardware
-from pmk import PMK
+key_colours = {"red": (255, 0, 0),
+               "green": (0, 255, 0),
+               "blue": (0, 0, 255),
+               "cyan": (0, 255, 255),
+               "orange": (255, 165, 0),
+               "none": (0, 0, 0)}
+
 
 class Hardware:
     _pmk = None
@@ -14,14 +19,6 @@ class Hardware:
             raise ValueError("Hardware not initialised before use.")
         return Hardware._pmk
 
-# Shortcuts for various switch LED colours
-key_colours = {"red": (255, 0, 0),
-               "green": (0, 255, 0),
-               "blue": (0, 0, 255),
-               "cyan": (0, 255, 255),
-               "orange": (255, 165, 0),
-               "none": (0, 0, 0)}
-
 
 class RotatedKeys:
     _pmk_to_rotated_map = {
@@ -30,9 +27,6 @@ class RotatedKeys:
         8: 2, 9: 6, 10: 10, 11: 14,
         12: 3, 13: 7, 14: 11, 15: 15
     }
-
-    def __init__(self):
-        pass
 
     @staticmethod
     def keypad_index_to_rotated(actual):
