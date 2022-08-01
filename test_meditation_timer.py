@@ -94,7 +94,34 @@ def test_rotated_keys():
         turn_on = not turn_on
 
 
+def test_menus_in_sequence():
+    meditation_timer.Hardware.set_hardware(pmk)
+    maker = meditation_timer.MenuMaker()
+    minute_menu = maker.make_minutes_menu()
+
+    while True:
+        if minute_menu.get_selected_value() is not None:
+            pmk.update()
+            break
+        pmk.update()
+
+    multiplier_menu = maker.make_multiplier_menu()
+
+    while True:
+        if multiplier_menu.get_selected_value() is not None:
+            pmk.update()
+            break
+        pmk.update()
+
+    minutes = minute_menu.get_selected_value()
+    multiplier = multiplier_menu.get_selected_value()
+    total_time = minutes * multiplier
+
+    print(f"Minutes: {minutes}, Multiplier: {multiplier}, Total Time: {total_time}")
+
+
 # test_minutes_menu()
 # test_multiplier_menu()
 # test_integer_selector()
-test_rotated_keys()
+# test_rotated_keys()
+test_menus_in_sequence()
