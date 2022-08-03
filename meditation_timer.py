@@ -73,6 +73,8 @@ class MenuMaker:
             selector.set_colour("cyan")
             menu.add_selector(selector)
 
+        menu.light_all_selectors()
+
         return menu
 
 

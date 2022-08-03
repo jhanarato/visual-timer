@@ -137,7 +137,6 @@ def test_menus_in_sequence():
         pmk.update()
 
     multiplier_menu = maker.make_multiplier_menu()
-    multiplier_menu.light_all_selectors()
 
     while True:
         if multiplier_menu.get_selected_value() is not None:
