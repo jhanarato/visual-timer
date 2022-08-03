@@ -29,19 +29,27 @@ class ValueChangeMonitor:
 
 
 def test_minutes_menu():
+    print("In test_minutes_menu()")
     meditation_timer.Hardware.set_hardware(pmk)
-
     maker = meditation_timer.MenuMaker()
-    menu = maker.make_minutes_menu()
+    minute_menu = maker.make_minutes_menu()
 
-    monitor = ValueChangeMonitor()
     while True:
-        minutes = menu.get_selected_value()
-        monitor.update_value(minutes)
-        if monitor.value_has_changed():
-            print(f"Minutes set to: {minutes}")
-            menu.reset_menu()
+        if minute_menu.get_selected_value() is not None:
+            pmk.update()
+            break
         pmk.update()
+
+    # Keep selection visible for 1 second
+    selection_time = time.monotonic()
+    while True:
+        minute_menu.light_selected_value()
+        now = time.monotonic()
+        if now - selection_time > 3:
+            break
+
+
+    print(f"Minutes Menu Selection: {minute_menu.get_selected_value()}")
 
 
 def test_multiplier_menu():
@@ -120,8 +128,8 @@ def test_menus_in_sequence():
     print(f"Minutes: {minutes}, Multiplier: {multiplier}, Total Time: {total_time}")
 
 
-# test_minutes_menu()
+test_minutes_menu()
 # test_multiplier_menu()
 # test_integer_selector()
 # test_rotated_keys()
-test_menus_in_sequence()
+# test_menus_in_sequence()

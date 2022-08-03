@@ -108,6 +108,14 @@ class Menu:
             else:
                 selector.led_off()
 
+    def light_selected_value(self):
+        selected_key = self.get_selected_key()
+        for selector in self._selectors:
+            if selector.integer_value == selected_key.integer_value:
+                selector.led_on()
+            else:
+                selector.led_off()
+
     def light_all_selectors(self):
         for selector in self._selectors:
             selector.led_on()
