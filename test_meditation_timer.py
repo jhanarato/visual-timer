@@ -117,8 +117,10 @@ def test_rotated_keys():
 
 
 def test_menus_in_sequence():
+    print("In test_menus_in_sequence()")
     meditation_timer.Hardware.set_hardware(pmk)
     maker = meditation_timer.MenuMaker()
+
     minute_menu = maker.make_minutes_menu()
 
     while True:
@@ -127,12 +129,27 @@ def test_menus_in_sequence():
             break
         pmk.update()
 
+    minute_menu.light_selected_value()
+
+    pause = Pause(seconds=3)
+
+    while not pause.complete():
+        pmk.update()
+
     multiplier_menu = maker.make_multiplier_menu()
+    multiplier_menu.light_all_selectors()
 
     while True:
         if multiplier_menu.get_selected_value() is not None:
             pmk.update()
             break
+        pmk.update()
+
+    multiplier_menu.light_keys_up_to_selected_value()
+
+    pause = Pause(seconds=3)
+
+    while not pause.complete():
         pmk.update()
 
     minutes = minute_menu.get_selected_value()
@@ -142,8 +159,8 @@ def test_menus_in_sequence():
     print(f"Minutes: {minutes}, Multiplier: {multiplier}, Total Time: {total_time}")
 
 
-test_minutes_menu()
+# test_minutes_menu()
 # test_multiplier_menu()
 # test_integer_selector()
 # test_rotated_keys()
-# test_menus_in_sequence()
+test_menus_in_sequence()
