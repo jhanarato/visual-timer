@@ -117,10 +117,12 @@ def test_rotated_keys():
 
 
 def test_menus_in_sequence():
+    # TODO: Break up steps and move to MenuSequence class
     print("In test_menus_in_sequence()")
     meditation_timer.Hardware.set_hardware(pmk)
     maker = meditation_timer.MenuMaker()
 
+    # Step 1: Select minutes
     minute_menu = maker.make_minutes_menu()
 
     while minute_menu.get_selected_value() is None:
@@ -128,10 +130,12 @@ def test_menus_in_sequence():
 
     minute_menu.light_selected_value()
 
+    # Step 2: Wait for 3 seconds
     pause = Pause(seconds=3)
     while not pause.complete():
         pmk.update()
 
+    # Step 3: Select multiplier
     multiplier_menu = maker.make_multiplier_menu()
 
     while multiplier_menu.get_selected_value() is None:
@@ -139,10 +143,12 @@ def test_menus_in_sequence():
 
     multiplier_menu.light_keys_up_to_selected_value()
 
+    # Step 4: Wait for 3 seconds.
     pause = Pause(seconds=3)
     while not pause.complete():
         pmk.update()
 
+    # Step 5: Now we have our values, print them to the console.
     minutes = minute_menu.get_selected_value()
     multiplier = multiplier_menu.get_selected_value()
     total_time = minutes * multiplier
