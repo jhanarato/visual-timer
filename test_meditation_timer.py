@@ -123,31 +123,23 @@ def test_menus_in_sequence():
 
     minute_menu = maker.make_minutes_menu()
 
-    while True:
-        if minute_menu.get_selected_value() is not None:
-            pmk.update()
-            break
+    while minute_menu.get_selected_value() is None:
         pmk.update()
 
     minute_menu.light_selected_value()
 
     pause = Pause(seconds=3)
-
     while not pause.complete():
         pmk.update()
 
     multiplier_menu = maker.make_multiplier_menu()
 
-    while True:
-        if multiplier_menu.get_selected_value() is not None:
-            pmk.update()
-            break
+    while multiplier_menu.get_selected_value() is None:
         pmk.update()
 
     multiplier_menu.light_keys_up_to_selected_value()
 
     pause = Pause(seconds=3)
-
     while not pause.complete():
         pmk.update()
 
