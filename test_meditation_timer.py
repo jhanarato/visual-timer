@@ -28,6 +28,17 @@ class ValueChangeMonitor:
             return False
 
 
+class Pause:
+    def __init__(self, seconds):
+        self._seconds_to_pause_for = seconds
+        self._start = time.monotonic()
+
+    def complete(self):
+        now = time.monotonic()
+        paused_for = now - self._start
+        return paused_for > self._seconds_to_pause_for
+
+
 def test_minutes_menu():
     print("In test_minutes_menu()")
     meditation_timer.Hardware.set_hardware(pmk)
@@ -40,13 +51,12 @@ def test_minutes_menu():
             break
         pmk.update()
 
-    # Keep selection visible for 1 second
-    selection_time = time.monotonic()
-    while True:
-        minute_menu.light_selected_value()
-        now = time.monotonic()
-        if now - selection_time > 3:
-            break
+    minute_menu.light_selected_value()
+
+    pause = Pause(seconds=3)
+
+    while not pause.complete():
+        pmk.update()
 
     print(f"Minutes Menu Selection: {minute_menu.get_selected_value()}")
 
@@ -64,13 +74,12 @@ def test_multiplier_menu():
             break
         pmk.update()
 
-    # Keep selection visible for 1 second
-    selection_time = time.monotonic()
-    while True:
-        multiplier_menu.light_keys_up_to_selected_value()
-        now = time.monotonic()
-        if now - selection_time > 3:
-            break
+    multiplier_menu.light_keys_up_to_selected_value()
+
+    pause = Pause(seconds=3)
+
+    while not pause.complete():
+        pmk.update()
 
     print(f"Multiplier Menu Selection: {multiplier_menu.get_selected_value()}")
 
@@ -133,8 +142,8 @@ def test_menus_in_sequence():
     print(f"Minutes: {minutes}, Multiplier: {multiplier}, Total Time: {total_time}")
 
 
-# test_minutes_menu()
-test_multiplier_menu()
+test_minutes_menu()
+# test_multiplier_menu()
 # test_integer_selector()
 # test_rotated_keys()
 # test_menus_in_sequence()
