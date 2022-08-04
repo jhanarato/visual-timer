@@ -156,8 +156,20 @@ def test_menus_in_sequence():
     print(f"Minutes: {minutes}, Multiplier: {multiplier}, Total Time: {total_time}")
 
 
+def test_menu_sequence():
+    print("In test_menu_sequence()")
+    meditation_timer.Hardware.set_hardware(pmk)
+    sequence = meditation_timer.MenuSequence()
+    sequence.select_minutes()
+    sequence.pause()
+    sequence.select_multiplier()
+    sequence.pause()
+    sequence.set_timer()
+
+
 # test_minutes_menu()
 # test_multiplier_menu()
 # test_integer_selector()
 # test_rotated_keys()
-test_menus_in_sequence()
+# test_menus_in_sequence()
+test_menu_sequence()

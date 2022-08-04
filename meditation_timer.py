@@ -1,3 +1,5 @@
+import time
+
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
                "blue": (0, 0, 255),
@@ -38,6 +40,43 @@ class RotatedKeys:
         rotated_list = list(RotatedKeys._pmk_to_rotated_map.values())
         index = rotated_list.index(rotated)
         return actual_list[index]
+
+
+class MenuSequence:
+    def __init__(self):
+        self._maker = MenuMaker()
+        self._minutes = 0
+        self._multiplier = 0
+
+    def select_minutes(self):
+        minute_menu = self._maker.make_minutes_menu()
+
+        while minute_menu.get_selected_value() is None:
+            Hardware.get_hardware().update()
+
+        minute_menu.light_selected_value()
+        self._minutes = minute_menu.get_selected_value()
+
+    def select_multiplier(self):
+        multiplier_menu = self._maker.make_multiplier_menu()
+
+        while multiplier_menu.get_selected_value() is None:
+            Hardware.get_hardware().update()
+
+        multiplier_menu.light_keys_up_to_selected_value()
+
+        self._multiplier = multiplier_menu.get_selected_value()
+
+    def pause(self):
+        pause = Pause(seconds=3)
+        while not pause.complete():
+            Hardware.get_hardware().update()
+
+    def set_timer(self):
+        print(f"Minutes: {self._minutes}, Multiplier: {self._multiplier}, Total Time: {self.total_time()}")
+
+    def total_time(self):
+        return self._multiplier * self._minutes
 
 
 class MenuMaker:
@@ -150,6 +189,17 @@ class IntegerSelector:
 
     def led_off(self):
         self._key.set_led(*key_colours[self._off_colour])
+
+
+class Pause:
+    def __init__(self, seconds):
+        self._seconds_to_pause_for = seconds
+        self._start = time.monotonic()
+
+    def complete(self):
+        now = time.monotonic()
+        paused_for = now - self._start
+        return paused_for > self._seconds_to_pause_for
 
 
 class Timer:
