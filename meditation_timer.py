@@ -1,4 +1,5 @@
 import time
+import math
 
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
@@ -57,29 +58,26 @@ class MenuSequence:
 
     def select_minutes(self):
         minute_menu = self._maker.make_minutes_menu()
-
-        while minute_menu.get_selected_value() is None:
-            Hardware.get_hardware().update()
-
+        minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
         self._minutes = minute_menu.get_selected_value()
 
     def select_multiplier(self):
         multiplier_menu = self._maker.make_multiplier_menu()
-
-        while multiplier_menu.get_selected_value() is None:
-            Hardware.get_hardware().update()
-
+        multiplier_menu.wait_for_selection()
         multiplier_menu.light_keys_up_to_selected_value()
-
         self._multiplier = multiplier_menu.get_selected_value()
 
     def pause(self):
         pause = Pause(seconds=3)
-        while not pause.complete():
-            Hardware.get_hardware().update()
+        pause.wait_until_complete()
 
     def set_timer(self):
+        timer = Timer()
+        timer.minutes = self._minutes
+        timer.multiplier = self._minutes
+        timer.start()
+
         print(f"Minutes: {self._minutes}, Multiplier: {self._multiplier}, Total Time: {self.total_time()}")
 
     def total_time(self):
@@ -168,6 +166,10 @@ class Menu:
         for selector in self._selectors:
             selector.led_on()
 
+    def wait_for_selection(self):
+        while self.get_selected_value() is None:
+            Hardware.get_hardware().update()
+
 
 class IntegerSelector:
     def __init__(self, rotated_key_index, integer_value):
@@ -208,24 +210,39 @@ class Pause:
         paused_for = now - self._start
         return paused_for > self._seconds_to_pause_for
 
+    def wait_until_complete(self):
+        while not self.complete():
+            Hardware.get_hardware().update()
+
 
 class Timer:
-    """
-    Once we know the number of minutes assigned per key and
-    the number of keys selected, multiply the two and track
-    when the total number of minutes has passed.
-    """
-
     def __init__(self):
         self.started = False
         self.minutes = 0
         self.multiplier = 0
+        self._start_time_seconds = 0
 
     def start(self):
-        minutes = self.minutes * self.multiplier
-        print(f"Timer started: {minutes} minutes")
         self.started = True
+        self._start_time_seconds = time.monotonic()
 
     def is_complete(self):
-        # TODO Check if the time has elapsed.
-        return self.started
+        return self.duration_seconds() <= self.seconds_passed()
+
+    def duration_minutes(self):
+        return self.multiplier * self.minutes
+
+    def duration_seconds(self):
+        return self.duration_minutes() * 60
+
+    def seconds_passed(self):
+        return time.monotonic() - self._start_time_seconds
+
+    def minutes_passed(self):
+        return math.floor(self.seconds_passed() / 60)
+
+    def seconds_remaining(self):
+        return self.duration_seconds() - self.seconds_passed()
+
+    def minutes_remaining(self):
+        return self.duration_minutes() - self.minutes_passed()
