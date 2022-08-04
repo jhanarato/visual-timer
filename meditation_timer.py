@@ -48,6 +48,13 @@ class MenuSequence:
         self._minutes = 0
         self._multiplier = 0
 
+    def do(self):
+        self.select_minutes()
+        self.pause()
+        self.select_multiplier()
+        self.pause()
+        self.set_timer()
+
     def select_minutes(self):
         minute_menu = self._maker.make_minutes_menu()
 
