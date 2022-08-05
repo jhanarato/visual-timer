@@ -75,13 +75,50 @@ class MenuSequence:
     def set_timer(self):
         timer = Timer()
         timer.minutes = self._minutes
-        timer.multiplier = self._minutes
+        timer.multiplier = self._multiplier
+        print(f"Starting timer: {timer.minutes} x {timer.multiplier}")
         timer.start()
+        monitor = TimerMonitor(timer)
+        while not timer.is_complete():
+            monitor.on_indicator_view()
+            Hardware.get_hardware().update()
 
-        print(f"Minutes: {self._minutes}, Multiplier: {self._multiplier}, Total Time: {self.total_time()}")
+        monitor.complete_view()
+        Hardware.get_hardware().update()
 
-    def total_time(self):
-        return self._multiplier * self._minutes
+
+class TimerMonitor:
+    def __init__(self, timer):
+        self._timer = timer
+        self._hardware = Hardware.get_hardware()
+
+    def on_indicator_view(self):
+        indicator_key = 0
+        for key_num in range(0, 16):
+            if key_num == indicator_key:
+                self._hardware.keys[key_num].set_led(*key_colours["orange"])
+            else:
+                self._hardware.keys[key_num].set_led(*key_colours["none"])
+
+    def minutes_view(self):
+        pass
+        # self._minute_menu.light_selected_value()
+
+    def multiplier_view(self):
+        pass
+        # self._multiplier_menu.light_keys_up_to_selected_value()
+
+    def countdown_view(self):
+        remaining = self._timer.minutes_remaining()
+        for key_num in range(0, 16):
+            rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
+            if key_num < remaining:
+                self._hardware.keys[rotated_num].set_led(*key_colours["green"])
+            else:
+                self._hardware.keys[rotated_num].set_led(*key_colours["blue"])
+
+    def complete_view(self):
+        self._hardware.set_all(*key_colours["orange"])
 
 
 class MenuMaker:
