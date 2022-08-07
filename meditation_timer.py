@@ -50,11 +50,27 @@ class MenuSequence:
         self._multiplier = 0
 
     def do(self):
+        print("Reset")
+        self.reset()
         self.select_minutes()
         self.pause()
         self.select_multiplier()
         self.pause()
         self.set_timer()
+        self.wait_for_keypress()
+
+    def wait_for_keypress(self):
+        wait = KeypressWait()
+        wait.wait()
+
+    def reset(self):
+        hardware = Hardware.get_hardware()
+        for key in hardware.keys:
+            key.set_led(*key_colours["none"])
+
+            @hardware.on_press(key)
+            def handler(key):
+                pass
 
     def select_minutes(self):
         minute_menu = self._maker.make_minutes_menu()
@@ -85,6 +101,7 @@ class MenuSequence:
 
         monitor.show_complete_view()
         Hardware.get_hardware().update()
+
 
 
 class MenuMaker:
@@ -340,3 +357,21 @@ class ModeSelector:
 
     def current_mode(self):
         return self.modes[self.mode_index]
+
+
+class KeypressWait:
+    def __init__(self):
+        self._pressed = False
+
+        hardware = Hardware.get_hardware()
+
+        for key in hardware.keys:
+            @hardware.on_press(key)
+            def handler(key):
+                self._pressed = True
+
+    def wait(self):
+        while not self._pressed:
+            Hardware.get_hardware().update()
+
+        print("KeypressWait Finished")

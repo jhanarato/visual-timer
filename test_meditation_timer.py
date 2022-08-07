@@ -160,7 +160,8 @@ def test_sequence():
     print("In test_sequence()")
     meditation_timer.Hardware.set_hardware(pmk)
     sequence = meditation_timer.MenuSequence()
-    sequence.do()
+    while True:
+        sequence.do()
 
 
 # test_minutes_menu()
