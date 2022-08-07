@@ -250,9 +250,11 @@ class Timer:
     def minutes_remaining(self):
         return self.duration_minutes() - self.minutes_passed()
 
+    def fraction_remaining(self):
+        return self.seconds_remaining() / self.duration_seconds()
+
 
 class TimerMonitor:
-
     def __init__(self, timer):
         self._timer = timer
         self._hardware = Hardware.get_hardware()
@@ -306,10 +308,12 @@ class TimerMonitor:
                 self._hardware.keys[key_num].set_led(*key_colours["none"])
 
     def countdown_view(self):
-        remaining = self._timer.minutes_remaining()
+        fraction = self._timer.fraction_remaining()
+        keys_to_be_lit = 16 * fraction
+
         for key_num in range(0, 16):
             rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
-            if key_num < remaining:
+            if key_num < keys_to_be_lit:
                 self._hardware.keys[rotated_num].set_led(*key_colours["green"])
             else:
                 self._hardware.keys[rotated_num].set_led(*key_colours["blue"])
