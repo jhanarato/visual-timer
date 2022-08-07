@@ -80,45 +80,11 @@ class MenuSequence:
         timer.start()
         monitor = TimerMonitor(timer)
         while not timer.is_complete():
-            monitor.on_indicator_view()
+            monitor.show_waiting_view()
             Hardware.get_hardware().update()
 
-        monitor.complete_view()
+        monitor.show_complete_view()
         Hardware.get_hardware().update()
-
-
-class TimerMonitor:
-    def __init__(self, timer):
-        self._timer = timer
-        self._hardware = Hardware.get_hardware()
-
-    def on_indicator_view(self):
-        indicator_key = 0
-        for key_num in range(0, 16):
-            if key_num == indicator_key:
-                self._hardware.keys[key_num].set_led(*key_colours["orange"])
-            else:
-                self._hardware.keys[key_num].set_led(*key_colours["none"])
-
-    def minutes_view(self):
-        pass
-        # self._minute_menu.light_selected_value()
-
-    def multiplier_view(self):
-        pass
-        # self._multiplier_menu.light_keys_up_to_selected_value()
-
-    def countdown_view(self):
-        remaining = self._timer.minutes_remaining()
-        for key_num in range(0, 16):
-            rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
-            if key_num < remaining:
-                self._hardware.keys[rotated_num].set_led(*key_colours["green"])
-            else:
-                self._hardware.keys[rotated_num].set_led(*key_colours["blue"])
-
-    def complete_view(self):
-        self._hardware.set_all(*key_colours["orange"])
 
 
 class MenuMaker:
@@ -283,3 +249,90 @@ class Timer:
 
     def minutes_remaining(self):
         return self.duration_minutes() - self.minutes_passed()
+
+
+class TimerMonitor:
+
+    def __init__(self, timer):
+        self._timer = timer
+        self._hardware = Hardware.get_hardware()
+        self._mode_selector = ModeSelector()
+
+    def show_waiting_view(self):
+        mode_name = self._mode_selector.current_mode()
+        if mode_name == "on_indicator":
+            self.on_indicator_view()
+        if mode_name == "minutes":
+            self.minutes_view()
+        if mode_name == "multiplier":
+            self.multiplier_view()
+        if mode_name == "countdown":
+            self.countdown_view()
+
+    def on_indicator_view(self):
+        indicator_key = 0
+        for key_num in range(0, 16):
+            if key_num == indicator_key:
+                self._hardware.keys[key_num].set_led(*key_colours["orange"])
+            else:
+                self._hardware.keys[key_num].set_led(*key_colours["none"])
+
+    def minutes_view(self):
+        rotated_key = None
+        colour = None
+
+        if self._timer.minutes == 5:
+            colour = "red"
+            rotated_key = 0
+        if self._timer.minutes == 10:
+            colour = "green"
+            rotated_key = 1
+        if self._timer.minutes == 15:
+            colour = "blue"
+            rotated_key = 2
+
+        for key_num in range(0, 16):
+            if key_num == RotatedKeys.rotated_to_keypad_index(rotated_key):
+                self._hardware.keys[key_num].set_led(*key_colours[colour])
+            else:
+                self._hardware.keys[key_num].set_led(*key_colours["none"])
+
+    def multiplier_view(self):
+        for key_num in range(0, 16):
+            rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
+            if rotated_num < self._timer.multiplier:
+                self._hardware.keys[key_num].set_led(*key_colours["cyan"])
+            else:
+                self._hardware.keys[key_num].set_led(*key_colours["none"])
+
+    def countdown_view(self):
+        remaining = self._timer.minutes_remaining()
+        for key_num in range(0, 16):
+            rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
+            if key_num < remaining:
+                self._hardware.keys[rotated_num].set_led(*key_colours["green"])
+            else:
+                self._hardware.keys[rotated_num].set_led(*key_colours["blue"])
+
+    def show_complete_view(self):
+        self._hardware.set_all(*key_colours["orange"])
+
+
+class ModeSelector:
+    def __init__(self):
+        self.modes = ["on_indicator", "minutes", "multiplier", "countdown"]
+        self.mode_index = 0
+        hardware = Hardware.get_hardware()
+
+        for key in hardware.keys:
+            @hardware.on_press(key)
+            def handler(key):
+                self.next_mode()
+
+    def next_mode(self):
+        mode_name = self.modes[self.mode_index]
+        self.mode_index = (self.mode_index + 1) % len(self.modes)
+        return mode_name
+
+    def current_mode(self):
+        return self.modes[self.mode_index]
