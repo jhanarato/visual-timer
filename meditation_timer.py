@@ -337,10 +337,10 @@ class TimerMonitor:
 
 
 class ModeSelector:
-    ON_INDICATOR = "on_indicator"
-    MINUTES = "minutes"
-    MULTIPLIER = "multiplier"
-    COUNTDOWN = "countdown"
+    ON_INDICATOR = 0
+    MINUTES = 1
+    MULTIPLIER = 2
+    COUNTDOWN = 3
 
     def __init__(self):
         self.modes = [ModeSelector.ON_INDICATOR,
