@@ -269,10 +269,15 @@ class TimerMonitor:
         self._timer = timer
         self.modes = ModeSelector()
 
-    def show_waiting_view(self):
-        if Hardware.any_key_pressed():
-            self.modes.next()
+        hardware = Hardware.get_hardware()
 
+        for key in hardware.keys:
+            @hardware.on_press(key)
+            def handler(key):
+                print("Next mode")
+                self.modes.next()
+
+    def show_waiting_view(self):
         mode = self.modes.current()
 
         if mode == ModeSelector.ON_INDICATOR:
