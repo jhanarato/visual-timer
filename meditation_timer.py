@@ -11,16 +11,52 @@ key_colours = {"red": (255, 0, 0),
 
 class Hardware:
     _pmk = None
+    rotator = None
 
     @staticmethod
     def set_hardware(pmk):
         Hardware._pmk = pmk
+        Hardware.rotator = KeyRotator()
 
     @staticmethod
     def get_hardware():
         if Hardware._pmk is None:
             raise ValueError("Hardware not initialised before use.")
         return Hardware._pmk
+
+    @staticmethod
+    def reset():
+        hardware = Hardware._pmk
+        for key in hardware.keys:
+            key.set_led(*key_colours["none"])
+
+            @hardware.on_press(key)
+            def handler(key):
+                pass
+
+    @staticmethod
+    def update():
+        hardware = Hardware._pmk
+        hardware.update()
+
+    @staticmethod
+    def get_key(index):
+        return Hardware._pmk.keys[index]
+
+    @staticmethod
+    def get_rotated_key(index):
+        rotated_index = Hardware.rotator.to_device_orientation(index)
+        return Hardware._pmk.keys[rotated_index]
+
+    @staticmethod
+    def set_key_colour(key_num, colour, rotated=False):
+        if rotated:
+            key_num = Hardware.rotator.to_device_orientation(key_num)
+        Hardware._pmk.keys[key_num].set_led(*key_colours[colour])
+
+    @staticmethod
+    def set_all_colour(colour):
+        Hardware._pmk.set_all(*key_colours[colour])
 
 
 class KeyRotator:
@@ -63,13 +99,7 @@ class MenuSequence:
         wait.wait()
 
     def reset(self):
-        hardware = Hardware.get_hardware()
-        for key in hardware.keys:
-            key.set_led(*key_colours["none"])
-
-            @hardware.on_press(key)
-            def handler(key):
-                pass
+        Hardware.reset()
 
     def select_minutes(self):
         minute_menu = self._maker.make_minutes_menu()
@@ -84,7 +114,7 @@ class MenuSequence:
         self._multiplier = multiplier_menu.get_selected_value()
 
     def pause(self):
-        pause = Pause(seconds=3)
+        pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
     def set_timer(self):
@@ -96,10 +126,10 @@ class MenuSequence:
         monitor = TimerMonitor(timer)
         while not timer.is_complete():
             monitor.show_waiting_view()
-            Hardware.get_hardware().update()
+            Hardware.update()
 
         monitor.show_complete_view()
-        Hardware.get_hardware().update()
+        Hardware.update()
 
 
 class MenuMaker:
@@ -186,15 +216,13 @@ class Menu:
 
     def wait_for_selection(self):
         while self.get_selected_value() is None:
-            Hardware.get_hardware().update()
+            Hardware.update()
 
 
 class IntegerSelector:
     def __init__(self, rotated_key_index, integer_value):
-        self._rotator = KeyRotator()
-        self.key_index = self._rotator.to_device_orientation(rotated_key_index)
         self.integer_value = integer_value
-        self._key = Hardware.get_hardware().keys[self.key_index]
+        self._rotated_key_index = rotated_key_index
         self.selected = False
         self._on_colour = "none"
         self._off_colour = "none"
@@ -202,21 +230,19 @@ class IntegerSelector:
     def set_colour(self, colour):
         self._on_colour = colour
 
-    def get_rotated_key_number(self):
-        return self._rotator.to_rotated_orientation(self.key_index)
-
     def enable_keypress(self):
         hardware = Hardware.get_hardware()
+        key = Hardware.get_rotated_key(self._rotated_key_index)
 
-        @hardware.on_press(self._key)
+        @hardware.on_press(key)
         def select(choice_key):
             self.selected = True
 
     def led_on(self):
-        self._key.set_led(*key_colours[self._on_colour])
+        Hardware.set_key_colour(self._rotated_key_index, self._on_colour, rotated=True)
 
     def led_off(self):
-        self._key.set_led(*key_colours[self._off_colour])
+        Hardware.set_key_colour(self._rotated_key_index, self._off_colour, rotated=True)
 
 
 class Pause:
@@ -231,55 +257,12 @@ class Pause:
 
     def wait_until_complete(self):
         while not self.complete():
-            Hardware.get_hardware().update()
-
-
-class Timer:
-    def __init__(self, minutes, multiplier):
-        self.started = False
-        self._minutes = minutes
-        self._multiplier = multiplier
-        self._start_time_seconds = 0
-
-    def get_minutes(self):
-        return self._minutes
-
-    def get_multiplier(self):
-        return self._multiplier
-
-    def start(self):
-        self.started = True
-        self._start_time_seconds = time.monotonic()
-
-    def is_complete(self):
-        return self.total_seconds() <= self.seconds_passed()
-
-    def total_minutes(self):
-        return self._multiplier * self._minutes
-
-    def total_seconds(self):
-        return self.total_minutes() * 60
-
-    def seconds_passed(self):
-        return time.monotonic() - self._start_time_seconds
-
-    def minutes_passed(self):
-        return math.floor(self.seconds_passed() / 60)
-
-    def seconds_remaining(self):
-        return self.total_seconds() - self.seconds_passed()
-
-    def minutes_remaining(self):
-        return self.total_minutes() - self.minutes_passed()
-
-    def fraction_remaining(self):
-        return self.seconds_remaining() / self.total_seconds()
+            Hardware.update()
 
 
 class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
-        self._hardware = Hardware.get_hardware()
         self._mode_selector = ModeSelector()
 
     def show_waiting_view(self):
@@ -297,54 +280,60 @@ class TimerMonitor:
         indicator_key = 0
         for key_num in range(0, 16):
             if key_num == indicator_key:
-                self._hardware.keys[key_num].set_led(*key_colours["orange"])
+                Hardware.set_key_colour(key_num, "orange", rotated=False)
             else:
-                self._hardware.keys[key_num].set_led(*key_colours["none"])
+                Hardware.set_key_colour(key_num, "none", rotated=False)
 
     def minutes_view(self):
-        rotated_key = None
-        colour = None
+        minutes = self._timer.get_minutes()
 
-        if self._timer._minutes == 5:
-            colour = "red"
-            rotated_key = 0
-        if self._timer._minutes == 10:
-            colour = "green"
-            rotated_key = 1
-        if self._timer._minutes == 15:
-            colour = "blue"
-            rotated_key = 2
+        all_keys = set(range(0, 16))
+        selected = set()
 
-        for key_num in range(0, 16):
-            rotator = KeyRotator()
-            if key_num == rotator.to_device_orientation(rotated_key):
-                self._hardware.keys[key_num].set_led(*key_colours[colour])
-            else:
-                self._hardware.keys[key_num].set_led(*key_colours["none"])
+        if minutes == 5:
+            selected.add(0)
+            Hardware.set_key_colour(0, "red", rotated=True)
+        if minutes == 10:
+            selected.add(1)
+            Hardware.set_key_colour(1, "green", rotated=True)
+        if minutes == 15:
+            selected.add(2)
+            Hardware.set_key_colour(2, "blue", rotated=True)
+
+        not_selected = all_keys - selected
+
+        for key_num in not_selected:
+            Hardware.set_key_colour(key_num, "none", rotated=True)
 
     def multiplier_view(self):
-        for key_num in range(0, 16):
-            rotator = KeyRotator()
-            rotated_num = rotator.to_rotated_orientation(key_num)
-            if rotated_num < self._timer._multiplier:
-                self._hardware.keys[key_num].set_led(*key_colours["cyan"])
-            else:
-                self._hardware.keys[key_num].set_led(*key_colours["none"])
+        multiplier = self._timer.get_multiplier()
+
+        all_keys = set(range(0, 16))
+        selected = set(range(0, multiplier))
+        not_selected = all_keys - selected
+
+        for key_num in selected:
+            Hardware.set_key_colour(key_num, "cyan", rotated=True)
+
+        for key_num in not_selected:
+            Hardware.set_key_colour(key_num, "none", rotated=True)
 
     def countdown_view(self):
         fraction = self._timer.fraction_remaining()
-        keys_to_be_lit = 16 * fraction
+        keys_to_be_lit = math.ceil(16 * fraction)
 
-        for key_num in range(0, 16):
-            rotator = KeyRotator()
-            rotated_num = rotator.to_rotated_orientation(key_num)
-            if key_num < keys_to_be_lit:
-                self._hardware.keys[rotated_num].set_led(*key_colours["green"])
-            else:
-                self._hardware.keys[rotated_num].set_led(*key_colours["blue"])
+        all_keys = set(range(0, 16))
+        green_keys = set(range(0, keys_to_be_lit))
+        blue_keys = all_keys - green_keys
+
+        for key_num in green_keys:
+            Hardware.set_key_colour(key_num, "green", rotated=True)
+
+        for key_num in blue_keys:
+            Hardware.set_key_colour(key_num, "blue", rotated=True)
 
     def show_complete_view(self):
-        self._hardware.set_all(*key_colours["orange"])
+        Hardware.set_all_colour("orange")
 
 
 class ModeSelector:
@@ -392,3 +381,45 @@ class KeypressWait:
             Hardware.get_hardware().update()
 
         print("KeypressWait Finished")
+
+
+class Timer:
+    def __init__(self, minutes, multiplier):
+        self.started = False
+        self._minutes = minutes
+        self._multiplier = multiplier
+        self._start_time_seconds = 0
+
+    def get_minutes(self):
+        return self._minutes
+
+    def get_multiplier(self):
+        return self._multiplier
+
+    def start(self):
+        self.started = True
+        self._start_time_seconds = time.monotonic()
+
+    def is_complete(self):
+        return self.total_seconds() <= self.seconds_passed()
+
+    def total_minutes(self):
+        return self._multiplier * self._minutes
+
+    def total_seconds(self):
+        return self.total_minutes() * 60
+
+    def seconds_passed(self):
+        return time.monotonic() - self._start_time_seconds
+
+    def minutes_passed(self):
+        return math.floor(self.seconds_passed() / 60)
+
+    def seconds_remaining(self):
+        return self.total_seconds() - self.seconds_passed()
+
+    def minutes_remaining(self):
+        return self.total_minutes() - self.minutes_passed()
+
+    def fraction_remaining(self):
+        return self.seconds_remaining() / self.total_seconds()
