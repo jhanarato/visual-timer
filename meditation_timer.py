@@ -268,6 +268,7 @@ class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
         self.modes = ModeSelector()
+        self._all_keys = frozenset(range(0, 16))
 
         hardware = Hardware.get_hardware()
 
@@ -290,16 +291,17 @@ class TimerMonitor:
 
     def on_indicator_view(self):
         indicator_key = 0
-        for key_num in range(0, 16):
-            if key_num == indicator_key:
-                Hardware.set_key_colour(key_num, "orange", rotated=False)
-            else:
-                Hardware.set_key_colour(key_num, "none", rotated=False)
+        selected = {indicator_key}
+        not_selected = self._all_keys - selected
+
+        for key_num in selected:
+            Hardware.set_key_colour(key_num, "orange", rotated=False)
+
+        for key_num in not_selected:
+            Hardware.set_key_colour(key_num, "none", rotated=False)
 
     def minutes_view(self):
         minutes = self._timer.get_minutes()
-
-        all_keys = set(range(0, 16))
         selected = set()
 
         if minutes == 5:
@@ -312,17 +314,15 @@ class TimerMonitor:
             selected.add(2)
             Hardware.set_key_colour(2, "blue", rotated=True)
 
-        not_selected = all_keys - selected
+        not_selected = self._all_keys - selected
 
         for key_num in not_selected:
             Hardware.set_key_colour(key_num, "none", rotated=True)
 
     def multiplier_view(self):
         multiplier = self._timer.get_multiplier()
-
-        all_keys = set(range(0, 16))
         selected = set(range(0, multiplier))
-        not_selected = all_keys - selected
+        not_selected = self._all_keys - selected
 
         for key_num in selected:
             Hardware.set_key_colour(key_num, "cyan", rotated=True)
@@ -333,10 +333,8 @@ class TimerMonitor:
     def countdown_view(self):
         fraction = self._timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
-
-        all_keys = set(range(0, 16))
         green_keys = set(range(0, keys_to_be_lit))
-        blue_keys = all_keys - green_keys
+        blue_keys = self._all_keys - green_keys
 
         for key_num in green_keys:
             Hardware.set_key_colour(key_num, "green", rotated=True)
@@ -345,7 +343,8 @@ class TimerMonitor:
             Hardware.set_key_colour(key_num, "blue", rotated=True)
 
     def show_complete_view(self):
-        Hardware.set_all_colour("orange")
+        for key_num in self._all_keys:
+            Hardware.set_key_colour(key_num, "orange", rotated=True)
 
 
 class ModeSelector:
