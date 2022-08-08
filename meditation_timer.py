@@ -63,6 +63,7 @@ class Hardware:
         Hardware.update()
         return Hardware._pmk.any_pressed()
 
+
 class KeyRotator:
     def __init__(self):
         self._device_to_rotated = {
@@ -382,8 +383,6 @@ class KeypressWait:
     def wait(self):
         while not self._pressed:
             Hardware.get_hardware().update()
-
-        print("KeypressWait Finished")
 
 
 class Timer:
