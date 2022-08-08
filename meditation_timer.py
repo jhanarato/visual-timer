@@ -89,7 +89,6 @@ class MenuSequence:
         self._multiplier = 0
 
     def do(self):
-        print("Reset")
         self.reset()
         self.select_minutes()
         self.pause()
@@ -126,6 +125,7 @@ class MenuSequence:
                       self._multiplier)
 
         print(f"Starting timer: {timer.get_minutes()} x {timer.get_multiplier()}")
+
         timer.start()
         monitor = TimerMonitor(timer)
         while not timer.is_complete():
@@ -274,7 +274,6 @@ class TimerMonitor:
         for key in hardware.keys:
             @hardware.on_press(key)
             def handler(key):
-                print("Next mode")
                 self.modes.next()
 
     def show_waiting_view(self):
