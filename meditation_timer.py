@@ -89,10 +89,10 @@ class MenuSequence:
         pause.wait_until_complete()
 
     def set_timer(self):
-        timer = Timer()
-        timer.minutes = self._minutes
-        timer.multiplier = self._multiplier
-        print(f"Starting timer: {timer.minutes} x {timer.multiplier}")
+        timer = Timer(self._minutes,
+                      self._multiplier)
+
+        print(f"Starting timer: {timer._minutes} x {timer._multiplier}")
         timer.start()
         monitor = TimerMonitor(timer)
         while not timer.is_complete():
@@ -101,7 +101,6 @@ class MenuSequence:
 
         monitor.show_complete_view()
         Hardware.get_hardware().update()
-
 
 
 class MenuMaker:
@@ -236,10 +235,10 @@ class Pause:
 
 
 class Timer:
-    def __init__(self):
+    def __init__(self, minutes, multiplier):
         self.started = False
-        self.minutes = 0
-        self.multiplier = 0
+        self._minutes = minutes
+        self._multiplier = multiplier
         self._start_time_seconds = 0
 
     def start(self):
@@ -250,7 +249,7 @@ class Timer:
         return self.duration_seconds() <= self.seconds_passed()
 
     def duration_minutes(self):
-        return self.multiplier * self.minutes
+        return self._multiplier * self._minutes
 
     def duration_seconds(self):
         return self.duration_minutes() * 60
@@ -279,13 +278,13 @@ class TimerMonitor:
 
     def show_waiting_view(self):
         mode_name = self._mode_selector.current_mode()
-        if mode_name == "on_indicator":
+        if mode_name == ModeSelector.ON_INDICATOR:
             self.on_indicator_view()
-        if mode_name == "minutes":
+        if mode_name == ModeSelector.MINUTES:
             self.minutes_view()
-        if mode_name == "multiplier":
+        if mode_name == ModeSelector.MULTIPLIER:
             self.multiplier_view()
-        if mode_name == "countdown":
+        if mode_name == ModeSelector.COUNTDOWN:
             self.countdown_view()
 
     def on_indicator_view(self):
@@ -300,13 +299,13 @@ class TimerMonitor:
         rotated_key = None
         colour = None
 
-        if self._timer.minutes == 5:
+        if self._timer._minutes == 5:
             colour = "red"
             rotated_key = 0
-        if self._timer.minutes == 10:
+        if self._timer._minutes == 10:
             colour = "green"
             rotated_key = 1
-        if self._timer.minutes == 15:
+        if self._timer._minutes == 15:
             colour = "blue"
             rotated_key = 2
 
@@ -319,7 +318,7 @@ class TimerMonitor:
     def multiplier_view(self):
         for key_num in range(0, 16):
             rotated_num = RotatedKeys.keypad_index_to_rotated(key_num)
-            if rotated_num < self._timer.multiplier:
+            if rotated_num < self._timer._multiplier:
                 self._hardware.keys[key_num].set_led(*key_colours["cyan"])
             else:
                 self._hardware.keys[key_num].set_led(*key_colours["none"])
@@ -340,8 +339,17 @@ class TimerMonitor:
 
 
 class ModeSelector:
+    ON_INDICATOR = "on_indicator"
+    MINUTES = "minutes"
+    MULTIPLIER = "multiplier"
+    COUNTDOWN = "countdown"
+
     def __init__(self):
-        self.modes = ["on_indicator", "minutes", "multiplier", "countdown"]
+        self.modes = [ModeSelector.ON_INDICATOR,
+                      ModeSelector.MINUTES,
+                      ModeSelector.MULTIPLIER,
+                      ModeSelector.COUNTDOWN]
+
         self.mode_index = 0
         hardware = Hardware.get_hardware()
 

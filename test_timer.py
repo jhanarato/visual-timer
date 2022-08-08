@@ -7,9 +7,7 @@ hardware = Hardware()
 pmk = PMK(hardware)
 
 
-timer = Timer()
-timer.minutes = 1
-timer.multiplier = 5
+timer = Timer(1, 5)
 timer.start()
 
 remaining = timer.minutes_remaining()
