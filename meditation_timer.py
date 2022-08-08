@@ -58,6 +58,10 @@ class Hardware:
     def set_all_colour(colour):
         Hardware._pmk.set_all(*key_colours[colour])
 
+    @staticmethod
+    def any_key_pressed():
+        Hardware.update()
+        return Hardware._pmk.any_pressed()
 
 class KeyRotator:
     def __init__(self):
@@ -263,17 +267,21 @@ class Pause:
 class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
-        self._mode_selector = ModeSelector()
+        self.modes = ModeSelector()
 
     def show_waiting_view(self):
-        mode_name = self._mode_selector.current_mode()
-        if mode_name == ModeSelector.ON_INDICATOR:
+        if Hardware.any_key_pressed():
+            self.modes.next()
+
+        mode = self.modes.current()
+
+        if mode == ModeSelector.ON_INDICATOR:
             self.on_indicator_view()
-        if mode_name == ModeSelector.MINUTES:
+        if mode == ModeSelector.MINUTES:
             self.minutes_view()
-        if mode_name == ModeSelector.MULTIPLIER:
+        if mode == ModeSelector.MULTIPLIER:
             self.multiplier_view()
-        if mode_name == ModeSelector.COUNTDOWN:
+        if mode == ModeSelector.COUNTDOWN:
             self.countdown_view()
 
     def on_indicator_view(self):
@@ -349,19 +357,11 @@ class ModeSelector:
                       ModeSelector.COUNTDOWN]
 
         self.mode_index = 0
-        hardware = Hardware.get_hardware()
 
-        for key in hardware.keys:
-            @hardware.on_press(key)
-            def handler(key):
-                self.next_mode()
-
-    def next_mode(self):
-        mode_name = self.modes[self.mode_index]
+    def next(self):
         self.mode_index = (self.mode_index + 1) % len(self.modes)
-        return mode_name
 
-    def current_mode(self):
+    def current(self):
         return self.modes[self.mode_index]
 
 
