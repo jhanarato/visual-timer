@@ -105,7 +105,7 @@ def test_rotated_keys():
     turn_on = True
     while True:
         for pmk_number in range(0, 16):
-            rotated_number = meditation_timer.RotatedKeys.keypad_index_to_rotated(pmk_number)
+            rotated_number = meditation_timer.KeyRotator.keypad_index_to_rotated(pmk_number)
             if turn_on:
                 pmk.keys[rotated_number].set_led(0, 255, 0)
             else:
