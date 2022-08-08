@@ -382,7 +382,7 @@ class KeypressWait:
 
     def wait(self):
         while not self._pressed:
-            Hardware.get_hardware().update()
+            Hardware.update()
 
 
 class Timer:
