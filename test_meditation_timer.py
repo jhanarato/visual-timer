@@ -117,7 +117,6 @@ def test_rotated_keys():
 
 
 def test_menus_in_sequence():
-    # TODO: Break up steps and move to MenuSequence class
     print("In test_menus_in_sequence()")
     meditation_timer.Hardware.set_hardware(pmk)
     maker = meditation_timer.MenuMaker()
