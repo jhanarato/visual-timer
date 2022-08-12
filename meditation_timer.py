@@ -40,13 +40,13 @@ class MenuSequence:
         minute_menu = self._maker.make_minutes_menu()
         minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
-        self._minutes = minute_menu.get_selected_value()
+        self._minutes = minute_menu.get_selected()[0].integer_value
 
     def select_multiplier(self):
         multiplier_menu = self._maker.make_multiplier_menu()
         multiplier_menu.wait_for_selection()
         multiplier_menu.light_keys_up_to_selected_value()
-        self._multiplier = multiplier_menu.get_selected_value()
+        self._multiplier = multiplier_menu.get_selected()[0].integer_value
 
     def pause(self):
         pause = Pause(seconds=1.5)
@@ -124,34 +124,23 @@ class Menu:
         self._selectors.append(selector)
         selector.enable_keypress()
 
-    def get_selected_value(self):
-        for selector in self._selectors:
-            if selector.selected:
-                return selector.integer_value
-        return None
+    def get_selected(self):
+        return [selector for selector in self._selectors if selector.selected]
 
-    def reset_menu(self):
-        for selector in self._selectors:
-            selector.selected = False
+    def wait_for_selection(self):
+        while not self.get_selected():
+            Hardware.update()
 
-    def get_selected_key(self):
+    def light_selected_value(self):
         for selector in self._selectors:
-            if selector.selected:
-                return selector
-        return None
-
-    def light_keys_up_to_selected_value(self):
-        selected_key = self.get_selected_key()
-        for selector in self._selectors:
-            if selector.integer_value <= selected_key.integer_value:
+            if selector.integer_value == self.get_selected()[0].integer_value:
                 selector.led_on()
             else:
                 selector.led_off()
 
-    def light_selected_value(self):
-        selected_key = self.get_selected_key()
+    def light_keys_up_to_selected_value(self):
         for selector in self._selectors:
-            if selector.integer_value == selected_key.integer_value:
+            if selector.integer_value <= self.get_selected()[0].integer_value:
                 selector.led_on()
             else:
                 selector.led_off()
@@ -159,10 +148,6 @@ class Menu:
     def light_all_selectors(self):
         for selector in self._selectors:
             selector.led_on()
-
-    def wait_for_selection(self):
-        while self.get_selected_value() is None:
-            Hardware.update()
 
 
 class IntegerSelector:
