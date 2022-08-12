@@ -11,80 +11,6 @@ key_colours = {"red": (255, 0, 0),
 all_keys = frozenset(range(0, 16))
 
 
-class Hardware:
-    _pmk = None
-    rotator = None
-
-    @staticmethod
-    def set_hardware(pmk):
-        Hardware._pmk = pmk
-        Hardware.rotator = KeyRotator()
-
-    @staticmethod
-    def get_hardware():
-        if Hardware._pmk is None:
-            raise ValueError("Hardware not initialised before use.")
-        return Hardware._pmk
-
-    @staticmethod
-    def reset():
-        hardware = Hardware._pmk
-        for key in hardware.keys:
-            key.set_led(*key_colours["none"])
-
-            @hardware.on_press(key)
-            def handler(key):
-                pass
-
-    @staticmethod
-    def update():
-        hardware = Hardware._pmk
-        hardware.update()
-
-    @staticmethod
-    def get_key(index):
-        return Hardware._pmk.keys[index]
-
-    @staticmethod
-    def get_rotated_key(index):
-        rotated_index = Hardware.rotator.to_device_orientation(index)
-        return Hardware._pmk.keys[rotated_index]
-
-    @staticmethod
-    def set_key_colour(key_num, colour, rotated=False):
-        if rotated:
-            key_num = Hardware.rotator.to_device_orientation(key_num)
-        Hardware._pmk.keys[key_num].set_led(*key_colours[colour])
-
-    @staticmethod
-    def set_all_colour(colour):
-        Hardware._pmk.set_all(*key_colours[colour])
-
-    @staticmethod
-    def any_key_pressed():
-        Hardware.update()
-        return Hardware._pmk.any_pressed()
-
-
-class KeyRotator:
-    def __init__(self):
-        self._device_to_rotated = {
-            0: 0, 1: 4, 2: 8, 3: 12,
-            4: 1, 5: 5, 6: 9, 7: 13,
-            8: 2, 9: 6, 10: 10, 11: 14,
-            12: 3, 13: 7, 14: 11, 15: 15
-        }
-
-    def to_rotated_orientation(self, device_key_number):
-        return self._device_to_rotated[device_key_number]
-
-    def to_device_orientation(self, rotated_key_number):
-        actual_list = list(self._device_to_rotated.keys())
-        rotated_list = list(self._device_to_rotated.values())
-        index = rotated_list.index(rotated_key_number)
-        return actual_list[index]
-
-
 class MenuSequence:
     def __init__(self):
         self._maker = MenuMaker()
@@ -265,21 +191,6 @@ class IntegerSelector:
         Hardware.set_key_colour(self._rotated_key_index, self._off_colour, rotated=True)
 
 
-class Pause:
-    def __init__(self, seconds):
-        self._seconds_to_pause_for = seconds
-        self._start = time.monotonic()
-
-    def complete(self):
-        now = time.monotonic()
-        paused_for = now - self._start
-        return paused_for > self._seconds_to_pause_for
-
-    def wait_until_complete(self):
-        while not self.complete():
-            Hardware.update()
-
-
 class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
@@ -388,22 +299,6 @@ class MonitoringViewCycle:
         return self.modes[self.mode_index]
 
 
-class KeypressWait:
-    def __init__(self):
-        self._pressed = False
-
-        hardware = Hardware.get_hardware()
-
-        for key in hardware.keys:
-            @hardware.on_press(key)
-            def handler(key):
-                self._pressed = True
-
-    def wait(self):
-        while not self._pressed:
-            Hardware.update()
-
-
 class Timer:
     def __init__(self, minutes, multiplier):
         self.started = False
@@ -451,3 +346,108 @@ class Timer:
 
     def fraction_remaining(self):
         return self.seconds_remaining() / self.total_seconds()
+
+
+class Hardware:
+    _pmk = None
+    rotator = None
+
+    @staticmethod
+    def set_hardware(pmk):
+        Hardware._pmk = pmk
+        Hardware.rotator = KeyRotator()
+
+    @staticmethod
+    def get_hardware():
+        if Hardware._pmk is None:
+            raise ValueError("Hardware not initialised before use.")
+        return Hardware._pmk
+
+    @staticmethod
+    def reset():
+        hardware = Hardware._pmk
+        for key in hardware.keys:
+            key.set_led(*key_colours["none"])
+
+            @hardware.on_press(key)
+            def handler(key):
+                pass
+
+    @staticmethod
+    def update():
+        hardware = Hardware._pmk
+        hardware.update()
+
+    @staticmethod
+    def get_key(index):
+        return Hardware._pmk.keys[index]
+
+    @staticmethod
+    def get_rotated_key(index):
+        rotated_index = Hardware.rotator.to_device_orientation(index)
+        return Hardware._pmk.keys[rotated_index]
+
+    @staticmethod
+    def set_key_colour(key_num, colour, rotated=False):
+        if rotated:
+            key_num = Hardware.rotator.to_device_orientation(key_num)
+        Hardware._pmk.keys[key_num].set_led(*key_colours[colour])
+
+    @staticmethod
+    def set_all_colour(colour):
+        Hardware._pmk.set_all(*key_colours[colour])
+
+    @staticmethod
+    def any_key_pressed():
+        Hardware.update()
+        return Hardware._pmk.any_pressed()
+
+
+class KeypressWait:
+    def __init__(self):
+        self._pressed = False
+
+        hardware = Hardware.get_hardware()
+
+        for key in hardware.keys:
+            @hardware.on_press(key)
+            def handler(key):
+                self._pressed = True
+
+    def wait(self):
+        while not self._pressed:
+            Hardware.update()
+
+
+class Pause:
+    def __init__(self, seconds):
+        self._seconds_to_pause_for = seconds
+        self._start = time.monotonic()
+
+    def complete(self):
+        now = time.monotonic()
+        paused_for = now - self._start
+        return paused_for > self._seconds_to_pause_for
+
+    def wait_until_complete(self):
+        while not self.complete():
+            Hardware.update()
+
+
+class KeyRotator:
+    def __init__(self):
+        self._device_to_rotated = {
+            0: 0, 1: 4, 2: 8, 3: 12,
+            4: 1, 5: 5, 6: 9, 7: 13,
+            8: 2, 9: 6, 10: 10, 11: 14,
+            12: 3, 13: 7, 14: 11, 15: 15
+        }
+
+    def to_rotated_orientation(self, device_key_number):
+        return self._device_to_rotated[device_key_number]
+
+    def to_device_orientation(self, rotated_key_number):
+        actual_list = list(self._device_to_rotated.keys())
+        rotated_list = list(self._device_to_rotated.values())
+        index = rotated_list.index(rotated_key_number)
+        return actual_list[index]
