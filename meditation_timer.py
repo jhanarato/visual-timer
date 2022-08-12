@@ -100,6 +100,10 @@ class MenuSequence:
         self.pause()
         self.set_timer()
         self.monitor_timer()
+
+        if self._timer.is_cancelled():
+            return
+
         self.show_complete_view()
         self.wait_for_keypress()
 
@@ -130,7 +134,11 @@ class MenuSequence:
 
     def monitor_timer(self):
         monitor = TimerMonitor(self._timer)
-        while not self._timer.is_complete():
+        while True:
+            if self._timer.is_complete():
+                return
+            if self._timer.is_cancelled():
+                return
             monitor.show_current_view()
             Hardware.update()
 
@@ -276,16 +284,22 @@ class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
         self.modes = MonitoringViewCycle()
+        self.enable_next_view_on_keypress()
+        self.enable_cancel_timer_on_keyhold()
 
+    def enable_next_view_on_keypress(self):
         hardware = Hardware.get_hardware()
-
-        self.enable_next_view_on_keypress(hardware)
-
-    def enable_next_view_on_keypress(self, hardware):
         for key in hardware.keys:
             @hardware.on_press(key)
             def handler(key):
                 self.modes.next()
+
+    def enable_cancel_timer_on_keyhold(self):
+        hardware = Hardware.get_hardware()
+        for key in hardware.keys:
+            @hardware.on_hold(key)
+            def handler(key):
+                self._timer.cancel()
 
     def show_current_view(self):
         mode = self.modes.current()
@@ -393,6 +407,7 @@ class KeypressWait:
 class Timer:
     def __init__(self, minutes, multiplier):
         self.started = False
+        self._cancelled = False
         self._minutes = minutes
         self._multiplier = multiplier
         self._start_time_seconds = 0
@@ -406,6 +421,12 @@ class Timer:
     def start(self):
         self.started = True
         self._start_time_seconds = time.monotonic()
+
+    def cancel(self):
+        self._cancelled = True
+
+    def is_cancelled(self):
+        return self._cancelled
 
     def is_complete(self):
         return self.total_seconds() <= self.seconds_passed()
