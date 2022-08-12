@@ -8,6 +8,8 @@ key_colours = {"red": (255, 0, 0),
                "orange": (255, 165, 0),
                "none": (0, 0, 0)}
 
+all_keys = frozenset(range(0, 16))
+
 
 class Hardware:
     _pmk = None
@@ -88,6 +90,7 @@ class MenuSequence:
         self._maker = MenuMaker()
         self._minutes = 0
         self._multiplier = 0
+        self._timer = None
 
     def do(self):
         self.reset()
@@ -96,11 +99,9 @@ class MenuSequence:
         self.select_multiplier()
         self.pause()
         self.set_timer()
+        self.monitor_timer()
+        self.show_complete_view()
         self.wait_for_keypress()
-
-    def wait_for_keypress(self):
-        wait = KeypressWait()
-        wait.wait()
 
     def reset(self):
         Hardware.reset()
@@ -122,19 +123,25 @@ class MenuSequence:
         pause.wait_until_complete()
 
     def set_timer(self):
-        timer = Timer(self._minutes,
-                      self._multiplier)
+        self._timer = Timer(self._minutes,
+                            self._multiplier)
+        print(f"Starting timer: {self._timer.get_minutes()} x {self._timer.get_multiplier()}")
+        self._timer.start()
 
-        print(f"Starting timer: {timer.get_minutes()} x {timer.get_multiplier()}")
-
-        timer.start()
-        monitor = TimerMonitor(timer)
-        while not timer.is_complete():
-            monitor.show_waiting_view()
+    def monitor_timer(self):
+        monitor = TimerMonitor(self._timer)
+        while not self._timer.is_complete():
+            monitor.show_current_view()
             Hardware.update()
 
-        monitor.show_complete_view()
+    def show_complete_view(self):
+        for key_num in all_keys:
+            Hardware.set_key_colour(key_num, "orange", rotated=True)
         Hardware.update()
+
+    def wait_for_keypress(self):
+        wait = KeypressWait()
+        wait.wait()
 
 
 class MenuMaker:
@@ -268,32 +275,34 @@ class Pause:
 class TimerMonitor:
     def __init__(self, timer):
         self._timer = timer
-        self.modes = ModeSelector()
-        self._all_keys = frozenset(range(0, 16))
+        self.modes = MonitoringViewCycle()
 
         hardware = Hardware.get_hardware()
 
+        self.enable_next_view_on_keypress(hardware)
+
+    def enable_next_view_on_keypress(self, hardware):
         for key in hardware.keys:
             @hardware.on_press(key)
             def handler(key):
                 self.modes.next()
 
-    def show_waiting_view(self):
+    def show_current_view(self):
         mode = self.modes.current()
 
-        if mode == ModeSelector.ON_INDICATOR:
-            self.on_indicator_view()
-        if mode == ModeSelector.MINUTES:
-            self.minutes_view()
-        if mode == ModeSelector.MULTIPLIER:
-            self.multiplier_view()
-        if mode == ModeSelector.COUNTDOWN:
-            self.countdown_view()
+        if mode == MonitoringViewCycle.ON_INDICATOR:
+            self.show_indicator_view()
+        if mode == MonitoringViewCycle.MINUTES:
+            self.show_minutes_view()
+        if mode == MonitoringViewCycle.MULTIPLIER:
+            self.show_multiplier_view()
+        if mode == MonitoringViewCycle.COUNTDOWN:
+            self.show_progress_view()
 
-    def on_indicator_view(self):
+    def show_indicator_view(self):
         indicator_key = 0
         selected = {indicator_key}
-        not_selected = self._all_keys - selected
+        not_selected = all_keys - selected
 
         for key_num in selected:
             Hardware.set_key_colour(key_num, "orange", rotated=False)
@@ -301,7 +310,7 @@ class TimerMonitor:
         for key_num in not_selected:
             Hardware.set_key_colour(key_num, "none", rotated=False)
 
-    def minutes_view(self):
+    def show_minutes_view(self):
         minutes = self._timer.get_minutes()
         selected = set()
 
@@ -315,15 +324,15 @@ class TimerMonitor:
             selected.add(2)
             Hardware.set_key_colour(2, "blue", rotated=True)
 
-        not_selected = self._all_keys - selected
+        not_selected = all_keys - selected
 
         for key_num in not_selected:
             Hardware.set_key_colour(key_num, "none", rotated=True)
 
-    def multiplier_view(self):
+    def show_multiplier_view(self):
         multiplier = self._timer.get_multiplier()
         selected = set(range(0, multiplier))
-        not_selected = self._all_keys - selected
+        not_selected = all_keys - selected
 
         for key_num in selected:
             Hardware.set_key_colour(key_num, "cyan", rotated=True)
@@ -331,11 +340,11 @@ class TimerMonitor:
         for key_num in not_selected:
             Hardware.set_key_colour(key_num, "none", rotated=True)
 
-    def countdown_view(self):
+    def show_progress_view(self):
         fraction = self._timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
         green_keys = set(range(0, keys_to_be_lit))
-        blue_keys = self._all_keys - green_keys
+        blue_keys = all_keys - green_keys
 
         for key_num in green_keys:
             Hardware.set_key_colour(key_num, "green", rotated=True)
@@ -343,22 +352,18 @@ class TimerMonitor:
         for key_num in blue_keys:
             Hardware.set_key_colour(key_num, "blue", rotated=True)
 
-    def show_complete_view(self):
-        for key_num in self._all_keys:
-            Hardware.set_key_colour(key_num, "orange", rotated=True)
 
-
-class ModeSelector:
+class MonitoringViewCycle:
     ON_INDICATOR = 0
     MINUTES = 1
     MULTIPLIER = 2
     COUNTDOWN = 3
 
     def __init__(self):
-        self.modes = [ModeSelector.ON_INDICATOR,
-                      ModeSelector.MINUTES,
-                      ModeSelector.MULTIPLIER,
-                      ModeSelector.COUNTDOWN]
+        self.modes = [MonitoringViewCycle.ON_INDICATOR,
+                      MonitoringViewCycle.MINUTES,
+                      MonitoringViewCycle.MULTIPLIER,
+                      MonitoringViewCycle.COUNTDOWN]
 
         self.mode_index = 0
 
