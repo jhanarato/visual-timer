@@ -204,6 +204,7 @@ class TimerMonitor:
             @hardware.on_press(key)
             def handler(key):
                 self.modes.next()
+                print(f"Keypress: view is now: {self.modes.current()}")
 
     def enable_cancel_timer_on_keyhold(self):
         hardware = Hardware.get_hardware()
@@ -221,7 +222,7 @@ class TimerMonitor:
             self.show_minutes_view()
         if mode == MonitoringViewCycle.MULTIPLIER:
             self.show_multiplier_view()
-        if mode == MonitoringViewCycle.COUNTDOWN:
+        if mode == MonitoringViewCycle.PROGRESS:
             self.show_progress_view()
 
     def show_indicator_view(self):
@@ -279,16 +280,16 @@ class TimerMonitor:
 
 
 class MonitoringViewCycle:
-    ON_INDICATOR = 0
-    MINUTES = 1
-    MULTIPLIER = 2
-    COUNTDOWN = 3
+    ON_INDICATOR = "showing is on"
+    MINUTES = "showing minutes"
+    MULTIPLIER = "showing multiplier"
+    PROGRESS = "showing progress"
 
     def __init__(self):
         self.modes = [MonitoringViewCycle.ON_INDICATOR,
                       MonitoringViewCycle.MINUTES,
                       MonitoringViewCycle.MULTIPLIER,
-                      MonitoringViewCycle.COUNTDOWN]
+                      MonitoringViewCycle.PROGRESS]
 
         self.mode_index = 0
 
