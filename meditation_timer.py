@@ -13,54 +13,61 @@ all_keys = frozenset(range(0, 16))
 
 class SequenceOfOperation:
     def __init__(self):
-        self._maker = MenuMaker()
-        self._timer = None
+        pass
 
-    def perform(self):
-        self.reset()
+    def perform_sequence(self):
+        Hardware.reset()
+
         minutes = self.select_minutes()
-        self.pause()
         multiplier = self.select_multiplier()
-        self.pause()
-        self.set_timer(minutes, multiplier)
-        self.monitor_timer()
 
-        if self._timer.is_cancelled():
+        timer = self.start_timer(minutes, multiplier)
+        self.monitor_timer(timer)
+
+        if timer.is_cancelled():
             return
 
         self.show_complete_view()
         self.wait_for_keypress()
 
-    def reset(self):
-        Hardware.reset()
-
     def select_minutes(self):
-        minute_menu = self._maker.make_minutes_menu()
+        maker = MenuMaker()
+        minute_menu = maker.make_minutes_menu()
+
         minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
-        return minute_menu.get_selected()[0].integer_value
 
-    def select_multiplier(self):
-        multiplier_menu = self._maker.make_multiplier_menu()
-        multiplier_menu.wait_for_selection()
-        multiplier_menu.light_keys_up_to_selected_value()
-        return multiplier_menu.get_selected()[0].integer_value
+        self.pause()
+
+        return minute_menu.get_selected()[0].integer_value
 
     def pause(self):
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-    def set_timer(self, minutes, multiplier):
-        self._timer = Timer(minutes, multiplier)
-        print(f"Starting timer: {minutes} x {multiplier}")
-        self._timer.start()
+    def select_multiplier(self):
+        maker = MenuMaker()
+        multiplier_menu = maker.make_multiplier_menu()
 
-    def monitor_timer(self):
-        monitor = TimerMonitor(self._timer)
+        multiplier_menu.wait_for_selection()
+        multiplier_menu.light_keys_up_to_selected_value()
+
+        self.pause()
+
+        return multiplier_menu.get_selected()[0].integer_value
+
+    def start_timer(self, minutes, multiplier):
+        timer = Timer(minutes, multiplier)
+        print(f"Starting timer: {minutes} x {multiplier}")
+        timer.start()
+        return timer
+
+    def monitor_timer(self, timer):
+        monitor = TimerMonitor(timer)
         while True:
-            if self._timer.is_complete():
+            if timer.is_complete():
                 return
-            if self._timer.is_cancelled():
+            if timer.is_cancelled():
                 return
             monitor.show_current_view()
             Hardware.update()
