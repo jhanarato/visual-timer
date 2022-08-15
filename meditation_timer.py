@@ -193,7 +193,6 @@ class TimerMonitor:
             @hardware.on_press(key)
             def handler(key):
                 self.modes.next()
-                print(f"Keypress: view is now: {self.modes.current()}")
 
     def enable_cancel_timer_on_keyhold(self):
         hardware = Hardware.get_hardware()
