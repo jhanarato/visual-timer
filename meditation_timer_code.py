@@ -8,7 +8,7 @@ print("In Code.py")
 hardware = Hardware()
 pmk = PMK(hardware)
 meditation_timer.Hardware.set_hardware(pmk)
-sequence = meditation_timer.MenuSequence()
+sequence = meditation_timer.SequenceOfOperation()
 
 while True:
-    sequence.do()
+    sequence.perform()

@@ -11,20 +11,18 @@ key_colours = {"red": (255, 0, 0),
 all_keys = frozenset(range(0, 16))
 
 
-class MenuSequence:
+class SequenceOfOperation:
     def __init__(self):
         self._maker = MenuMaker()
-        self._minutes = 0
-        self._multiplier = 0
         self._timer = None
 
-    def do(self):
+    def perform(self):
         self.reset()
-        self.select_minutes()
+        minutes = self.select_minutes()
         self.pause()
-        self.select_multiplier()
+        multiplier = self.select_multiplier()
         self.pause()
-        self.set_timer()
+        self.set_timer(minutes, multiplier)
         self.monitor_timer()
 
         if self._timer.is_cancelled():
@@ -40,22 +38,21 @@ class MenuSequence:
         minute_menu = self._maker.make_minutes_menu()
         minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
-        self._minutes = minute_menu.get_selected()[0].integer_value
+        return minute_menu.get_selected()[0].integer_value
 
     def select_multiplier(self):
         multiplier_menu = self._maker.make_multiplier_menu()
         multiplier_menu.wait_for_selection()
         multiplier_menu.light_keys_up_to_selected_value()
-        self._multiplier = multiplier_menu.get_selected()[0].integer_value
+        return multiplier_menu.get_selected()[0].integer_value
 
     def pause(self):
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-    def set_timer(self):
-        self._timer = Timer(self._minutes,
-                            self._multiplier)
-        print(f"Starting timer: {self._timer.get_minutes()} x {self._timer.get_multiplier()}")
+    def set_timer(self, minutes, multiplier):
+        self._timer = Timer(minutes, multiplier)
+        print(f"Starting timer: {minutes} x {multiplier}")
         self._timer.start()
 
     def monitor_timer(self):
