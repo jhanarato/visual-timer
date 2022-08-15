@@ -28,7 +28,9 @@ class SequenceOfOperation:
             return
 
         self.show_complete_view()
-        self.wait_for_keypress()
+
+        wait = KeypressWait()
+        wait.wait()
 
     def select_minutes(self):
         maker = MenuMaker()
@@ -37,13 +39,10 @@ class SequenceOfOperation:
         minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
 
-        self.pause()
-
-        return minute_menu.get_selected()[0].integer_value
-
-    def pause(self):
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
+
+        return minute_menu.get_selected()[0].integer_value
 
     def select_multiplier(self):
         maker = MenuMaker()
@@ -52,7 +51,8 @@ class SequenceOfOperation:
         multiplier_menu.wait_for_selection()
         multiplier_menu.light_keys_up_to_selected_value()
 
-        self.pause()
+        pause = Pause(seconds=1.5)
+        pause.wait_until_complete()
 
         return multiplier_menu.get_selected()[0].integer_value
 
@@ -76,10 +76,6 @@ class SequenceOfOperation:
         for key_num in all_keys:
             Hardware.set_key_colour(key_num, "orange", rotated=True)
         Hardware.update()
-
-    def wait_for_keypress(self):
-        wait = KeypressWait()
-        wait.wait()
 
 
 class MenuMaker:
