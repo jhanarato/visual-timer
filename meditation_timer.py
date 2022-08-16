@@ -41,7 +41,7 @@ class SequenceOfOperation:
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-        return minute_menu.get_selected()[0].integer_value
+        return minute_menu.get_selected().integer_value
 
     def select_multiplier(self):
         multiplier_menu = make_multiplier_menu()
@@ -52,7 +52,7 @@ class SequenceOfOperation:
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-        return multiplier_menu.get_selected()[0].integer_value
+        return multiplier_menu.get_selected().integer_value
 
     def start_timer(self, minutes, multiplier):
         timer = Timer(minutes, multiplier)
@@ -114,28 +114,47 @@ def make_multiplier_menu():
 class Menu:
     def __init__(self):
         self._selectors = []
+        self.enable_choice_on_keypress()
+        self._selected = None
+
+    def enable_choice_on_keypress(self):
+        hardware = Hardware.get_hardware()
+
+        for key in hardware.keys:
+            @hardware.on_press(key)
+            def handler(choice_key):
+                pressed_list = hardware.get_pressed()
+                if len(pressed_list) > 1:
+                    return
+                pressed = pressed_list[0]
+                rotator = KeyRotator()
+                rotated = rotator.to_rotated_orientation(pressed)
+                for selector in self._selectors:
+                    if selector.rotated_key_index == rotated:
+                        self._selected = selector
+                        print(self._selected)
 
     def add_selector(self, selector):
         self._selectors.append(selector)
-        selector.enable_keypress()
 
     def get_selected(self):
-        return [selector for selector in self._selectors if selector.selected]
+        return self._selected
 
     def wait_for_selection(self):
-        while not self.get_selected():
+        while self.get_selected() is None:
             Hardware.update()
 
     def light_selected_value(self):
+        selected = self.get_selected()
         for selector in self._selectors:
-            if selector.integer_value == self.get_selected()[0].integer_value:
+            if selector.integer_value == selected.integer_value:
                 selector.led_on()
             else:
                 selector.led_off()
 
     def light_keys_up_to_selected_value(self):
         for selector in self._selectors:
-            if selector.integer_value <= self.get_selected()[0].integer_value:
+            if selector.integer_value <= self.get_selected().integer_value:
                 selector.led_on()
             else:
                 selector.led_off()
@@ -148,27 +167,21 @@ class Menu:
 class IntegerSelector:
     def __init__(self, rotated_key_index, integer_value):
         self.integer_value = integer_value
-        self._rotated_key_index = rotated_key_index
-        self.selected = False
+        self.rotated_key_index = rotated_key_index
         self._on_colour = "none"
         self._off_colour = "none"
 
     def set_colour(self, colour):
         self._on_colour = colour
 
-    def enable_keypress(self):
-        hardware = Hardware.get_hardware()
-        key = Hardware.get_rotated_key(self._rotated_key_index)
-
-        @hardware.on_press(key)
-        def select(choice_key):
-            self.selected = True
-
     def led_on(self):
-        Hardware.set_key_colour(self._rotated_key_index, self._on_colour, rotated=True)
+        Hardware.set_key_colour(self.rotated_key_index, self._on_colour, rotated=True)
 
     def led_off(self):
-        Hardware.set_key_colour(self._rotated_key_index, self._off_colour, rotated=True)
+        Hardware.set_key_colour(self.rotated_key_index, self._off_colour, rotated=True)
+
+    def __str__(self):
+        return f"rotated key {self.rotated_key_index} colour {self._on_colour} value {self.integer_value}"
 
 
 class TimerMonitor:
