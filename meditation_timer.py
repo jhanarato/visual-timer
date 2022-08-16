@@ -33,8 +33,7 @@ class SequenceOfOperation:
         wait.wait()
 
     def select_minutes(self):
-        maker = MenuMaker()
-        minute_menu = maker.make_minutes_menu()
+        minute_menu = make_minutes_menu()
 
         minute_menu.wait_for_selection()
         minute_menu.light_selected_value()
@@ -45,8 +44,7 @@ class SequenceOfOperation:
         return minute_menu.get_selected()[0].integer_value
 
     def select_multiplier(self):
-        maker = MenuMaker()
-        multiplier_menu = maker.make_multiplier_menu()
+        multiplier_menu = make_multiplier_menu()
 
         multiplier_menu.wait_for_selection()
         multiplier_menu.light_keys_up_to_selected_value()
@@ -78,42 +76,39 @@ class SequenceOfOperation:
         Hardware.update()
 
 
-class MenuMaker:
-    def __init__(self):
-        pass
+def make_minutes_menu():
+    menu = Menu()
 
-    def make_minutes_menu(self):
-        menu = Menu()
+    five = IntegerSelector(rotated_key_index=0, integer_value=5)
+    ten = IntegerSelector(rotated_key_index=1, integer_value=10)
+    fifteen = IntegerSelector(rotated_key_index=2, integer_value=15)
 
-        five = IntegerSelector(rotated_key_index=0, integer_value=5)
-        ten = IntegerSelector(rotated_key_index=1, integer_value=10)
-        fifteen = IntegerSelector(rotated_key_index=2, integer_value=15)
+    five.set_colour("red")
+    ten.set_colour("green")
+    fifteen.set_colour("blue")
 
-        five.set_colour("red")
-        ten.set_colour("green")
-        fifteen.set_colour("blue")
+    menu.add_selector(five)
+    menu.add_selector(ten)
+    menu.add_selector(fifteen)
 
-        menu.add_selector(five)
-        menu.add_selector(ten)
-        menu.add_selector(fifteen)
+    menu.light_all_selectors()
 
-        menu.light_all_selectors()
+    return menu
 
-        return menu
 
-    def make_multiplier_menu(self):
-        menu = Menu()
+def make_multiplier_menu():
+    menu = Menu()
 
-        for index in range(0, 16):
-            selector = IntegerSelector(rotated_key_index=index,
-                                       integer_value=index + 1)
+    for index in range(0, 16):
+        selector = IntegerSelector(rotated_key_index=index,
+                                   integer_value=index + 1)
 
-            selector.set_colour("cyan")
-            menu.add_selector(selector)
+        selector.set_colour("cyan")
+        menu.add_selector(selector)
 
-        menu.light_all_selectors()
+    menu.light_all_selectors()
 
-        return menu
+    return menu
 
 
 class Menu:
