@@ -12,5 +12,5 @@ mt.Hardware.set_hardware(pmk)
 
 print("Displaying normal layout")
 for key_num in range(0, 5):
-    mt.Hardware.set_key_colour(key_num, "blue", rotated=True)
+    mt.Hardware.set_rotated_key_colour(key_num, "blue", rotated=True)
 

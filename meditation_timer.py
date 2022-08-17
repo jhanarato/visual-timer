@@ -72,7 +72,7 @@ class SequenceOfOperation:
 
     def show_complete_view(self):
         for key_num in all_keys:
-            Hardware.set_key_colour(key_num, "orange", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "orange")
         Hardware.update()
 
 
@@ -114,6 +114,7 @@ def make_multiplier_menu():
 class Menu:
     def __init__(self):
         self._selectors = []
+        # TODO Map selectors to rotated key num.
         self.enable_choice_on_keypress()
         self._selected = None
 
@@ -173,6 +174,7 @@ class Menu:
 
 
 class IntegerSelector:
+    # TODO Add comparison operators using integer_value
     def __init__(self, rotated_key_index, integer_value):
         self.integer_value = integer_value
         self.rotated_key_index = rotated_key_index
@@ -183,10 +185,10 @@ class IntegerSelector:
         self._on_colour = colour
 
     def led_on(self):
-        Hardware.set_key_colour(self.rotated_key_index, self._on_colour, rotated=True)
+        Hardware.set_rotated_key_colour(self.rotated_key_index, self._on_colour)
 
     def led_off(self):
-        Hardware.set_key_colour(self.rotated_key_index, self._off_colour, rotated=True)
+        Hardware.set_rotated_key_colour(self.rotated_key_index, self._off_colour)
 
     def __str__(self):
         return f"rotated key {self.rotated_key_index} colour {self._on_colour} value {self.integer_value}"
@@ -231,10 +233,10 @@ class TimerMonitor:
         not_selected = all_keys - selected
 
         for key_num in selected:
-            Hardware.set_key_colour(key_num, "orange", rotated=False)
+            Hardware.set_rotated_key_colour(key_num, "orange")
 
         for key_num in not_selected:
-            Hardware.set_key_colour(key_num, "none", rotated=False)
+            Hardware.set_rotated_key_colour(key_num, "none")
 
     def show_minutes_view(self):
         minutes = self._timer.get_minutes()
@@ -242,18 +244,18 @@ class TimerMonitor:
 
         if minutes == 5:
             selected.add(0)
-            Hardware.set_key_colour(0, "red", rotated=True)
+            Hardware.set_rotated_key_colour(0, "red")
         if minutes == 10:
             selected.add(1)
-            Hardware.set_key_colour(1, "green", rotated=True)
+            Hardware.set_rotated_key_colour(1, "green")
         if minutes == 15:
             selected.add(2)
-            Hardware.set_key_colour(2, "blue", rotated=True)
+            Hardware.set_rotated_key_colour(2, "blue")
 
         not_selected = all_keys - selected
 
         for key_num in not_selected:
-            Hardware.set_key_colour(key_num, "none", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "none")
 
     def show_multiplier_view(self):
         multiplier = self._timer.get_multiplier()
@@ -261,10 +263,10 @@ class TimerMonitor:
         not_selected = all_keys - selected
 
         for key_num in selected:
-            Hardware.set_key_colour(key_num, "cyan", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "cyan")
 
         for key_num in not_selected:
-            Hardware.set_key_colour(key_num, "none", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "none")
 
     def show_progress_view(self):
         fraction = self._timer.fraction_remaining()
@@ -273,10 +275,10 @@ class TimerMonitor:
         blue_keys = all_keys - green_keys
 
         for key_num in green_keys:
-            Hardware.set_key_colour(key_num, "green", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "green")
 
         for key_num in blue_keys:
-            Hardware.set_key_colour(key_num, "blue", rotated=True)
+            Hardware.set_rotated_key_colour(key_num, "blue")
 
 
 class MonitoringViewCycle:
@@ -389,9 +391,8 @@ class Hardware:
         return Hardware._pmk.keys[rotated_index]
 
     @staticmethod
-    def set_key_colour(key_num, colour, rotated=False):
-        if rotated:
-            key_num = Hardware.rotator.to_device_orientation(key_num)
+    def set_rotated_key_colour(key_num, colour):
+        key_num = Hardware.rotator.to_device_orientation(key_num)
         Hardware._pmk.keys[key_num].set_led(*key_colours[colour])
 
     @staticmethod
