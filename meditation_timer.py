@@ -92,11 +92,8 @@ def make_multiplier_menu():
     menu = Menu()
 
     for index in range(0, 16):
-        selector = MenuOption(rotated_key_index=index,
-                              integer_value=index + 1)
-
-        selector.set_colour("cyan")
-        menu.add_option(selector)
+        multiplier_value = index + 1
+        menu.create_option(index, "cyan", multiplier_value)
 
     menu.light_all_selectors()
 
