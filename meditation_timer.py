@@ -79,17 +79,9 @@ class SequenceOfOperation:
 def make_minutes_menu():
     menu = Menu()
 
-    five = MenuOption(rotated_key_index=0, integer_value=5)
-    ten = MenuOption(rotated_key_index=1, integer_value=10)
-    fifteen = MenuOption(rotated_key_index=2, integer_value=15)
-
-    five.set_colour("red")
-    ten.set_colour("green")
-    fifteen.set_colour("blue")
-
-    menu.add_option(five)
-    menu.add_option(ten)
-    menu.add_option(fifteen)
+    menu.create_option(0, "red", 5)
+    menu.create_option(1, "green", 10)
+    menu.create_option(2, "blue", 15)
 
     menu.light_all_selectors()
 
@@ -122,6 +114,11 @@ class Menu:
     def add_option(self, option):
         self._options.append(option)
         self._options_by_rotated_key[option.rotated_key_index] = option
+
+    def create_option(self, rotated_key_index, colour, integer_value):
+        option = MenuOption(rotated_key_index, integer_value)
+        option.set_colour(colour)
+        self.add_option(option)
 
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
