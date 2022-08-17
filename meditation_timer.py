@@ -110,7 +110,7 @@ class Menu:
 
     def add_option(self, option):
         self._options.append(option)
-        self._options_by_rotated_key[option.rotated_key_index] = option
+        self._options_by_rotated_key[option.key_num] = option
 
     def create_option(self, rotated_key_index, colour, integer_value):
         option = MenuOption(rotated_key_index, integer_value)
@@ -167,9 +167,9 @@ class Menu:
 
 
 class MenuOption:
-    def __init__(self, rotated_key_index, integer_value):
+    def __init__(self, key_num, integer_value):
         self.integer_value = integer_value
-        self.rotated_key_index = rotated_key_index
+        self.key_num = key_num
         self.on_colour = "none"
         self.off_colour = "none"
 
@@ -177,10 +177,10 @@ class MenuOption:
         self.on_colour = colour
 
     def led_on(self):
-        Hardware.set_rotated_key_colour(self.rotated_key_index, self.on_colour)
+        Hardware.set_rotated_key_colour(self.key_num, self.on_colour)
 
     def led_off(self):
-        Hardware.set_rotated_key_colour(self.rotated_key_index, self.off_colour)
+        Hardware.set_rotated_key_colour(self.key_num, self.off_colour)
 
     def __le__(self, other):
         return self.integer_value <= other.integer_value
@@ -189,7 +189,7 @@ class MenuOption:
         return self.integer_value == other.integer_value
 
     def __str__(self):
-        return f"rotated key {self.rotated_key_index} colour {self.on_colour} value {self.integer_value}"
+        return f"rotated key {self.key_num} colour {self.on_colour} value {self.integer_value}"
 
 
 class TimerMonitor:
