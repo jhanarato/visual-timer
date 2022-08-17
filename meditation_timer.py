@@ -124,15 +124,23 @@ class Menu:
             @hardware.on_press(key)
             def handler(choice_key):
                 pressed_list = hardware.get_pressed()
-                if len(pressed_list) > 1:
-                    return
-                pressed = pressed_list[0]
-                rotator = KeyRotator()
-                rotated = rotator.to_rotated_orientation(pressed)
-                for selector in self._selectors:
-                    if selector.rotated_key_index == rotated:
-                        self._selected = selector
-                        print(self._selected)
+                self._on_press_select(pressed_list)
+
+    def _on_press_select(self, pressed_list):
+        if len(pressed_list) != 1:
+            return
+
+        pressed = pressed_list[0]
+        rotator = KeyRotator()
+        rotated = rotator.to_rotated_orientation(pressed)
+
+        self._set_selected(rotated)
+
+    def _set_selected(self, rotated):
+        for selector in self._selectors:
+            if selector.rotated_key_index == rotated:
+                self._selected = selector
+                print(self._selected)
 
     def add_selector(self, selector):
         self._selectors.append(selector)
