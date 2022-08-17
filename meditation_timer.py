@@ -143,7 +143,6 @@ class Menu:
 
     def _set_selected(self, rotated_key_index):
         self._selected = self._selectors_by_rotated_key[rotated_key_index]
-        print(self._selected)
 
     def get_selected(self):
         return self._selected
@@ -155,14 +154,14 @@ class Menu:
     def light_selected_value(self):
         selected = self.get_selected()
         for selector in self._selectors:
-            if selector.integer_value == selected.integer_value:
+            if selector == selected:
                 selector.led_on()
             else:
                 selector.led_off()
 
     def light_keys_up_to_selected_value(self):
         for selector in self._selectors:
-            if selector.integer_value <= self.get_selected().integer_value:
+            if selector <= self.get_selected():
                 selector.led_on()
             else:
                 selector.led_off()
@@ -188,6 +187,12 @@ class IntegerSelector:
 
     def led_off(self):
         Hardware.set_rotated_key_colour(self.rotated_key_index, self._off_colour)
+
+    def __le__(self, other):
+        return self.integer_value <= other.integer_value
+
+    def __eq__(self, other):
+        return self.integer_value == other.integer_value
 
     def __str__(self):
         return f"rotated key {self.rotated_key_index} colour {self._on_colour} value {self.integer_value}"
