@@ -87,7 +87,7 @@ def test_multiplier_menu():
 def test_integer_selector():
     meditation_timer.Hardware.set_hardware(pmk)
 
-    selector = meditation_timer.IntegerSelector(rotated_key_index=0, integer_value=1)
+    selector = meditation_timer.MenuOption(rotated_key_index=0, integer_value=1)
     selector.set_colour("orange")
     selector.enable_keypress()
     selector.led_on()

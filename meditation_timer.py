@@ -79,9 +79,9 @@ class SequenceOfOperation:
 def make_minutes_menu():
     menu = Menu()
 
-    five = IntegerSelector(rotated_key_index=0, integer_value=5)
-    ten = IntegerSelector(rotated_key_index=1, integer_value=10)
-    fifteen = IntegerSelector(rotated_key_index=2, integer_value=15)
+    five = MenuOption(rotated_key_index=0, integer_value=5)
+    ten = MenuOption(rotated_key_index=1, integer_value=10)
+    fifteen = MenuOption(rotated_key_index=2, integer_value=15)
 
     five.set_colour("red")
     ten.set_colour("green")
@@ -100,8 +100,8 @@ def make_multiplier_menu():
     menu = Menu()
 
     for index in range(0, 16):
-        selector = IntegerSelector(rotated_key_index=index,
-                                   integer_value=index + 1)
+        selector = MenuOption(rotated_key_index=index,
+                              integer_value=index + 1)
 
         selector.set_colour("cyan")
         menu.add_selector(selector)
@@ -171,8 +171,7 @@ class Menu:
             selector.led_on()
 
 
-class IntegerSelector:
-    # TODO Add comparison operators using integer_value
+class MenuOption:
     def __init__(self, rotated_key_index, integer_value):
         self.integer_value = integer_value
         self.rotated_key_index = rotated_key_index
