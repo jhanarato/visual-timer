@@ -117,6 +117,9 @@ class Menu:
         self.enable_choice_on_keypress()
         self._selected = None
 
+    def add_selector(self, selector):
+        self._selectors.append(selector)
+
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
 
@@ -141,9 +144,6 @@ class Menu:
             if selector.rotated_key_index == rotated:
                 self._selected = selector
                 print(self._selected)
-
-    def add_selector(self, selector):
-        self._selectors.append(selector)
 
     def get_selected(self):
         return self._selected
