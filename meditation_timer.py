@@ -87,9 +87,9 @@ def make_minutes_menu():
     ten.set_colour("green")
     fifteen.set_colour("blue")
 
-    menu.add_selector(five)
-    menu.add_selector(ten)
-    menu.add_selector(fifteen)
+    menu.add_option(five)
+    menu.add_option(ten)
+    menu.add_option(fifteen)
 
     menu.light_all_selectors()
 
@@ -104,7 +104,7 @@ def make_multiplier_menu():
                               integer_value=index + 1)
 
         selector.set_colour("cyan")
-        menu.add_selector(selector)
+        menu.add_option(selector)
 
     menu.light_all_selectors()
 
@@ -113,14 +113,15 @@ def make_multiplier_menu():
 
 class Menu:
     def __init__(self):
-        self._selectors = []
-        self._selectors_by_rotated_key = dict()
+        self._options = []
+        self._options_by_rotated_key = dict()
+
         self.enable_choice_on_keypress()
         self._selected = None
 
-    def add_selector(self, selector):
-        self._selectors.append(selector)
-        self._selectors_by_rotated_key[selector.rotated_key_index] = selector
+    def add_option(self, option):
+        self._options.append(option)
+        self._options_by_rotated_key[option.rotated_key_index] = option
 
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
@@ -142,7 +143,7 @@ class Menu:
         self._set_selected(rotated)
 
     def _set_selected(self, rotated_key_index):
-        self._selected = self._selectors_by_rotated_key[rotated_key_index]
+        self._selected = self._options_by_rotated_key[rotated_key_index]
 
     def get_selected(self):
         return self._selected
@@ -153,21 +154,21 @@ class Menu:
 
     def light_selected_value(self):
         selected = self.get_selected()
-        for selector in self._selectors:
+        for selector in self._options:
             if selector == selected:
                 selector.led_on()
             else:
                 selector.led_off()
 
     def light_keys_up_to_selected_value(self):
-        for selector in self._selectors:
+        for selector in self._options:
             if selector <= self.get_selected():
                 selector.led_on()
             else:
                 selector.led_off()
 
     def light_all_selectors(self):
-        for selector in self._selectors:
+        for selector in self._options:
             selector.led_on()
 
 
