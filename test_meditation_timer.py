@@ -51,7 +51,7 @@ def test_minutes_menu():
             break
         pmk.update()
 
-    minute_menu.light_selected_value()
+    minute_menu.light_selected_option_key()
 
     pause = Pause(seconds=3)
 
@@ -66,7 +66,7 @@ def test_multiplier_menu():
     meditation_timer.Hardware.set_hardware(pmk)
     maker = meditation_timer.MenuMaker()
     multiplier_menu = maker.make_multiplier_menu()
-    multiplier_menu.light_all_selectors()
+    multiplier_menu.light_all_option_keys()
 
     while True:
         if multiplier_menu.get_selected_value() is not None:
@@ -74,7 +74,7 @@ def test_multiplier_menu():
             break
         pmk.update()
 
-    multiplier_menu.light_keys_up_to_selected_value()
+    multiplier_menu.light_up_to_selected_option_key()
 
     pause = Pause(seconds=3)
 
@@ -127,7 +127,7 @@ def test_menus_in_sequence():
     while minute_menu.get_selected_value() is None:
         pmk.update()
 
-    minute_menu.light_selected_value()
+    minute_menu.light_selected_option_key()
 
     # Step 2: Wait for 3 seconds
     pause = Pause(seconds=3)
@@ -140,7 +140,7 @@ def test_menus_in_sequence():
     while multiplier_menu.get_selected_value() is None:
         pmk.update()
 
-    multiplier_menu.light_keys_up_to_selected_value()
+    multiplier_menu.light_up_to_selected_option_key()
 
     # Step 4: Wait for 3 seconds.
     pause = Pause(seconds=3)

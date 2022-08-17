@@ -36,7 +36,7 @@ class SequenceOfOperation:
         minute_menu = make_minutes_menu()
 
         minute_menu.wait_for_selection()
-        minute_menu.light_selected_value()
+        minute_menu.light_selected_option_key()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
@@ -47,7 +47,7 @@ class SequenceOfOperation:
         multiplier_menu = make_multiplier_menu()
 
         multiplier_menu.wait_for_selection()
-        multiplier_menu.light_keys_up_to_selected_value()
+        multiplier_menu.light_up_to_selected_option_key()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
@@ -83,7 +83,7 @@ def make_minutes_menu():
     menu.create_option(1, "green", 10)
     menu.create_option(2, "blue", 15)
 
-    menu.light_all_selectors()
+    menu.light_all_option_keys()
 
     return menu
 
@@ -95,7 +95,7 @@ def make_multiplier_menu():
         multiplier_value = index + 1
         menu.create_option(index, "cyan", multiplier_value)
 
-    menu.light_all_selectors()
+    menu.light_all_option_keys()
 
     return menu
 
@@ -146,22 +146,22 @@ class Menu:
         while self.get_selected() is None:
             Hardware.update()
 
-    def light_selected_value(self):
+    def light_selected_option_key(self):
         selected = self.get_selected()
-        for selector in self._options:
-            if selector == selected:
-                selector.led_on()
+        for option in self._options:
+            if option == selected:
+                option.led_on()
             else:
-                selector.led_off()
+                option.led_off()
 
-    def light_keys_up_to_selected_value(self):
-        for selector in self._options:
-            if selector <= self.get_selected():
-                selector.led_on()
+    def light_up_to_selected_option_key(self):
+        for option in self._options:
+            if option <= self.get_selected():
+                option.led_on()
             else:
-                selector.led_off()
+                option.led_off()
 
-    def light_all_selectors(self):
+    def light_all_option_keys(self):
         for selector in self._options:
             selector.led_on()
 
@@ -170,17 +170,17 @@ class MenuOption:
     def __init__(self, rotated_key_index, integer_value):
         self.integer_value = integer_value
         self.rotated_key_index = rotated_key_index
-        self._on_colour = "none"
-        self._off_colour = "none"
+        self.on_colour = "none"
+        self.off_colour = "none"
 
     def set_colour(self, colour):
-        self._on_colour = colour
+        self.on_colour = colour
 
     def led_on(self):
-        Hardware.set_rotated_key_colour(self.rotated_key_index, self._on_colour)
+        Hardware.set_rotated_key_colour(self.rotated_key_index, self.on_colour)
 
     def led_off(self):
-        Hardware.set_rotated_key_colour(self.rotated_key_index, self._off_colour)
+        Hardware.set_rotated_key_colour(self.rotated_key_index, self.off_colour)
 
     def __le__(self, other):
         return self.integer_value <= other.integer_value
@@ -189,7 +189,7 @@ class MenuOption:
         return self.integer_value == other.integer_value
 
     def __str__(self):
-        return f"rotated key {self.rotated_key_index} colour {self._on_colour} value {self.integer_value}"
+        return f"rotated key {self.rotated_key_index} colour {self.on_colour} value {self.integer_value}"
 
 
 class TimerMonitor:
