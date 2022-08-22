@@ -136,7 +136,7 @@ class Menu:
         self._set_selected(rotated)
 
     def _set_selected(self, rotated_key_index):
-        self._selected = self._options_by_rotated_key[rotated_key_index]
+        self._selected = self._options_by_rotated_key.get(rotated_key_index)
 
     def get_selected(self):
         return self._selected
