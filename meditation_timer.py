@@ -33,26 +33,27 @@ class SequenceOfOperation:
         wait.wait()
 
     def select_minutes(self):
-        minute_menu = make_minutes_menu()
-
-        minute_menu.wait_for_selection()
-        minute_menu.light_selected_option_key()
+        menu = MinutesMenu()
+        menu.light_all_option_keys()
+        menu.wait_for_selection()
+        menu.display_selection()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-        return minute_menu.get_selected().integer_value
+        return menu.get_selected().integer_value
 
     def select_multiplier(self):
-        multiplier_menu = make_multiplier_menu()
+        menu = MultiplierMenu()
 
-        multiplier_menu.wait_for_selection()
-        multiplier_menu.light_up_to_selected_option_key()
+        menu.light_all_option_keys()
+        menu.wait_for_selection()
+        menu.display_selection()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-        return multiplier_menu.get_selected().integer_value
+        return menu.get_selected().integer_value
 
     def start_timer(self, minutes, multiplier):
         timer = Timer(minutes, multiplier)
@@ -76,43 +77,16 @@ class SequenceOfOperation:
         Hardware.update()
 
 
-def make_minutes_menu():
-    menu = Menu()
-
-    menu.create_option(0, "red", 5)
-    menu.create_option(1, "green", 10)
-    menu.create_option(2, "blue", 15)
-
-    menu.light_all_option_keys()
-
-    return menu
-
-
-def make_multiplier_menu():
-    menu = Menu()
-
-    for index in range(0, 16):
-        multiplier_value = index + 1
-        menu.create_option(index, "cyan", multiplier_value)
-
-    menu.light_all_option_keys()
-
-    return menu
-
-
 class Menu:
     def __init__(self):
         self._options = dict()
-
-        self.enable_choice_on_keypress()
         self._selected = None
-
-    def add_option(self, option):
-        self._options[option.key_num] = option
+        self.add_options()
+        self.enable_choice_on_keypress()
 
     def create_option(self, rotated_key_index, colour, integer_value):
         option = MenuOption(rotated_key_index, colour, integer_value)
-        self.add_option(option)
+        self._options[option.key_num] = option
 
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
@@ -139,11 +113,31 @@ class Menu:
     def get_selected(self):
         return self._selected
 
+    def _get_all_options(self):
+        return self._options.values()
+
     def wait_for_selection(self):
         while self.get_selected() is None:
             Hardware.update()
 
-    def light_selected_option_key(self):
+    def light_all_option_keys(self):
+        for selector in self._get_all_options():
+            selector.led_on()
+
+    def add_options(self):
+        raise NotImplementedError
+
+    def display_selection(self):
+        raise NotImplementedError
+
+
+class MinutesMenu(Menu):
+    def add_options(self):
+        self.create_option(0, "red", 5)
+        self.create_option(1, "green", 10)
+        self.create_option(2, "blue", 15)
+
+    def display_selection(self):
         selected = self.get_selected()
         for option in self._get_all_options():
             if option == selected:
@@ -151,19 +145,19 @@ class Menu:
             else:
                 option.led_off()
 
-    def _get_all_options(self):
-        return self._options.values()
 
-    def light_up_to_selected_option_key(self):
+class MultiplierMenu(Menu):
+    def add_options(self):
+        for index in range(0, 16):
+            multiplier_value = index + 1
+            self.create_option(index, "cyan", multiplier_value)
+
+    def display_selection(self):
         for option in self._get_all_options():
             if option <= self.get_selected():
                 option.led_on()
             else:
                 option.led_off()
-
-    def light_all_option_keys(self):
-        for selector in self._get_all_options():
-            selector.led_on()
 
 
 class MenuOption:
