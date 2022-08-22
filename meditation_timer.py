@@ -102,15 +102,13 @@ def make_multiplier_menu():
 
 class Menu:
     def __init__(self):
-        self._options = []
-        self._options_by_rotated_key = dict()
+        self._options = dict()
 
         self.enable_choice_on_keypress()
         self._selected = None
 
     def add_option(self, option):
-        self._options.append(option)
-        self._options_by_rotated_key[option.key_num] = option
+        self._options[option.key_num] = option
 
     def create_option(self, rotated_key_index, colour, integer_value):
         option = MenuOption(rotated_key_index, colour, integer_value)
@@ -136,7 +134,7 @@ class Menu:
         self._set_selected(rotated)
 
     def _set_selected(self, rotated_key_index):
-        self._selected = self._options_by_rotated_key.get(rotated_key_index)
+        self._selected = self._options.get(rotated_key_index)
 
     def get_selected(self):
         return self._selected
@@ -147,21 +145,24 @@ class Menu:
 
     def light_selected_option_key(self):
         selected = self.get_selected()
-        for option in self._options:
+        for option in self._get_all_options():
             if option == selected:
                 option.led_on()
             else:
                 option.led_off()
 
+    def _get_all_options(self):
+        return self._options.values()
+
     def light_up_to_selected_option_key(self):
-        for option in self._options:
+        for option in self._get_all_options():
             if option <= self.get_selected():
                 option.led_on()
             else:
                 option.led_off()
 
     def light_all_option_keys(self):
-        for selector in self._options:
+        for selector in self._get_all_options():
             selector.led_on()
 
 
