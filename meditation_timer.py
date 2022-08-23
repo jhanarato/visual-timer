@@ -24,7 +24,9 @@ class SequenceOfOperation:
         multiplier_menu = MultiplierMenu()
         multiplier = multiplier_menu.get_users_choice()
 
-        timer = self.start_timer(minutes, multiplier)
+        timer = Timer(minutes, multiplier)
+        timer.start()
+
         self.monitor_timer(timer)
 
         if timer.is_cancelled():
@@ -34,12 +36,6 @@ class SequenceOfOperation:
 
         wait = KeypressWait()
         wait.wait()
-
-    def start_timer(self, minutes, multiplier):
-        timer = Timer(minutes, multiplier)
-        print(f"Starting timer: {minutes} x {multiplier}")
-        timer.start()
-        return timer
 
     def monitor_timer(self, timer):
         monitor = TimerMonitor(timer)
@@ -64,10 +60,6 @@ class Menu:
         self.add_options()
         self.enable_choice_on_keypress()
 
-    def create_option(self, rotated_key_index, colour, integer_value):
-        option = MenuOption(rotated_key_index, colour, integer_value)
-        self._options[option.key_num] = option
-
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
 
@@ -88,6 +80,10 @@ class Menu:
 
         self._set_selected(rotated)
 
+    def create_option(self, rotated_key_index, colour, integer_value):
+        option = MenuOption(rotated_key_index, colour, integer_value)
+        self._options[option.key_num] = option
+
     def _set_selected(self, key_num):
         if key_num in self._options:
             self._selected = self._options.get(key_num)
@@ -106,12 +102,6 @@ class Menu:
         for selector in self._get_all_options():
             selector.led_on()
 
-    def add_options(self):
-        raise NotImplementedError
-
-    def display_selection(self):
-        raise NotImplementedError
-
     def get_users_choice(self):
         self.light_all_option_keys()
         self.wait_for_selection()
@@ -119,6 +109,12 @@ class Menu:
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
         return self.get_selected().integer_value
+
+    def add_options(self):
+        raise NotImplementedError
+
+    def display_selection(self):
+        raise NotImplementedError
 
 
 class MinutesMenu(Menu):
