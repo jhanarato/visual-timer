@@ -18,8 +18,11 @@ class SequenceOfOperation:
     def perform_sequence(self):
         Hardware.reset()
 
-        minutes = self.select_minutes()
-        multiplier = self.select_multiplier()
+        minutes_menu = MinutesMenu()
+        minutes = minutes_menu.get_users_choice()
+
+        multiplier_menu = MultiplierMenu()
+        multiplier = multiplier_menu.get_users_choice()
 
         timer = self.start_timer(minutes, multiplier)
         self.monitor_timer(timer)
@@ -31,29 +34,6 @@ class SequenceOfOperation:
 
         wait = KeypressWait()
         wait.wait()
-
-    def select_minutes(self):
-        menu = MinutesMenu()
-        menu.light_all_option_keys()
-        menu.wait_for_selection()
-        menu.display_selection()
-
-        pause = Pause(seconds=1.5)
-        pause.wait_until_complete()
-
-        return menu.get_selected().integer_value
-
-    def select_multiplier(self):
-        menu = MultiplierMenu()
-
-        menu.light_all_option_keys()
-        menu.wait_for_selection()
-        menu.display_selection()
-
-        pause = Pause(seconds=1.5)
-        pause.wait_until_complete()
-
-        return menu.get_selected().integer_value
 
     def start_timer(self, minutes, multiplier):
         timer = Timer(minutes, multiplier)
@@ -131,6 +111,14 @@ class Menu:
 
     def display_selection(self):
         raise NotImplementedError
+
+    def get_users_choice(self):
+        self.light_all_option_keys()
+        self.wait_for_selection()
+        self.display_selection()
+        pause = Pause(seconds=1.5)
+        pause.wait_until_complete()
+        return self.get_selected().integer_value
 
 
 class MinutesMenu(Menu):
