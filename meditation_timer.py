@@ -102,13 +102,15 @@ class Menu:
             return
 
         pressed = pressed_list[0]
+
         rotator = KeyRotator()
         rotated = rotator.to_rotated_orientation(pressed)
 
         self._set_selected(rotated)
 
-    def _set_selected(self, rotated_key_index):
-        self._selected = self._options.get(rotated_key_index)
+    def _set_selected(self, key_num):
+        if key_num in self._options:
+            self._selected = self._options.get(key_num)
 
     def get_selected(self):
         return self._selected
