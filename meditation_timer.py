@@ -121,6 +121,10 @@ class Menu:
         options_keys = set(self._options.keys())
         return all_keys - options_keys
 
+    @property
+    def unselected_keys(self):
+        return all_keys - {self.selected_option.key_num}
+
     # TODO Refactor views. This should be extracted somewhere.
     def light_all_option_keys(self):
         for option in self.options:
@@ -134,12 +138,11 @@ class MinutesMenu(Menu):
         self.add_option(MenuOption(2, "blue", 15))
 
     def display_selection(self):
-        selected = self.selected_option
-        for option in self.options:
-            if option == selected:
-                option.led_on()
-            else:
-                option.led_off()
+        Hardware.set_rotated_key_colour(self.selected_option.key_num,
+                                        self.selected_option.colour)
+
+        for key_num in self.unselected_keys:
+            Hardware.set_rotated_key_colour(key_num, "none")
 
 
 class MultiplierMenu(Menu):
@@ -149,11 +152,17 @@ class MultiplierMenu(Menu):
             self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        for option in self.options:
-            if option <= self.selected_option:
-                option.led_on()
-            else:
-                option.led_off()
+        for key_num in self._keys_equal_to_or_less_than(self.selected_option.key_num):
+            Hardware.set_rotated_key_colour(key_num, "cyan")
+
+        for key_num in self._keys_greater_than(self.selected_option.key_num):
+            Hardware.set_rotated_key_colour(key_num, "none")
+
+    def _keys_equal_to_or_less_than(self, key_num):
+        return {option.key_num for option in self.options if option.key_num <= key_num}
+
+    def _keys_greater_than(self, key_num):
+        return all_keys - self._keys_equal_to_or_less_than(key_num)
 
 
 class MenuOption:
@@ -161,12 +170,6 @@ class MenuOption:
         self.key_num = key_num
         self.colour = colour
         self.integer_value = integer_value
-
-    def led_on(self):
-        Hardware.set_rotated_key_colour(self.key_num, self.colour)
-
-    def led_off(self):
-        Hardware.set_rotated_key_colour(self.key_num, "none")
 
     def __le__(self, other):
         return self.integer_value <= other.integer_value
