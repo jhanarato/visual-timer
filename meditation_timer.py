@@ -88,8 +88,13 @@ class Menu:
 
         self.selected_option = rotated
 
-    def add_option(self, option):
-        self._options[option.key_num] = option
+    def wait_for_selection(self):
+        while self.selected_option is None:
+            Hardware.update()
+
+    @property
+    def options(self):
+        return self._options.values()
 
     @property
     def selected_option(self):
@@ -100,22 +105,20 @@ class Menu:
         if key_num in self._options:
             self._selected_option = self._options.get(key_num)
 
-    def get_all_options(self):
-        return self._options.values()
-
-    def wait_for_selection(self):
-        while self.selected_option is None:
-            Hardware.update()
-
-    def light_all_option_keys(self):
-        for selector in self.get_all_options():
-            selector.led_on()
+    def add_option(self, option):
+        self._options[option.key_num] = option
 
     def add_options(self):
         raise NotImplementedError
 
+    # Template methods must be subclassed.
     def display_selection(self):
         raise NotImplementedError
+
+    # TODO Refactor views. This should be extracted somewhere.
+    def light_all_option_keys(self):
+        for option in self.options:
+            option.led_on()
 
 
 class MinutesMenu(Menu):
@@ -126,7 +129,7 @@ class MinutesMenu(Menu):
 
     def display_selection(self):
         selected = self.selected_option
-        for option in self.get_all_options():
+        for option in self.options:
             if option == selected:
                 option.led_on()
             else:
@@ -140,7 +143,7 @@ class MultiplierMenu(Menu):
             self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        for option in self.get_all_options():
+        for option in self.options:
             if option <= self.selected_option:
                 option.led_on()
             else:
