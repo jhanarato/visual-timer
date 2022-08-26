@@ -128,7 +128,7 @@ class Menu:
     # TODO Refactor views. This should be extracted somewhere.
     def light_all_option_keys(self):
         for option in self.options:
-            option.led_on()
+            Hardware.set_rotated_key_colour(option.key_num, option.colour)
 
 
 class MinutesMenu(Menu):
@@ -170,15 +170,6 @@ class MenuOption:
         self.key_num = key_num
         self.colour = colour
         self.integer_value = integer_value
-
-    def __le__(self, other):
-        return self.integer_value <= other.integer_value
-
-    def __eq__(self, other):
-        return self.integer_value == other.integer_value
-
-    def __str__(self):
-        return f"rotated key {self.key_num} colour {self.colour} value {self.integer_value}"
 
 
 class TimerMonitor:
