@@ -113,9 +113,13 @@ class Menu:
     def add_options(self):
         raise NotImplementedError
 
-    # Template methods must be subclassed.
     def display_selection(self):
         raise NotImplementedError
+
+    @property
+    def unused_keys(self):
+        options_keys = set(self._options.keys())
+        return all_keys - options_keys
 
     # TODO Refactor views. This should be extracted somewhere.
     def light_all_option_keys(self):
