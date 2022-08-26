@@ -27,6 +27,8 @@ class SequenceOfOperation:
         timer = Timer(minutes, multiplier)
         timer.start()
 
+        print(timer)
+
         self.monitor_timer(timer)
 
         if timer.is_cancelled():
@@ -327,6 +329,9 @@ class Timer:
 
     def fraction_remaining(self):
         return self.seconds_remaining() / self.total_seconds()
+
+    def __str__(self):
+        return f"Timer set: {self._minutes} x {self._multiplier} = {self.total_minutes()} minutes"
 
 
 class Hardware:
