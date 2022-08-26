@@ -78,28 +78,27 @@ class Menu:
         rotator = KeyRotator()
         rotated = rotator.to_rotated_orientation(pressed)
 
-        self._set_selected(rotated)
+        self.set_selected_option(rotated)
 
-    def create_option(self, rotated_key_index, colour, integer_value):
-        option = MenuOption(rotated_key_index, colour, integer_value)
+    def add_option(self, option):
         self._options[option.key_num] = option
 
-    def _set_selected(self, key_num):
+    def get_selected_option(self):
+        return self._selected
+
+    def set_selected_option(self, key_num):
         if key_num in self._options:
             self._selected = self._options.get(key_num)
 
-    def get_selected(self):
-        return self._selected
-
-    def _get_all_options(self):
+    def get_all_options(self):
         return self._options.values()
 
     def wait_for_selection(self):
-        while self.get_selected() is None:
+        while self.get_selected_option() is None:
             Hardware.update()
 
     def light_all_option_keys(self):
-        for selector in self._get_all_options():
+        for selector in self.get_all_options():
             selector.led_on()
 
     def get_users_choice(self):
@@ -108,7 +107,7 @@ class Menu:
         self.display_selection()
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
-        return self.get_selected().integer_value
+        return self.get_selected_option().integer_value
 
     def add_options(self):
         raise NotImplementedError
@@ -119,13 +118,13 @@ class Menu:
 
 class MinutesMenu(Menu):
     def add_options(self):
-        self.create_option(0, "red", 5)
-        self.create_option(1, "green", 10)
-        self.create_option(2, "blue", 15)
+        self.add_option(MenuOption(0, "red", 5))
+        self.add_option(MenuOption(1, "green", 10))
+        self.add_option(MenuOption(2, "blue", 15))
 
     def display_selection(self):
-        selected = self.get_selected()
-        for option in self._get_all_options():
+        selected = self.get_selected_option()
+        for option in self.get_all_options():
             if option == selected:
                 option.led_on()
             else:
@@ -136,11 +135,11 @@ class MultiplierMenu(Menu):
     def add_options(self):
         for index in range(0, 16):
             multiplier_value = index + 1
-            self.create_option(index, "cyan", multiplier_value)
+            self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        for option in self._get_all_options():
-            if option <= self.get_selected():
+        for option in self.get_all_options():
+            if option <= self.get_selected_option():
                 option.led_on()
             else:
                 option.led_off()
