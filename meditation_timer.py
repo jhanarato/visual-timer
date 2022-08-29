@@ -184,7 +184,7 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
-    # TODO move
+    # TODO move keypress handling to new class
     def enable_next_view_on_keypress(self):
         hardware = Hardware.get_hardware()
         for key in hardware.keys:
@@ -222,6 +222,7 @@ class TimerMonitor:
         for key_num in not_selected:
             set_key_colour(key_num, "none")
 
+    # TODO move to new class
     def show_progress_view(self):
         fraction = self.timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
