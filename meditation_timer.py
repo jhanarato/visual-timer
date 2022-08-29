@@ -160,21 +160,22 @@ class MultiplierMenu(Menu):
             self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        for key_num in self._keys_equal_to_or_less_than(self.selected_option.key_num):
+        for key_num in self._keys_equal_to_or_less_than():
             set_key_colour(key_num, "cyan")
 
-        for key_num in self._keys_greater_than(self.selected_option.key_num):
+        for key_num in self._keys_greater_than():
             set_key_colour(key_num, "none")
 
-    def _keys_equal_to_or_less_than(self, key_num):
+    def _keys_equal_to_or_less_than(self):
         key_le = set()
+
         for option in self.options:
-            if option.key_num <= key_num:
+            if option.key_num <= self.selected_option.key_num:
                 key_le.add(option.key_num)
         return key_le
 
-    def _keys_greater_than(self, key_num):
-        return all_keys - self._keys_equal_to_or_less_than(key_num)
+    def _keys_greater_than(self):
+        return all_keys - self._keys_equal_to_or_less_than()
 
 
 class TimerMonitor:
