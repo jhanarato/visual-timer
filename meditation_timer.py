@@ -72,7 +72,7 @@ class Menu:
         self.display_selection()
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
-        return self.selected_option.integer_value
+        return self.selected_option.value
 
     def enable_choice_on_keypress(self):
         hardware = Hardware.get_hardware()
@@ -135,6 +135,9 @@ class Menu:
             Hardware.set_rotated_key_colour(option.key_num, option.colour)
 
 
+MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
+
+
 class MinutesMenu(Menu):
     def add_options(self):
         self.add_option(MenuOption(0, "red", 5))
@@ -167,13 +170,6 @@ class MultiplierMenu(Menu):
 
     def _keys_greater_than(self, key_num):
         return all_keys - self._keys_equal_to_or_less_than(key_num)
-
-
-class MenuOption:
-    def __init__(self, key_num, colour, integer_value):
-        self.key_num = key_num
-        self.colour = colour
-        self.integer_value = integer_value
 
 
 class TimerMonitor:
