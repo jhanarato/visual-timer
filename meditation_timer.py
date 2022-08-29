@@ -43,8 +43,8 @@ class SequenceOfOperation:
         wait = KeypressWait()
         wait.wait()
 
-    def monitor_timer(self, timer):
-        monitor = TimerMonitor(timer)
+    def monitor_timer(self, minutes_menu, multiplier_menu, timer):
+        monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
         while True:
             if timer.is_complete():
                 return
@@ -175,8 +175,11 @@ class MultiplierMenu(Menu):
 
 
 class TimerMonitor:
-    def __init__(self, timer):
-        self._timer = timer
+    def __init__(self, minutes_menu, multiplier_menu, timer):
+        self.minutes_menu = minutes_menu
+        self.multiplier_menu = multiplier_menu
+        self.timer = timer
+
         self.modes = MonitoringViewCycle()
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
@@ -193,7 +196,7 @@ class TimerMonitor:
         for key in hardware.keys:
             @hardware.on_hold(key)
             def handler(key):
-                self._timer.cancel()
+                self.timer.cancel()
 
     def show_current_view(self):
         mode = self.modes.current()
@@ -219,7 +222,7 @@ class TimerMonitor:
             set_key_colour(key_num, "none")
 
     def show_minutes_view(self):
-        minutes = self._timer.get_minutes()
+        minutes = self.timer.get_minutes()
         selected = set()
 
         if minutes == 5:
@@ -238,7 +241,7 @@ class TimerMonitor:
             set_key_colour(key_num, "none")
 
     def show_multiplier_view(self):
-        multiplier = self._timer.get_multiplier()
+        multiplier = self.timer.get_multiplier()
         selected = set(range(0, multiplier))
         not_selected = all_keys - selected
 
@@ -249,7 +252,7 @@ class TimerMonitor:
             set_key_colour(key_num, "none")
 
     def show_progress_view(self):
-        fraction = self._timer.fraction_remaining()
+        fraction = self.timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
         green_keys = set(range(0, keys_to_be_lit))
         blue_keys = all_keys - green_keys
