@@ -1,5 +1,9 @@
 import time
 import math
+import collections
+
+from pmk.platform.keybow2040 import Keybow2040
+from pmk import PMK
 
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
@@ -434,3 +438,13 @@ class KeyRotator:
         rotated_list = list(self._device_to_rotated.values())
         index = rotated_list.index(rotated_key_number)
         return actual_list[index]
+
+
+# Run the application
+keybow2040 = Keybow2040()
+pmk = PMK(keybow2040)
+Hardware.set_hardware(pmk)
+sequence = SequenceOfOperation()
+
+while True:
+    sequence.perform_sequence()
