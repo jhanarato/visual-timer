@@ -33,7 +33,7 @@ class SequenceOfOperation:
 
         print(timer)
 
-        self.monitor_timer(timer)
+        self.monitor_timer(minutes_menu, multiplier_menu, timer)
 
         if timer.is_cancelled():
             return
@@ -204,9 +204,9 @@ class TimerMonitor:
         if mode == MonitoringViewCycle.ON_INDICATOR:
             self.show_indicator_view()
         if mode == MonitoringViewCycle.MINUTES:
-            self.show_minutes_view()
+            self.minutes_menu.display_selection()
         if mode == MonitoringViewCycle.MULTIPLIER:
-            self.show_multiplier_view()
+            self.multiplier_menu.display_selection()
         if mode == MonitoringViewCycle.PROGRESS:
             self.show_progress_view()
 
@@ -217,36 +217,6 @@ class TimerMonitor:
 
         for key_num in selected:
             set_key_colour(key_num, "orange")
-
-        for key_num in not_selected:
-            set_key_colour(key_num, "none")
-
-    def show_minutes_view(self):
-        minutes = self.timer.get_minutes()
-        selected = set()
-
-        if minutes == 5:
-            selected.add(0)
-            set_key_colour(0, "red")
-        if minutes == 10:
-            selected.add(1)
-            set_key_colour(1, "green")
-        if minutes == 15:
-            selected.add(2)
-            set_key_colour(2, "blue")
-
-        not_selected = all_keys - selected
-
-        for key_num in not_selected:
-            set_key_colour(key_num, "none")
-
-    def show_multiplier_view(self):
-        multiplier = self.timer.get_multiplier()
-        selected = set(range(0, multiplier))
-        not_selected = all_keys - selected
-
-        for key_num in selected:
-            set_key_colour(key_num, "cyan")
 
         for key_num in not_selected:
             set_key_colour(key_num, "none")
