@@ -160,7 +160,6 @@ class MultiplierMenu(Menu):
             self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        # TODO no need to pass a member as a parameter
         for key_num in self._keys_equal_to_or_less_than():
             set_key_colour(key_num, "cyan")
 
