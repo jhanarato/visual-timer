@@ -184,6 +184,7 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
+    # TODO move
     def enable_next_view_on_keypress(self):
         hardware = Hardware.get_hardware()
         for key in hardware.keys:
