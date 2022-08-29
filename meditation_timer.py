@@ -160,21 +160,18 @@ class MultiplierMenu(Menu):
             self.add_option(MenuOption(index, "cyan", multiplier_value))
 
     def display_selection(self):
-        for key_num in self._keys_equal_to_or_less_than():
+        # TODO no need to pass a member as a parameter
+        for key_num in self._keys_equal_to_or_less_than(self.selected_option.key_num):
             set_key_colour(key_num, "cyan")
 
-        for key_num in self._keys_greater_than():
+        for key_num in self._keys_greater_than(self.selected_option.key_num):
             set_key_colour(key_num, "none")
 
-    def _keys_equal_to_or_less_than(self):
-        key_le = set()
-        for option in self.options:
-            if option.key_num <= self.selected_option.key_num:
-                key_le.add(option.key_num)
-        return key_le
+    def _keys_equal_to_or_less_than(self, key_num):
+        return {option.key_num for option in self.options if option.key_num <= key_num}
 
-    def _keys_greater_than(self):
-        return all_keys - self._keys_equal_to_or_less_than()
+    def _keys_greater_than(self, key_num):
+        return all_keys - self._keys_equal_to_or_less_than(key_num)
 
 
 class TimerMonitor:
@@ -187,7 +184,7 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
-    # TODO move keypress handling to separate class
+    # TODO move
     def enable_next_view_on_keypress(self):
         hardware = Hardware.get_hardware()
         for key in hardware.keys:
@@ -225,7 +222,6 @@ class TimerMonitor:
         for key_num in not_selected:
             set_key_colour(key_num, "none")
 
-    # TODO move method to its own class
     def show_progress_view(self):
         fraction = self.timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
