@@ -60,6 +60,8 @@ class SequenceOfOperation:
 
 
 class Menu:
+    NO_SELECTION = -1
+
     def __init__(self):
         self._options = dict()
         self.add_options()
@@ -74,7 +76,7 @@ class Menu:
         return self.selected_option.value
 
     def wait_for_selection(self):
-        while self._selection_handler.selected_key_num is None:
+        while self._selection_handler.selected_key_num is Menu.NO_SELECTION:
             Hardware.update()
 
     @property
@@ -113,7 +115,7 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 
 class MenuSelectionHandler:
     def __init__(self):
-        self.selected_key_num = None
+        self.selected_key_num = Menu.NO_SELECTION
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
@@ -126,7 +128,7 @@ class MenuSelectionHandler:
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
-        if self.selected_key_num is not None:
+        if self.selected_key_num is not Menu.NO_SELECTION:
             return
 
         if len(pressed_list) != 1:
