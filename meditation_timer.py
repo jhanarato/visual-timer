@@ -74,7 +74,7 @@ class Menu:
         return self.selected_option.value
 
     def wait_for_selection(self):
-        while self._selection_handler.selected_option is None:
+        while self._selection_handler.selected_key_num is None:
             Hardware.update()
 
     @property
@@ -83,12 +83,7 @@ class Menu:
 
     @property
     def selected_option(self):
-        return self._options[self._selection_handler.selected_option]
-
-    @selected_option.setter
-    def selected_option(self, key_num):
-        if key_num in self._options:
-            self._selection_handler.selected_option = self._options.get(key_num)
+        return self._options.get(self._selection_handler.selected_key_num)
 
     def add_option(self, option):
         self._options[option.key_num] = option
@@ -118,7 +113,7 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 
 class MenuSelectionHandler:
     def __init__(self):
-        self.selected_option = None
+        self.selected_key_num = None
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
@@ -131,13 +126,16 @@ class MenuSelectionHandler:
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
+        if self.selected_key_num is not None:
+            return
+
         if len(pressed_list) != 1:
             return
 
         pressed = pressed_list[0]
         rotator = KeyRotator()
         rotated = rotator.to_rotated_orientation(pressed)
-        self.selected_option = rotated
+        self.selected_key_num = rotated
 
 
 class MinutesMenu(Menu):
