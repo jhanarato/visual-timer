@@ -54,8 +54,6 @@ class SequenceOfOperation:
 
 
 class Menu:
-    NO_SELECTION = -1
-
     def __init__(self):
         self._options = dict()
         self.add_options()
@@ -63,15 +61,11 @@ class Menu:
 
     def get_users_choice(self):
         self.light_all_option_keys()
-        self.wait_for_selection()
+        self._selection_handler.wait_for_selection()
         self.display_selection()
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
         return self.selected_option.value
-
-    def wait_for_selection(self):
-        while self._selection_handler.selected_key_num is Menu.NO_SELECTION:
-            Hardware.update()
 
     @property
     def options(self):
@@ -108,8 +102,10 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 
 
 class MenuSelectionHandler:
+    NO_SELECTION = -1
+
     def __init__(self):
-        self.selected_key_num = Menu.NO_SELECTION
+        self.selected_key_num = MenuSelectionHandler.NO_SELECTION
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
@@ -132,7 +128,11 @@ class MenuSelectionHandler:
             self.selected_key_num = rotated
 
     def _selection_already_made(self):
-        return self.selected_key_num is not Menu.NO_SELECTION
+        return self.selected_key_num is not MenuSelectionHandler.NO_SELECTION
+
+    def wait_for_selection(self):
+        while self.selected_key_num is MenuSelectionHandler.NO_SELECTION:
+            Hardware.update()
 
 
 class MinutesMenu(Menu):
