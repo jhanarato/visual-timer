@@ -45,13 +45,7 @@ class SequenceOfOperation:
 
     def monitor_timer(self, minutes_menu, multiplier_menu, timer):
         monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
-        while True:
-            if timer.is_complete():
-                return
-            if timer.is_cancelled():
-                return
-            monitor.show_current_view()
-            Hardware.update()
+        monitor.monitor()
 
     def show_complete_view(self):
         for key_num in all_keys:
@@ -239,6 +233,15 @@ class TimerMonitor:
 
         for key_num in blue_keys:
             set_key_colour(key_num, "blue")
+
+    def monitor(self):
+        while True:
+            if self.timer.is_complete():
+                return
+            if self.timer.is_cancelled():
+                return
+            self.show_current_view()
+            Hardware.update()
 
 
 class MonitoringViewCycle:
