@@ -33,7 +33,8 @@ class SequenceOfOperation:
 
         print(timer)
 
-        self.monitor_timer(minutes_menu, multiplier_menu, timer)
+        monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
+        monitor.monitor()
 
         if timer.is_cancelled():
             return
@@ -42,10 +43,6 @@ class SequenceOfOperation:
 
         wait = KeypressWait()
         wait.wait()
-
-    def monitor_timer(self, minutes_menu, multiplier_menu, timer):
-        monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
-        monitor.monitor()
 
     def show_complete_view(self):
         for key_num in all_keys:
