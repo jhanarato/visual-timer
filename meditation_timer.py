@@ -128,16 +128,17 @@ class MenuSelectionHandler:
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
-        if self.selected_key_num is not Menu.NO_SELECTION:
+        if self._selection_already_made():
             return
 
-        if len(pressed_list) != 1:
-            return
+        if len(pressed_list) == 1:
+            pressed = pressed_list[0]
+            rotator = KeyRotator()
+            rotated = rotator.to_rotated_orientation(pressed)
+            self.selected_key_num = rotated
 
-        pressed = pressed_list[0]
-        rotator = KeyRotator()
-        rotated = rotator.to_rotated_orientation(pressed)
-        self.selected_key_num = rotated
+    def _selection_already_made(self):
+        return self.selected_key_num is not Menu.NO_SELECTION
 
 
 class MinutesMenu(Menu):
