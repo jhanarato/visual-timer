@@ -131,9 +131,7 @@ class MenuSelectionHandler:
 
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
-            rotator = KeyRotator()
-            rotated = rotator.to_rotated_orientation(pressed)
-            self.selected_key_num = rotated
+            self.selected_key_num = to_rotated_orientation(pressed)
 
     def _selection_already_made(self):
         return self.selected_key_num is not MenuSelectionHandler.NO_SELECTION
@@ -352,28 +350,28 @@ class Pause:
             keypad.update()
 
 
-class KeyRotator:
-    def __init__(self):
-        self._device_to_rotated = {
-            0: 0, 1: 4, 2: 8, 3: 12,
-            4: 1, 5: 5, 6: 9, 7: 13,
-            8: 2, 9: 6, 10: 10, 11: 14,
-            12: 3, 13: 7, 14: 11, 15: 15
-        }
+normal_to_rotated = {
+    0: 0, 1: 4, 2: 8, 3: 12,
+    4: 1, 5: 5, 6: 9, 7: 13,
+    8: 2, 9: 6, 10: 10, 11: 14,
+    12: 3, 13: 7, 14: 11, 15: 15
+}
 
-    def to_rotated_orientation(self, device_key_number):
-        return self._device_to_rotated[device_key_number]
 
-    def to_device_orientation(self, rotated_key_number):
-        actual_list = list(self._device_to_rotated.keys())
-        rotated_list = list(self._device_to_rotated.values())
-        index = rotated_list.index(rotated_key_number)
-        return actual_list[index]
+def invert_dictionary(d):
+    return {v: k for k, v in d.items()}
+
+
+def to_rotated_orientation(key_num):
+    return normal_to_rotated[key_num]
+
+
+def to_device_orientation(key_num):
+    return invert_dictionary(normal_to_rotated)[key_num]
 
 
 def set_key_colour(key_num, colour):
-    rotator = KeyRotator()
-    key_num = rotator.to_device_orientation(key_num)
+    key_num = to_device_orientation(key_num)
     keypad.keys[key_num].set_led(*key_colours[colour])
 
 
