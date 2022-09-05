@@ -5,6 +5,9 @@ import collections
 from pmk.platform.keybow2040 import Keybow2040
 from pmk import PMK
 
+keybow2040 = Keybow2040()
+pmk = PMK(keybow2040)
+
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
                "blue": (0, 0, 255),
@@ -48,7 +51,7 @@ class SequenceOfOperation:
     def show_complete_view(self):
         for key_num in all_keys:
             set_key_colour(key_num, "orange")
-        Hardware.update()
+        pmk.update()
 
     def reset(self):
         for key in pmk.keys:
@@ -136,7 +139,7 @@ class MenuSelectionHandler:
 
     def wait_for_selection(self):
         while self.selected_key_num is MenuSelectionHandler.NO_SELECTION:
-            Hardware.update()
+            pmk.update()
 
 
 class MinutesMenu(Menu):
@@ -243,7 +246,7 @@ class TimerMonitor:
             if self.timer.is_cancelled():
                 return
             self.show_current_view()
-            Hardware.update()
+            pmk.update()
 
 
 class MonitoringViewCycle:
@@ -319,12 +322,6 @@ class Timer:
         return f"Timer set: {self._minutes} x {self._multiplier} = {self.total_minutes()} minutes"
 
 
-class Hardware:
-    @staticmethod
-    def update():
-        pmk.update()
-
-
 class KeypressWait:
     def __init__(self):
         self._pressed = False
@@ -336,7 +333,7 @@ class KeypressWait:
 
     def wait(self):
         while not self._pressed:
-            Hardware.update()
+            pmk.update()
 
 
 class Pause:
@@ -351,7 +348,7 @@ class Pause:
 
     def wait_until_complete(self):
         while not self.complete():
-            Hardware.update()
+            pmk.update()
 
 
 class KeyRotator:
@@ -380,8 +377,6 @@ def set_key_colour(key_num, colour):
 
 
 # Run the application
-keybow2040 = Keybow2040()
-pmk = PMK(keybow2040)
 sequence = SequenceOfOperation()
 
 while True:
