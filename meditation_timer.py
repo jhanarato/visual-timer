@@ -49,7 +49,6 @@ class SequenceOfOperation:
     def show_complete_view(self):
         for key_num in all_keys:
             set_key_colour(key_num, "orange")
-        keypad.update()
 
 
 class Menu:
