@@ -24,9 +24,6 @@ class SequenceOfOperation:
         pass
 
     def perform_sequence(self):
-        # TODO: Clean up so we don't need to reset. Assuming reset does something.
-        self.reset()
-
         minutes_menu = MinutesMenu()
         minutes = minutes_menu.get_users_choice()
 
@@ -53,14 +50,6 @@ class SequenceOfOperation:
         for key_num in all_keys:
             set_key_colour(key_num, "orange")
         keypad.update()
-
-    def reset(self):
-        for key in keypad.keys:
-            set_key_colour(key.number, "none")
-
-            @keypad.on_press(key)
-            def handler(key):
-                pass
 
 
 class Menu:
@@ -106,6 +95,9 @@ class Menu:
     def light_all_option_keys(self):
         for option in self.options:
             set_key_colour(option.key_num, option.colour)
+
+        for key_num in self.unused_keys:
+            set_key_colour(key_num, "none")
 
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
@@ -196,6 +188,8 @@ class TimerMonitor:
             def handler(key):
                 self.modes.next()
 
+    # TODO Move cancelling to SequenceOfOperations as this handler
+    #   works even when we should reset it.
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
