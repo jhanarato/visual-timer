@@ -20,7 +20,8 @@ class SequenceOfOperation:
         pass
 
     def perform_sequence(self):
-        Hardware.reset()
+        # TODO: Clean up so we don't need to reset. Assuming reset does something.
+        self.reset()
 
         minutes_menu = MinutesMenu()
         minutes = minutes_menu.get_users_choice()
@@ -48,6 +49,14 @@ class SequenceOfOperation:
         for key_num in all_keys:
             set_key_colour(key_num, "orange")
         Hardware.update()
+
+    def reset(self):
+        for key in pmk.keys:
+            set_key_colour(key.number, "none")
+
+            @pmk.on_press(key)
+            def handler(key):
+                pass
 
 
 class Menu:
@@ -330,37 +339,9 @@ class Hardware:
         return Hardware._pmk
 
     @staticmethod
-    def reset():
-        hardware = Hardware._pmk
-        for key in hardware.keys:
-            key.set_led(*key_colours["none"])
-
-            @hardware.on_press(key)
-            def handler(key):
-                pass
-
-    @staticmethod
     def update():
         hardware = Hardware._pmk
         hardware.update()
-
-    @staticmethod
-    def get_key(index):
-        return Hardware._pmk.keys[index]
-
-    @staticmethod
-    def get_rotated_key(index):
-        rotated_index = Hardware.rotator.to_device_orientation(index)
-        return Hardware._pmk.keys[rotated_index]
-
-    @staticmethod
-    def set_all_colour(colour):
-        Hardware._pmk.set_all(*key_colours[colour])
-
-    @staticmethod
-    def any_key_pressed():
-        Hardware.update()
-        return Hardware._pmk.any_pressed()
 
 
 class KeypressWait:
@@ -414,7 +395,8 @@ class KeyRotator:
 
 
 def set_key_colour(key_num, colour):
-    key_num = Hardware.rotator.to_device_orientation(key_num)
+    rotator = KeyRotator()
+    key_num = rotator.to_device_orientation(key_num)
     pmk.keys[key_num].set_led(*key_colours[colour])
 
 
