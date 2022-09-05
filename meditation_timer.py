@@ -199,15 +199,14 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
-    # TODO move keypress handling to new class
+        self._progress_view = ProgressView(timer)
+
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
             @keypad.on_press(key)
             def handler(key):
                 self.modes.next()
 
-    # TODO Move cancelling to SequenceOfOperations as this handler
-    #   works even when we should reset it.
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
@@ -224,7 +223,7 @@ class TimerMonitor:
         if mode == MonitoringViewCycle.MULTIPLIER:
             self.multiplier_menu.display_selection()
         if mode == MonitoringViewCycle.PROGRESS:
-            self.show_progress_view()
+            self._progress_view.display()
 
     def show_indicator_view(self):
         indicator_key = 0
@@ -237,8 +236,21 @@ class TimerMonitor:
         for key_num in not_selected:
             set_key_colour(key_num, "none")
 
-    # TODO move to new class
-    def show_progress_view(self):
+    def monitor(self):
+        while True:
+            if self.timer.is_complete():
+                return
+            if self.timer.is_cancelled():
+                return
+            self.show_current_view()
+            keypad.update()
+
+
+class ProgressView:
+    def __init__(self, timer):
+        self.timer = timer
+
+    def display(self):
         fraction = self.timer.fraction_remaining()
         keys_to_be_lit = math.ceil(16 * fraction)
         green_keys = set(range(0, keys_to_be_lit))
@@ -249,15 +261,6 @@ class TimerMonitor:
 
         for key_num in blue_keys:
             set_key_colour(key_num, "blue")
-
-    def monitor(self):
-        while True:
-            if self.timer.is_complete():
-                return
-            if self.timer.is_cancelled():
-                return
-            self.show_current_view()
-            keypad.update()
 
 
 class MonitoringViewCycle:
