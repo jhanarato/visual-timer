@@ -9,6 +9,25 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
+normal_to_rotated = {
+    0: 0,
+    1: 4,
+    2: 8,
+    3: 12,
+    4: 1,
+    5: 5,
+    6: 9,
+    7: 13,
+    8: 2,
+    9: 6,
+    10: 10,
+    11: 14,
+    12: 3,
+    13: 7,
+    14: 11,
+    15: 15
+}
+
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
                "blue": (0, 0, 255),
@@ -341,26 +360,6 @@ class Pause:
     def wait_until_complete(self):
         while not self.complete():
             keypad.update()
-
-
-normal_to_rotated = {
-    0: 0,
-    1: 4,
-    2: 8,
-    3: 12,
-    4: 1,
-    5: 5,
-    6: 9,
-    7: 13,
-    8: 2,
-    9: 6,
-    10: 10,
-    11: 14,
-    12: 3,
-    13: 7,
-    14: 11,
-    15: 15
-}
 
 
 def invert_dictionary(d):
