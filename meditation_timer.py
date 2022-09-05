@@ -115,12 +115,10 @@ class MenuSelectionHandler:
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
-        hardware = Hardware.get_hardware()
-
-        for key in hardware.keys:
-            @hardware.on_press(key)
+        for key in pmk.keys:
+            @pmk.on_press(key)
             def handler(choice_key):
-                pressed_list = hardware.get_pressed()
+                pressed_list = pmk.get_pressed()
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
@@ -191,16 +189,14 @@ class TimerMonitor:
 
     # TODO move keypress handling to new class
     def enable_next_view_on_keypress(self):
-        hardware = Hardware.get_hardware()
-        for key in hardware.keys:
-            @hardware.on_press(key)
+        for key in pmk.keys:
+            @pmk.on_press(key)
             def handler(key):
                 self.modes.next()
 
     def enable_cancel_timer_on_keyhold(self):
-        hardware = Hardware.get_hardware()
-        for key in hardware.keys:
-            @hardware.on_hold(key)
+        for key in pmk.keys:
+            @pmk.on_hold(key)
             def handler(key):
                 self.timer.cancel()
 
@@ -324,34 +320,17 @@ class Timer:
 
 
 class Hardware:
-    _pmk = None
-    rotator = None
-
-    @staticmethod
-    def set_hardware(pmk):
-        Hardware._pmk = pmk
-        Hardware.rotator = KeyRotator()
-
-    @staticmethod
-    def get_hardware():
-        if Hardware._pmk is None:
-            raise ValueError("Hardware not initialised before use.")
-        return Hardware._pmk
-
     @staticmethod
     def update():
-        hardware = Hardware._pmk
-        hardware.update()
+        pmk.update()
 
 
 class KeypressWait:
     def __init__(self):
         self._pressed = False
 
-        hardware = Hardware.get_hardware()
-
-        for key in hardware.keys:
-            @hardware.on_press(key)
+        for key in pmk.keys:
+            @pmk.on_press(key)
             def handler(key):
                 self._pressed = True
 
@@ -403,7 +382,6 @@ def set_key_colour(key_num, colour):
 # Run the application
 keybow2040 = Keybow2040()
 pmk = PMK(keybow2040)
-Hardware.set_hardware(pmk)
 sequence = SequenceOfOperation()
 
 while True:
