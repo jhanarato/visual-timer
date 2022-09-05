@@ -2,11 +2,12 @@ import time
 import math
 import collections
 
+# Import libraries for Pimoroni Mechanical Keypad
 from pmk.platform.keybow2040 import Keybow2040
 from pmk import PMK
 
 keybow2040 = Keybow2040()
-pmk = PMK(keybow2040)
+keypad = PMK(keybow2040)
 
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
@@ -51,13 +52,13 @@ class SequenceOfOperation:
     def show_complete_view(self):
         for key_num in all_keys:
             set_key_colour(key_num, "orange")
-        pmk.update()
+        keypad.update()
 
     def reset(self):
-        for key in pmk.keys:
+        for key in keypad.keys:
             set_key_colour(key.number, "none")
 
-            @pmk.on_press(key)
+            @keypad.on_press(key)
             def handler(key):
                 pass
 
@@ -118,10 +119,10 @@ class MenuSelectionHandler:
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
-        for key in pmk.keys:
-            @pmk.on_press(key)
+        for key in keypad.keys:
+            @keypad.on_press(key)
             def handler(choice_key):
-                pressed_list = pmk.get_pressed()
+                pressed_list = keypad.get_pressed()
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
@@ -139,7 +140,7 @@ class MenuSelectionHandler:
 
     def wait_for_selection(self):
         while self.selected_key_num is MenuSelectionHandler.NO_SELECTION:
-            pmk.update()
+            keypad.update()
 
 
 class MinutesMenu(Menu):
@@ -192,14 +193,14 @@ class TimerMonitor:
 
     # TODO move keypress handling to new class
     def enable_next_view_on_keypress(self):
-        for key in pmk.keys:
-            @pmk.on_press(key)
+        for key in keypad.keys:
+            @keypad.on_press(key)
             def handler(key):
                 self.modes.next()
 
     def enable_cancel_timer_on_keyhold(self):
-        for key in pmk.keys:
-            @pmk.on_hold(key)
+        for key in keypad.keys:
+            @keypad.on_hold(key)
             def handler(key):
                 self.timer.cancel()
 
@@ -246,7 +247,7 @@ class TimerMonitor:
             if self.timer.is_cancelled():
                 return
             self.show_current_view()
-            pmk.update()
+            keypad.update()
 
 
 class MonitoringViewCycle:
@@ -326,14 +327,14 @@ class KeypressWait:
     def __init__(self):
         self._pressed = False
 
-        for key in pmk.keys:
-            @pmk.on_press(key)
+        for key in keypad.keys:
+            @keypad.on_press(key)
             def handler(key):
                 self._pressed = True
 
     def wait(self):
         while not self._pressed:
-            pmk.update()
+            keypad.update()
 
 
 class Pause:
@@ -348,7 +349,7 @@ class Pause:
 
     def wait_until_complete(self):
         while not self.complete():
-            pmk.update()
+            keypad.update()
 
 
 class KeyRotator:
@@ -373,7 +374,7 @@ class KeyRotator:
 def set_key_colour(key_num, colour):
     rotator = KeyRotator()
     key_num = rotator.to_device_orientation(key_num)
-    pmk.keys[key_num].set_led(*key_colours[colour])
+    keypad.keys[key_num].set_led(*key_colours[colour])
 
 
 # Run the application
