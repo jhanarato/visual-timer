@@ -131,7 +131,7 @@ class MenuSelectionHandler:
 
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
-            self.selected_key_num = to_rotated_orientation(pressed)
+            self.selected_key_num = rotate(pressed)
 
     def _selection_already_made(self):
         return self.selected_key_num is not MenuSelectionHandler.NO_SELECTION
@@ -362,16 +362,16 @@ def invert_dictionary(d):
     return {v: k for k, v in d.items()}
 
 
-def to_rotated_orientation(key_num):
+def rotate(key_num):
     return normal_to_rotated[key_num]
 
 
-def to_device_orientation(key_num):
+def undo_rotate(key_num):
     return invert_dictionary(normal_to_rotated)[key_num]
 
 
 def set_key_colour(key_num, colour):
-    key_num = to_device_orientation(key_num)
+    key_num = undo_rotate(key_num)
     keypad.keys[key_num].set_led(*key_colours[colour])
 
 
