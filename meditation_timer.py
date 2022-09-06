@@ -222,8 +222,14 @@ class TimerMonitor:
 
     def show_indicator_view(self):
         indicator_key = 0
-        set_all_keys_colour("none")
-        set_key_colour(indicator_key, "orange")
+        selected = {indicator_key}
+        not_selected = all_keys - selected
+
+        for key_num in selected:
+            set_key_colour(key_num, "orange")
+
+        for key_num in not_selected:
+            set_key_colour(key_num, "none")
 
     def monitor(self):
         while True:
