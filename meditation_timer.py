@@ -53,7 +53,7 @@ def main_sequence():
         print(timer)
 
         monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
-        monitor.monitor()
+        monitor.wait_for_timer()
 
         if timer.is_cancelled():
             continue
@@ -184,6 +184,9 @@ class MultiplierMenu(Menu):
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
+        # This is necessary to clean up after the MultiplierMenu
+        set_all_keys_colour("none")
+
         self.minutes_menu = minutes_menu
         self.multiplier_menu = multiplier_menu
         self.timer = timer
@@ -198,6 +201,7 @@ class TimerMonitor:
         for key in keypad.keys:
             @keypad.on_press(key)
             def handler(key):
+                # Clean up after previous view.
                 set_all_keys_colour("none")
                 self.modes.next()
 
@@ -223,7 +227,7 @@ class TimerMonitor:
         indicator_key = 0
         set_key_colour(indicator_key, "orange")
 
-    def monitor(self):
+    def wait_for_timer(self):
         while True:
             if self.timer.is_complete():
                 return
