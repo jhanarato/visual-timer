@@ -197,6 +197,7 @@ class TimerMonitor:
 
         self._progress_view = ProgressView(timer)
 
+    # TODO extract to ViewChangeHandler class
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
             @keypad.on_press(key)
@@ -205,6 +206,7 @@ class TimerMonitor:
                 set_all_keys_colour("none")
                 self.modes.next()
 
+    # TODO extract to Canceler class
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
@@ -255,6 +257,7 @@ class ProgressView:
 
 
 class MonitoringViewCycle:
+    # TODO Instead of using constants, store a list of views to cycle through.
     ON_INDICATOR = "showing is on"
     MINUTES = "showing minutes"
     MULTIPLIER = "showing multiplier"
@@ -268,6 +271,8 @@ class MonitoringViewCycle:
 
         self.mode_index = 0
 
+    # TODO Use a generator similar to itertools.cycle()
+    #   A pythonic iterator is the way to go - for view in views:
     def next(self):
         self.mode_index = (self.mode_index + 1) % len(self.modes)
 
