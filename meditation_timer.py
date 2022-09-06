@@ -60,14 +60,9 @@ class SequenceOfOperation:
         if timer.is_cancelled():
             return
 
-        self.show_complete_view()
-
+        set_all_keys_colour("orange")
         wait = KeypressWait()
         wait.wait()
-
-    def show_complete_view(self):
-        for key_num in all_keys:
-            set_key_colour(key_num, "orange")
 
 
 class Menu:
@@ -380,6 +375,10 @@ def undo_rotate(key_num):
 def set_key_colour(key_num, colour):
     key_num = undo_rotate(key_num)
     keypad.keys[key_num].set_led(*key_colours[colour])
+
+
+def set_all_keys_colour(colour):
+    keypad.set_all(*key_colours[colour])
 
 
 # Run the application
