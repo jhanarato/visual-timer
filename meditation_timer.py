@@ -38,11 +38,9 @@ key_colours = {"red": (255, 0, 0),
 all_keys = frozenset(range(0, 16))
 
 
-class SequenceOfOperation:
-    def __init__(self):
-        pass
-
-    def perform_sequence(self):
+def main_sequence():
+    print("Main sequence")
+    while True:
         minutes_menu = MinutesMenu()
         minutes = minutes_menu.get_users_choice()
 
@@ -58,7 +56,7 @@ class SequenceOfOperation:
         monitor.monitor()
 
         if timer.is_cancelled():
-            return
+            continue
 
         set_all_keys_colour("orange")
         wait = KeypressWait()
@@ -375,8 +373,4 @@ def set_all_keys_colour(colour):
     keypad.set_all(*key_colours[colour])
 
 
-# Run the application
-sequence = SequenceOfOperation()
-
-while True:
-    sequence.perform_sequence()
+main_sequence()
