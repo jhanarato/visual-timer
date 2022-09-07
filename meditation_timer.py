@@ -184,7 +184,6 @@ class MultiplierMenu(Menu):
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
-        print("With view list")
         # This is necessary to clean up after the MultiplierMenu
         set_all_keys_colour("none")
 
@@ -192,7 +191,6 @@ class TimerMonitor:
         self.multiplier_menu = multiplier_menu
         self.timer = timer
 
-        self.modes = MonitoringViewCycle()
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
@@ -201,13 +199,16 @@ class TimerMonitor:
                        MenuSelectionView(multiplier_menu),
                        ProgressView(timer)]
 
+        self._views_iter = cycle(self._views)
+        self._current_view = next(self._views_iter)
+
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
             @keypad.on_press(key)
             def handler(key):
                 # Clean up after previous view.
                 set_all_keys_colour("none")
-                self.modes.next()
+                self._current_view = next(self._views_iter)
 
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
@@ -216,8 +217,7 @@ class TimerMonitor:
                 self.timer.cancel()
 
     def show_current_view(self):
-        mode = self._views[self.modes.current_mode]
-        mode.display()
+        self._current_view.display()
 
     def wait_for_timer(self):
         while True:
@@ -227,16 +227,6 @@ class TimerMonitor:
                 return
             self.show_current_view()
             keypad.update()
-
-
-class MonitoringViewCycle:
-    def __init__(self):
-        self.mode_iter = cycle(range(0, 4))
-        self.current_mode = 0
-        self.next()
-
-    def next(self):
-        self.current_mode = next(self.mode_iter)
 
 
 class ProgressView:
