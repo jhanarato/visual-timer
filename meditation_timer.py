@@ -216,16 +216,13 @@ class TimerMonitor:
             def handler(key):
                 self.timer.cancel()
 
-    def show_current_view(self):
-        self._current_view.display()
-
     def wait_for_timer(self):
         while True:
             if self.timer.is_complete():
                 return
             if self.timer.is_cancelled():
                 return
-            self.show_current_view()
+            self._current_view.display()
             keypad.update()
 
 
