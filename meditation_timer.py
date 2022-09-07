@@ -184,6 +184,7 @@ class MultiplierMenu(Menu):
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
+        print("With view list")
         # This is necessary to clean up after the MultiplierMenu
         set_all_keys_colour("none")
 
@@ -195,10 +196,10 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
-        self._indicator_view = SimpleIndicatorView(key_num=0, colour="orange")
-        self._minutes_view = MenuSelectionView(minutes_menu)
-        self._multiplier_view = MenuSelectionView(multiplier_menu)
-        self._progress_view = ProgressView(timer)
+        self._views = [SimpleIndicatorView(key_num=0, colour="orange"),
+                       MenuSelectionView(minutes_menu),
+                       MenuSelectionView(multiplier_menu),
+                       ProgressView(timer)]
 
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
@@ -215,16 +216,8 @@ class TimerMonitor:
                 self.timer.cancel()
 
     def show_current_view(self):
-        mode = self.modes.current_mode
-
-        if mode == MonitoringViewCycle.ON_INDICATOR:
-            self._indicator_view.display()
-        if mode == MonitoringViewCycle.MINUTES:
-            self._minutes_view.display()
-        if mode == MonitoringViewCycle.MULTIPLIER:
-            self._multiplier_view.display()
-        if mode == MonitoringViewCycle.PROGRESS:
-            self._progress_view.display()
+        mode = self._views[self.modes.current_mode]
+        mode.display()
 
     def wait_for_timer(self):
         while True:
@@ -237,18 +230,9 @@ class TimerMonitor:
 
 
 class MonitoringViewCycle:
-    ON_INDICATOR = "showing is on"
-    MINUTES = "showing minutes"
-    MULTIPLIER = "showing multiplier"
-    PROGRESS = "showing progress"
-
     def __init__(self):
-        self.modes = [MonitoringViewCycle.ON_INDICATOR,
-                      MonitoringViewCycle.MINUTES,
-                      MonitoringViewCycle.MULTIPLIER,
-                      MonitoringViewCycle.PROGRESS]
-
-        self.mode_iter = cycle(self.modes)
+        self.mode_iter = cycle(range(0, 4))
+        self.current_mode = 0
         self.next()
 
     def next(self):
