@@ -194,7 +194,8 @@ class TimerMonitor:
         self.modes = MonitoringViewCycle()
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
-
+        print("Setup indicator view")
+        self._indicator_view = SimpleIndicatorView(key_num=0, colour="orange")
         self._progress_view = ProgressView(timer)
 
     def enable_next_view_on_keypress(self):
@@ -215,17 +216,13 @@ class TimerMonitor:
         mode = self.modes.current_mode
 
         if mode == MonitoringViewCycle.ON_INDICATOR:
-            self.show_indicator_view()
+            self._indicator_view.display()
         if mode == MonitoringViewCycle.MINUTES:
             self.minutes_menu.display_selection()
         if mode == MonitoringViewCycle.MULTIPLIER:
             self.multiplier_menu.display_selection()
         if mode == MonitoringViewCycle.PROGRESS:
             self._progress_view.display()
-
-    def show_indicator_view(self):
-        indicator_key = 0
-        set_key_colour(indicator_key, "orange")
 
     def wait_for_timer(self):
         while True:
@@ -271,6 +268,15 @@ class ProgressView:
 
         for key_num in blue_keys:
             set_key_colour(key_num, "blue")
+
+
+class SimpleIndicatorView:
+    def __init__(self, key_num, colour):
+        self._key_num = key_num
+        self._colour = colour
+
+    def display(self):
+        set_key_colour(self._key_num, self._colour)
 
 
 class Timer:
