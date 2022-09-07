@@ -197,7 +197,6 @@ class TimerMonitor:
 
         self._progress_view = ProgressView(timer)
 
-    # TODO extract to ViewChangeHandler class
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
             @keypad.on_press(key)
@@ -206,7 +205,6 @@ class TimerMonitor:
                 set_all_keys_colour("none")
                 self.modes.next()
 
-    # TODO extract to Canceler class
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
@@ -214,7 +212,7 @@ class TimerMonitor:
                 self.timer.cancel()
 
     def show_current_view(self):
-        mode = self.modes.current()
+        mode = self.modes.current_mode
 
         if mode == MonitoringViewCycle.ON_INDICATOR:
             self.show_indicator_view()
@@ -239,6 +237,25 @@ class TimerMonitor:
             keypad.update()
 
 
+class MonitoringViewCycle:
+    ON_INDICATOR = "showing is on"
+    MINUTES = "showing minutes"
+    MULTIPLIER = "showing multiplier"
+    PROGRESS = "showing progress"
+
+    def __init__(self):
+        self.modes = [MonitoringViewCycle.ON_INDICATOR,
+                      MonitoringViewCycle.MINUTES,
+                      MonitoringViewCycle.MULTIPLIER,
+                      MonitoringViewCycle.PROGRESS]
+
+        self.mode_iter = cycle(self.modes)
+        self.next()
+
+    def next(self):
+        self.current_mode = next(self.mode_iter)
+
+
 class ProgressView:
     def __init__(self, timer):
         self.timer = timer
@@ -254,30 +271,6 @@ class ProgressView:
 
         for key_num in blue_keys:
             set_key_colour(key_num, "blue")
-
-
-class MonitoringViewCycle:
-    # TODO Instead of using constants, store a list of views to cycle through.
-    ON_INDICATOR = "showing is on"
-    MINUTES = "showing minutes"
-    MULTIPLIER = "showing multiplier"
-    PROGRESS = "showing progress"
-
-    def __init__(self):
-        self.modes = [MonitoringViewCycle.ON_INDICATOR,
-                      MonitoringViewCycle.MINUTES,
-                      MonitoringViewCycle.MULTIPLIER,
-                      MonitoringViewCycle.PROGRESS]
-
-        self.mode_index = 0
-
-    # TODO Use a generator similar to itertools.cycle()
-    #   A pythonic iterator is the way to go - for view in views:
-    def next(self):
-        self.mode_index = (self.mode_index + 1) % len(self.modes)
-
-    def current(self):
-        return self.modes[self.mode_index]
 
 
 class Timer:
@@ -359,6 +352,14 @@ class Pause:
     def wait_until_complete(self):
         while not self.complete():
             keypad.update()
+
+
+# itertools.cycle() is not available in circuit python
+# Here's a simple implementation.
+def cycle(iterable):
+    while True:
+        for element in iterable:
+            yield element
 
 
 def invert_dictionary(d):
