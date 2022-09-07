@@ -229,23 +229,6 @@ class TimerMonitor:
             keypad.update()
 
 
-class ProgressView:
-    def __init__(self, timer):
-        self.timer = timer
-
-    def display(self):
-        fraction = self.timer.fraction_remaining()
-        keys_to_be_lit = math.ceil(16 * fraction)
-        green_keys = set(range(0, keys_to_be_lit))
-        blue_keys = all_keys - green_keys
-
-        for key_num in green_keys:
-            set_key_colour(key_num, "green")
-
-        for key_num in blue_keys:
-            set_key_colour(key_num, "blue")
-
-
 class SimpleIndicatorView:
     def __init__(self, key_num, colour):
         self._key_num = key_num
@@ -261,6 +244,23 @@ class MenuSelectionView:
 
     def display(self):
         self._menu.display_selection()
+
+
+class ProgressView:
+    def __init__(self, timer):
+        self.timer = timer
+
+    def display(self):
+        fraction = self.timer.fraction_remaining()
+        keys_to_be_lit = math.ceil(16 * fraction)
+        green_keys = set(range(0, keys_to_be_lit))
+        blue_keys = all_keys - green_keys
+
+        for key_num in green_keys:
+            set_key_colour(key_num, "green")
+
+        for key_num in blue_keys:
+            set_key_colour(key_num, "blue")
 
 
 class Timer:
