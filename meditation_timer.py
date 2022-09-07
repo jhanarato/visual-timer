@@ -194,13 +194,14 @@ class TimerMonitor:
         self.enable_next_view_on_keypress()
         self.enable_cancel_timer_on_keyhold()
 
-        self._views = [SimpleIndicatorView(key_num=0, colour="orange"),
-                       MenuSelectionView(minutes_menu),
-                       MenuSelectionView(multiplier_menu),
-                       ProgressView(timer)]
+        self._views = cycle(
+            [SimpleIndicatorView(key_num=0, colour="orange"),
+             MenuSelectionView(minutes_menu),
+             MenuSelectionView(multiplier_menu),
+             ProgressView(timer)]
+        )
 
-        self._views_iter = cycle(self._views)
-        self._current_view = next(self._views_iter)
+        self._current_view = next(self._views)
 
     def enable_next_view_on_keypress(self):
         for key in keypad.keys:
@@ -208,7 +209,7 @@ class TimerMonitor:
             def handler(key):
                 # Clean up after previous view.
                 set_all_keys_colour("none")
-                self._current_view = next(self._views_iter)
+                self._current_view = next(self._views)
 
     def enable_cancel_timer_on_keyhold(self):
         for key in keypad.keys:
