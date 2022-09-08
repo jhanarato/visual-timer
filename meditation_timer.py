@@ -179,7 +179,7 @@ class TimerMonitor:
 
         self.enable_next_view_on_keypress()
 
-        self._cancel = CancelHandler(timer)
+        self._cancel_handler = CancelHandler()
 
         self._views = cycle(
             [SimpleIndicatorView(key_num=0, colour="orange"),
@@ -201,22 +201,24 @@ class TimerMonitor:
     def wait_for_timer(self):
         while True:
             if self.timer.is_complete():
-                return
-            if self.timer.is_cancelled():
-                return
+                break
+            if self._cancel_handler.cancelled:
+                self.timer.cancel()
+                break
             self._current_view.display()
             keypad.update()
 
 
 class CancelHandler:
-    def __init__(self, timer):
-        self._timer = timer
+    def __init__(self):
+        self.cancelled = False
+        self.enable_on_hold()
 
-    def enable_cancel_timer_on_keyhold(self):
+    def enable_on_hold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
             def handler(key):
-                self._timer.cancel()
+                self.cancelled = True
 
 
 class SimpleIndicatorView:
