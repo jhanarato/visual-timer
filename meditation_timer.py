@@ -9,24 +9,10 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
-normal_to_rotated = {
-    0: 0,
-    1: 4,
-    2: 8,
-    3: 12,
-    4: 1,
-    5: 5,
-    6: 9,
-    7: 13,
-    8: 2,
-    9: 6,
-    10: 10,
-    11: 14,
-    12: 3,
-    13: 7,
-    14: 11,
-    15: 15
-}
+rotated_key_num = [0, 4, 8,  12,
+                   1, 5, 9,  13,
+                   2, 6, 10, 14,
+                   3, 7, 11, 15]
 
 key_colours = {"red": (255, 0, 0),
                "green": (0, 255, 0),
@@ -134,7 +120,7 @@ class MenuSelectionHandler:
 
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
-            self.selected_key_num = rotate(pressed)
+            self.selected_key_num = rotated_key_num[pressed]
 
     def _selection_already_made(self):
         return self.selected_key_num is not MenuSelectionHandler.NO_SELECTION
@@ -350,20 +336,8 @@ def cycle(iterable):
             yield element
 
 
-def invert_dictionary(d):
-    return {v: k for k, v in d.items()}
-
-
-def rotate(key_num):
-    return normal_to_rotated[key_num]
-
-
-def undo_rotate(key_num):
-    return invert_dictionary(normal_to_rotated)[key_num]
-
-
 def set_key_colour(key_num, colour):
-    key_num = undo_rotate(key_num)
+    key_num = rotated_key_num.index(key_num)
     keypad.keys[key_num].set_led(*key_colours[colour])
 
 
