@@ -9,6 +9,8 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
+NO_SELECTION_MADE = -1
+
 rotated_key_num = [0, 4, 8,  12,
                    1, 5, 9,  13,
                    2, 6, 10, 14,
@@ -101,10 +103,8 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 
 
 class MenuSelectionHandler:
-    NO_SELECTION = -1
-
     def __init__(self):
-        self.selected_key_num = MenuSelectionHandler.NO_SELECTION
+        self.selected_key_num = NO_SELECTION_MADE
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
@@ -123,10 +123,10 @@ class MenuSelectionHandler:
             self.selected_key_num = rotated_key_num[pressed]
 
     def _selection_already_made(self):
-        return self.selected_key_num is not MenuSelectionHandler.NO_SELECTION
+        return self.selected_key_num is not NO_SELECTION_MADE
 
     def wait_for_selection(self):
-        while self.selected_key_num is MenuSelectionHandler.NO_SELECTION:
+        while self.selected_key_num is NO_SELECTION_MADE:
             keypad.update()
 
 
