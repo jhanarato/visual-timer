@@ -170,16 +170,14 @@ class MultiplierMenu(Menu):
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
-        # This is necessary to clean up after the MultiplierMenu
         set_all_keys_colour("none")
 
         self.minutes_menu = minutes_menu
         self.multiplier_menu = multiplier_menu
         self.timer = timer
 
-        self.enable_next_view_on_keypress()
-
         self._cancel_handler = CancelHandler()
+        self._next_view_handler = NextViewHandler()
 
         self._views = cycle(
             [SimpleIndicatorView(key_num=0, colour="orange"),
@@ -190,21 +188,19 @@ class TimerMonitor:
 
         self._current_view = next(self._views)
 
-    def enable_next_view_on_keypress(self):
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                # Clean up after previous view.
-                set_all_keys_colour("none")
-                self._current_view = next(self._views)
-
     def wait_for_timer(self):
         while True:
             if self.timer.is_complete():
-                break
+                return
+
             if self._cancel_handler.cancelled:
                 self.timer.cancel()
-                break
+                return
+
+            if self._next_view_handler.pressed:
+                set_all_keys_colour("none")
+                self._current_view = next(self._views)
+
             self._current_view.display()
             keypad.update()
 
@@ -219,6 +215,25 @@ class CancelHandler:
             @keypad.on_hold(key)
             def handler(key):
                 self.cancelled = True
+
+
+class NextViewHandler:
+    def __init__(self):
+        self._pressed = False
+        self._enable_on_press()
+
+    def _enable_on_press(self):
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(key):
+                self._pressed = True
+
+    @property
+    def pressed(self):
+        is_pressed = self._pressed
+        if self._pressed:
+            self._pressed = False
+        return is_pressed
 
 
 class SimpleIndicatorView:
