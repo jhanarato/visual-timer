@@ -29,10 +29,10 @@ all_keys = frozenset(range(0, 16))
 def main_sequence():
     print("Main sequence")
     while True:
-        minutes_menu = MinutesMenu()
+        minutes_menu = create_minutes_menu()
         minutes = minutes_menu.get_users_choice()
 
-        multiplier_menu = MultiplierMenu()
+        multiplier_menu = create_multiplier_menu()
         multiplier = multiplier_menu.get_users_choice()
 
         timer = Timer(minutes, multiplier)
@@ -75,9 +75,6 @@ class Menu:
 
     def add_option(self, option):
         self._options[option.key_num] = option
-
-    def add_options(self):
-        raise NotImplementedError
 
     def display_selection(self):
         raise NotImplementedError
@@ -130,12 +127,15 @@ class MenuSelectionHandler:
             keypad.update()
 
 
-class MinutesMenu(Menu):
-    def add_options(self):
-        self.add_option(MenuOption(0, "red", 5))
-        self.add_option(MenuOption(1, "green", 10))
-        self.add_option(MenuOption(2, "blue", 15))
+def create_minutes_menu():
+    menu = MinutesMenu()
+    menu.add_option(MenuOption(0, "red", 5))
+    menu.add_option(MenuOption(1, "green", 10))
+    menu.add_option(MenuOption(2, "blue", 15))
+    return menu
 
+
+class MinutesMenu(Menu):
     def display_selection(self):
         set_key_colour(self.selected_option.key_num, self.selected_option.colour)
 
@@ -143,12 +143,18 @@ class MinutesMenu(Menu):
             set_key_colour(key_num, "none")
 
 
-class MultiplierMenu(Menu):
-    def add_options(self):
-        for index in range(0, 16):
-            multiplier_value = index + 1
-            self.add_option(MenuOption(index, "cyan", multiplier_value))
+def create_multiplier_menu():
+    print("2424")
+    menu = MultiplierMenu()
 
+    for index in range(0, 16):
+        multiplier_value = index + 1
+        menu.add_option(MenuOption(index, "cyan", multiplier_value))
+
+    return menu
+
+
+class MultiplierMenu(Menu):
     def display_selection(self):
         for key_num in self._keys_equal_to_or_less_than():
             set_key_colour(key_num, "cyan")
