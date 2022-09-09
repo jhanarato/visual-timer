@@ -190,20 +190,27 @@ class TimerMonitor:
         self._current_view = next(self._view_iter)
 
     def wait_for_timer(self):
-        while True:
-            if self.timer.is_complete():
-                return
+        for view in cycle(self._views):
+            while not self._next_view_handler.pressed:
+                if self.timer.is_complete():
+                    return
 
-            if self._cancel_handler.cancelled:
-                self.timer.cancel()
-                return
+                if self._cancel_handler.cancelled:
+                    self.timer.cancel()
+                    return
 
-            if self._next_view_handler.pressed:
-                set_all_keys_colour("none")
-                self._current_view = next(self._view_iter)
+                self._current_view.display()
+                keypad.update()
 
-            self._current_view.display()
-            keypad.update()
+            set_all_keys_colour("none")
+            self._current_view = view
+
+
+# A simple implementation of itertools.cycle()
+def cycle(iterable):
+    while True:
+        for element in iterable:
+            yield element
 
 
 class CancelHandler:
@@ -350,14 +357,6 @@ class Pause:
     def wait_until_complete(self):
         while not self.complete():
             keypad.update()
-
-
-# itertools.cycle() is not available in circuit python
-# Here's a simple implementation.
-def cycle(iterable):
-    while True:
-        for element in iterable:
-            yield element
 
 
 def set_key_colour(key_num, colour):
