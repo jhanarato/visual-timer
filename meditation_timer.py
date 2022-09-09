@@ -54,7 +54,6 @@ def main_sequence():
 class Menu:
     def __init__(self):
         self._options = dict()
-        self.add_options()
         self._selection_handler = MenuSelectionHandler()
 
     def get_users_choice(self):
