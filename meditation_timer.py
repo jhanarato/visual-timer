@@ -78,7 +78,7 @@ class Menu:
         self._options[option.key_num] = option
 
     @property
-    def unused_keys(self):
+    def _unused_keys(self):
         options_keys = set(self._options.keys())
         return all_keys - options_keys
 
@@ -87,7 +87,7 @@ class Menu:
         return all_keys - {self.selected_option.key_num}
 
     def fill_missing_options(self):
-        for key_num in self.unused_keys:
+        for key_num in self._unused_keys:
             not_an_option = MenuOption(key_num=key_num, colour="none", value=NOT_AN_OPTION_VALUE)
             self.add_option(not_an_option)
 
@@ -103,9 +103,6 @@ class Menu:
     def show_available_options(self):
         for option in self.options:
             set_key_colour(option.key_num, option.colour)
-
-        for key_num in self.unused_keys:
-            set_key_colour(key_num, "none")
 
     def show_selected_option(self):
         raise NotImplementedError
