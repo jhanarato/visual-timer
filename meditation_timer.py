@@ -58,10 +58,10 @@ class Menu:
         self._selection_handler = MenuSelectionHandler()
 
     def get_users_choice(self):
-        self.light_all_option_keys()
+        self.show_available_options()
         self.wait_for_selection()
 
-        self.display_selection()
+        self.show_selected_option()
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
         return self.selected_option.value
@@ -77,9 +77,6 @@ class Menu:
     def add_option(self, option):
         self._options[option.key_num] = option
 
-    def display_selection(self):
-        raise NotImplementedError
-
     @property
     def unused_keys(self):
         options_keys = set(self._options.keys())
@@ -88,13 +85,6 @@ class Menu:
     @property
     def unselected_keys(self):
         return all_keys - {self.selected_option.key_num}
-
-    def light_all_option_keys(self):
-        for option in self.options:
-            set_key_colour(option.key_num, option.colour)
-
-        for key_num in self.unused_keys:
-            set_key_colour(key_num, "none")
 
     def fill_missing_options(self):
         for key_num in self.unused_keys:
@@ -108,7 +98,17 @@ class Menu:
             if key_num in all_keys:
                 option = self._options[key_num]
                 if option.value is not NOT_AN_OPTION_VALUE:
-                    break
+                    return
+
+    def show_available_options(self):
+        for option in self.options:
+            set_key_colour(option.key_num, option.colour)
+
+        for key_num in self.unused_keys:
+            set_key_colour(key_num, "none")
+
+    def show_selected_option(self):
+        raise NotImplementedError
 
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
@@ -142,7 +142,7 @@ def create_minutes_menu():
 
 
 class MinutesMenu(Menu):
-    def display_selection(self):
+    def show_selected_option(self):
         set_key_colour(self.selected_option.key_num, self.selected_option.colour)
 
         for key_num in self.unselected_keys:
@@ -162,7 +162,7 @@ class SelectedOptionView:
         self._menu = menu
 
     def display(self):
-        self._menu.display_selection()
+        self._menu.show_selected_option()
 
 
 def create_multiplier_menu():
@@ -176,7 +176,7 @@ def create_multiplier_menu():
 
 
 class MultiplierMenu(Menu):
-    def display_selection(self):
+    def show_selected_option(self):
         for key_num in self._keys_equal_to_or_less_than():
             set_key_colour(key_num, "cyan")
 
