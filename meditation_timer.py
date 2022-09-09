@@ -9,7 +9,8 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
-NO_SELECTION_MADE = -1
+NOT_A_KEY_NUMBER = -1
+NOT_AN_OPTION_VALUE = -2
 
 rotated_key_num = [0, 4, 8,  12,
                    1, 5, 9,  13,
@@ -58,7 +59,8 @@ class Menu:
 
     def get_users_choice(self):
         self.light_all_option_keys()
-        self._selection_handler.wait_for_selection()
+        self.wait_for_selection()
+
         self.display_selection()
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
@@ -94,13 +96,27 @@ class Menu:
         for key_num in self.unused_keys:
             set_key_colour(key_num, "none")
 
+    def fill_missing_options(self):
+        for key_num in self.unused_keys:
+            not_an_option = MenuOption(key_num=key_num, colour="none", value=NOT_AN_OPTION_VALUE)
+            self.add_option(not_an_option)
+
+    def wait_for_selection(self):
+        while True:
+            keypad.update()
+            key_num = self._selection_handler.selected_key_num
+            if key_num in all_keys:
+                option = self._options[key_num]
+                if option.value is not NOT_AN_OPTION_VALUE:
+                    break
+
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
 class MenuSelectionHandler:
     def __init__(self):
-        self.selected_key_num = NO_SELECTION_MADE
+        self.selected_key_num = NOT_A_KEY
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
@@ -111,19 +127,9 @@ class MenuSelectionHandler:
                 self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
-        if self._selection_already_made():
-            return
-
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
             self.selected_key_num = rotated_key_num[pressed]
-
-    def _selection_already_made(self):
-        return self.selected_key_num is not NO_SELECTION_MADE
-
-    def wait_for_selection(self):
-        while self.selected_key_num is NO_SELECTION_MADE:
-            keypad.update()
 
 
 def create_minutes_menu():
@@ -131,6 +137,7 @@ def create_minutes_menu():
     menu.add_option(MenuOption(0, "red", 5))
     menu.add_option(MenuOption(1, "green", 10))
     menu.add_option(MenuOption(2, "blue", 15))
+    menu.fill_missing_options()
     return menu
 
 
