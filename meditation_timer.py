@@ -186,11 +186,9 @@ class TimerMonitor:
             ProgressView(timer)
         ]
 
-        self._view_iter = cycle(self._views)
-        self._current_view = next(self._view_iter)
-
     def wait_for_timer(self):
         for view in cycle(self._views):
+            set_all_keys_colour("none")
             while not self._next_view_handler.pressed:
                 if self.timer.is_complete():
                     return
@@ -199,11 +197,8 @@ class TimerMonitor:
                     self.timer.cancel()
                     return
 
-                self._current_view.display()
+                view.display()
                 keypad.update()
-
-            set_all_keys_colour("none")
-            self._current_view = view
 
 
 # A simple implementation of itertools.cycle()
