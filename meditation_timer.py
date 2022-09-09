@@ -56,9 +56,10 @@ class Menu:
     def __init__(self):
         self._options = dict()
         self._selection_handler = MenuSelectionHandler()
+        self._available_options_view = AvailableOptionsView(self.options)
 
     def get_users_choice(self):
-        self.show_available_options()
+        self._available_options_view.display()
         self.wait_for_selection()
 
         self.show_selected_option()
@@ -100,15 +101,21 @@ class Menu:
                 if option.value is not NOT_AN_OPTION_VALUE:
                     return
 
-    def show_available_options(self):
-        for option in self.options:
-            set_key_colour(option.key_num, option.colour)
-
     def show_selected_option(self):
         raise NotImplementedError
 
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
+
+
+class AvailableOptionsView:
+    def __init__(self, options):
+        self._options = options
+
+    def display(self):
+        print("Displaying available options")
+        for option in self._options:
+            set_key_colour(option.key_num, option.colour)
 
 
 class MenuSelectionHandler:
@@ -144,14 +151,6 @@ class MinutesMenu(Menu):
 
         for key_num in self.unselected_keys:
             set_key_colour(key_num, "none")
-
-
-class AvailableOptionsView:
-    def __init__(self, options):
-        pass
-
-    def display(self):
-        pass
 
 
 class SelectedOptionView:
