@@ -116,7 +116,7 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 
 class MenuSelectionHandler:
     def __init__(self):
-        self.selected_key_num = NOT_A_KEY
+        self.selected_key_num = NOT_A_KEY_NUMBER
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
