@@ -170,8 +170,6 @@ class MultiplierMenu(Menu):
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
-        set_all_keys_colour("none")
-
         self.minutes_menu = minutes_menu
         self.multiplier_menu = multiplier_menu
         self.timer = timer
