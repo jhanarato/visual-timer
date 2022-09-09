@@ -179,14 +179,15 @@ class TimerMonitor:
         self._cancel_handler = CancelHandler()
         self._next_view_handler = NextViewHandler()
 
-        self._views = cycle(
-            [SimpleIndicatorView(key_num=0, colour="orange"),
-             MenuSelectionView(minutes_menu),
-             MenuSelectionView(multiplier_menu),
-             ProgressView(timer)]
-        )
+        self._views = [
+            SimpleIndicatorView(key_num=0, colour="orange"),
+            MenuSelectionView(minutes_menu),
+            MenuSelectionView(multiplier_menu),
+            ProgressView(timer)
+        ]
 
-        self._current_view = next(self._views)
+        self._view_iter = cycle(self._views)
+        self._current_view = next(self._view_iter)
 
     def wait_for_timer(self):
         while True:
@@ -199,7 +200,7 @@ class TimerMonitor:
 
             if self._next_view_handler.pressed:
                 set_all_keys_colour("none")
-                self._current_view = next(self._views)
+                self._current_view = next(self._view_iter)
 
             self._current_view.display()
             keypad.update()
