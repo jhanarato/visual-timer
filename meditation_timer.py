@@ -142,8 +142,23 @@ class MinutesMenu(Menu):
             set_key_colour(key_num, "none")
 
 
+class AvailableOptionsView:
+    def __init__(self, options):
+        pass
+
+    def display(self):
+        pass
+
+
+class SelectedOptionView:
+    def __init__(self, menu):
+        self._menu = menu
+
+    def display(self):
+        self._menu.display_selection()
+
+
 def create_multiplier_menu():
-    print("2424")
     menu = MultiplierMenu()
 
     for index in range(0, 16):
@@ -184,8 +199,8 @@ class TimerMonitor:
 
         self._views = [
             SimpleIndicatorView(key_num=0, colour="orange"),
-            MenuSelectionView(minutes_menu),
-            MenuSelectionView(multiplier_menu),
+            SelectedOptionView(minutes_menu),
+            SelectedOptionView(multiplier_menu),
             ProgressView(timer)
         ]
 
@@ -249,14 +264,6 @@ class SimpleIndicatorView:
 
     def display(self):
         set_key_colour(self._key_num, self._colour)
-
-
-class MenuSelectionView:
-    def __init__(self, menu):
-        self._menu = menu
-
-    def display(self):
-        self._menu.display_selection()
 
 
 class ProgressView:
