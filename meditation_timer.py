@@ -109,21 +109,19 @@ class Menu:
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
-class AvailableOptionsView:
-    def __init__(self, options):
-        self._options = options
+def create_minutes_menu():
+    menu = MinutesMenu()
+    menu.add_option(MenuOption(0, "red", 5))
+    menu.add_option(MenuOption(1, "green", 10))
+    menu.add_option(MenuOption(2, "blue", 15))
+    menu.fill_missing_options()
+    return menu
 
-    def display(self):
-        for option in self._options:
-            set_key_colour(option.key_num, option.colour)
 
-
-class SelectedOptionView:
-    def __init__(self, menu):
-        self._menu = menu
-
-    def display(self):
-        self._menu.show_selected_option()
+class MinutesMenu(Menu):
+    def show_selected_option(self):
+        view = MinutesSelectedView(self.selected_option, self.unselected_keys)
+        view.display()
 
 
 class MinutesSelectedView:
@@ -136,6 +134,23 @@ class MinutesSelectedView:
 
         for key_num in self._unselected_keys:
             set_key_colour(key_num, "none")
+
+
+class SelectedOptionView:
+    def __init__(self, menu):
+        self._menu = menu
+
+    def display(self):
+        self._menu.show_selected_option()
+
+
+class AvailableOptionsView:
+    def __init__(self, options):
+        self._options = options
+
+    def display(self):
+        for option in self._options:
+            set_key_colour(option.key_num, option.colour)
 
 
 class MenuSelectionHandler:
@@ -154,21 +169,6 @@ class MenuSelectionHandler:
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
             self.selected_key_num = rotated_key_num[pressed]
-
-
-def create_minutes_menu():
-    menu = MinutesMenu()
-    menu.add_option(MenuOption(0, "red", 5))
-    menu.add_option(MenuOption(1, "green", 10))
-    menu.add_option(MenuOption(2, "blue", 15))
-    menu.fill_missing_options()
-    return menu
-
-
-class MinutesMenu(Menu):
-    def show_selected_option(self):
-        view = MinutesSelectedView(self.selected_option, self.unselected_keys)
-        view.display()
 
 
 def create_multiplier_menu():
