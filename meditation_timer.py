@@ -9,8 +9,8 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
-NOT_A_KEY_NUMBER = -1
-NOT_AN_OPTION_VALUE = -2
+NOT_A_KEY_NUMBER = -2
+NOT_AN_OPTION_VALUE = -1
 
 rotated_key_num = [0, 4, 8,  12,
                    1, 5, 9,  13,
@@ -56,6 +56,7 @@ class Menu:
     def __init__(self):
         self._options = dict()
         self._selection_handler = MenuSelectionHandler()
+        self.selected_option = MenuOption(key_num=NOT_A_KEY_NUMBER, colour="none", value=NOT_AN_OPTION_VALUE)
 
     def get_users_choice(self):
         available_options_view = AvailableOptionsView(self.options)
@@ -71,10 +72,6 @@ class Menu:
     @property
     def options(self):
         return self._options.values()
-
-    @property
-    def selected_option(self):
-        return self._options.get(self._selection_handler.selected_key_num)
 
     def add_option(self, option):
         self._options[option.key_num] = option
@@ -100,6 +97,7 @@ class Menu:
             if key_num in all_keys:
                 option = self._options[key_num]
                 if option.value is not NOT_AN_OPTION_VALUE:
+                    self.selected_option = option
                     return
 
     def show_selected_option(self):
