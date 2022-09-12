@@ -56,10 +56,11 @@ class Menu:
     def __init__(self):
         self._options = dict()
         self._selection_handler = MenuSelectionHandler()
-        self._available_options_view = AvailableOptionsView(self.options)
 
     def get_users_choice(self):
-        self._available_options_view.display()
+        available_options_view = AvailableOptionsView(self.options)
+        available_options_view.display()
+
         self.wait_for_selection()
 
         self.show_selected_option()
@@ -113,9 +114,28 @@ class AvailableOptionsView:
         self._options = options
 
     def display(self):
-        print("Displaying available options")
         for option in self._options:
             set_key_colour(option.key_num, option.colour)
+
+
+class SelectedOptionView:
+    def __init__(self, menu):
+        self._menu = menu
+
+    def display(self):
+        self._menu.show_selected_option()
+
+
+class MinutesSelectedView:
+    def __init__(self, option, unselected_keys):
+        self._option = option
+        self._unselected_keys = unselected_keys
+
+    def display(self):
+        set_key_colour(self._option.key_num, self._option.colour)
+
+        for key_num in self._unselected_keys:
+            set_key_colour(key_num, "none")
 
 
 class MenuSelectionHandler:
@@ -147,18 +167,8 @@ def create_minutes_menu():
 
 class MinutesMenu(Menu):
     def show_selected_option(self):
-        set_key_colour(self.selected_option.key_num, self.selected_option.colour)
-
-        for key_num in self.unselected_keys:
-            set_key_colour(key_num, "none")
-
-
-class SelectedOptionView:
-    def __init__(self, menu):
-        self._menu = menu
-
-    def display(self):
-        self._menu.show_selected_option()
+        view = MinutesSelectedView(self.selected_option, self.unselected_keys)
+        view.display()
 
 
 def create_multiplier_menu():
