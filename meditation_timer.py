@@ -121,6 +121,24 @@ class Menu:
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
+class MenuSelectionHandler:
+    def __init__(self):
+        self.selected_key_num = NOT_A_KEY_NUMBER
+        self._enable_choice_on_keypress()
+
+    def _enable_choice_on_keypress(self):
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(choice_key):
+                pressed_list = keypad.get_pressed()
+                self._on_press_select(pressed_list)
+
+    def _on_press_select(self, pressed_list):
+        if len(pressed_list) == 1:
+            pressed = pressed_list[0]
+            self.selected_key_num = rotated_key_num[pressed]
+
+
 def create_minutes_menu():
     menu = Menu()
     menu.add_option(MenuOption(0, "red", 5))
@@ -140,6 +158,16 @@ class MinutesSelectedView:
 
         for key_num in self._unselected_keys:
             set_key_colour(key_num, "none")
+
+
+def create_multiplier_menu():
+    menu = Menu()
+
+    for index in range(0, 16):
+        multiplier_value = index + 1
+        menu.add_option(MenuOption(index, "cyan", multiplier_value))
+
+    return menu
 
 
 class MultiplierSelectedView:
@@ -172,34 +200,6 @@ class AvailableOptionsView:
     def display(self):
         for option in self._options:
             set_key_colour(option.key_num, option.colour)
-
-
-class MenuSelectionHandler:
-    def __init__(self):
-        self.selected_key_num = NOT_A_KEY_NUMBER
-        self._enable_choice_on_keypress()
-
-    def _enable_choice_on_keypress(self):
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(choice_key):
-                pressed_list = keypad.get_pressed()
-                self._on_press_select(pressed_list)
-
-    def _on_press_select(self, pressed_list):
-        if len(pressed_list) == 1:
-            pressed = pressed_list[0]
-            self.selected_key_num = rotated_key_num[pressed]
-
-
-def create_multiplier_menu():
-    menu = Menu()
-
-    for index in range(0, 16):
-        multiplier_value = index + 1
-        menu.add_option(MenuOption(index, "cyan", multiplier_value))
-
-    return menu
 
 
 class TimerMonitor:
