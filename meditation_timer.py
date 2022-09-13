@@ -30,10 +30,11 @@ all_keys = frozenset(range(0, 16))
 def main_sequence():
     print("Main sequence")
     while True:
-        print("0998")
+        print("aaddcc")
+
+        # Minutes
         minutes_menu = create_minutes_menu()
 
-        # Breakout get_users_choice()
         available_options_view = AvailableOptionsView(minutes_menu.options)
         available_options_view.display()
 
@@ -46,10 +47,22 @@ def main_sequence():
         pause.wait_until_complete()
 
         minutes = minutes_menu.selected_option.value
-        # End breakout
 
+        # Multiplier
         multiplier_menu = create_multiplier_menu()
-        multiplier = multiplier_menu.get_users_choice()
+
+        available_options_view = AvailableOptionsView(multiplier_menu.options)
+        available_options_view.display()
+
+        multiplier_menu.wait_for_selection()
+
+        view = MultiplierSelectedView(multiplier_menu)
+        view.display()
+
+        pause = Pause(seconds=1.5)
+        pause.wait_until_complete()
+
+        multiplier = multiplier_menu.selected_option.value
 
         timer = Timer(minutes, multiplier)
         timer.start()
@@ -72,17 +85,6 @@ class Menu:
         self._options = dict()
         self._selection_handler = MenuSelectionHandler()
         self.selected_option = MenuOption(key_num=NOT_A_KEY_NUMBER, colour="none", value=NOT_AN_OPTION_VALUE)
-
-    def get_users_choice(self):
-        available_options_view = AvailableOptionsView(self.options)
-        available_options_view.display()
-
-        self.wait_for_selection()
-
-        self.show_selected_option()
-        pause = Pause(seconds=1.5)
-        pause.wait_until_complete()
-        return self.selected_option.value
 
     @property
     def options(self):
@@ -115,25 +117,17 @@ class Menu:
                     self.selected_option = option
                     return
 
-    def show_selected_option(self):
-        raise NotImplementedError
-
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
 def create_minutes_menu():
-    menu = MinutesMenu()
+    menu = Menu()
     menu.add_option(MenuOption(0, "red", 5))
     menu.add_option(MenuOption(1, "green", 10))
     menu.add_option(MenuOption(2, "blue", 15))
     menu.fill_missing_options()
     return menu
-
-
-class MinutesMenu(Menu):
-    def show_selected_option(self):
-        pass
 
 
 class MinutesSelectedView:
@@ -148,12 +142,27 @@ class MinutesSelectedView:
             set_key_colour(key_num, "none")
 
 
-class SelectedOptionView:
+class MultiplierSelectedView:
     def __init__(self, menu):
         self._menu = menu
 
     def display(self):
-        self._menu.show_selected_option()
+        for key_num in self._keys_equal_to_or_less_than():
+            set_key_colour(key_num, "cyan")
+
+        for key_num in self._keys_greater_than():
+            set_key_colour(key_num, "none")
+
+    def _keys_equal_to_or_less_than(self):
+        key_le = set()
+
+        for option in self._menu.options:
+            if option.key_num <= self._menu.selected_option.key_num:
+                key_le.add(option.key_num)
+        return key_le
+
+    def _keys_greater_than(self):
+        return all_keys - self._keys_equal_to_or_less_than()
 
 
 class AvailableOptionsView:
@@ -184,33 +193,13 @@ class MenuSelectionHandler:
 
 
 def create_multiplier_menu():
-    menu = MultiplierMenu()
+    menu = Menu()
 
     for index in range(0, 16):
         multiplier_value = index + 1
         menu.add_option(MenuOption(index, "cyan", multiplier_value))
 
     return menu
-
-
-class MultiplierMenu(Menu):
-    def show_selected_option(self):
-        for key_num in self._keys_equal_to_or_less_than():
-            set_key_colour(key_num, "cyan")
-
-        for key_num in self._keys_greater_than():
-            set_key_colour(key_num, "none")
-
-    def _keys_equal_to_or_less_than(self):
-        key_le = set()
-
-        for option in self.options:
-            if option.key_num <= self.selected_option.key_num:
-                key_le.add(option.key_num)
-        return key_le
-
-    def _keys_greater_than(self):
-        return all_keys - self._keys_equal_to_or_less_than()
 
 
 class TimerMonitor:
@@ -225,7 +214,7 @@ class TimerMonitor:
         self._views = [
             SimpleIndicatorView(key_num=0, colour="orange"),
             MinutesSelectedView(minutes_menu),
-            SelectedOptionView(multiplier_menu),
+            MultiplierSelectedView(multiplier_menu),
             ProgressView(timer)
         ]
 
