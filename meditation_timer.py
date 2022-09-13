@@ -30,8 +30,6 @@ all_keys = frozenset(range(0, 16))
 def main_sequence():
     print("Main sequence")
     while True:
-        print("aaddcc")
-
         # Minutes
         minutes_menu = create_minutes_menu()
 
@@ -45,8 +43,6 @@ def main_sequence():
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
-
-        minutes = minutes_menu.selected_option.value
 
         # Multiplier
         multiplier_menu = create_multiplier_menu()
@@ -62,9 +58,9 @@ def main_sequence():
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
 
-        multiplier = multiplier_menu.selected_option.value
+        timer = Timer(minutes_menu.selected_option.value,
+                      multiplier_menu.selected_option.value)
 
-        timer = Timer(minutes, multiplier)
         timer.start()
 
         print(timer)
