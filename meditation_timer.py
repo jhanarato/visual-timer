@@ -30,8 +30,23 @@ all_keys = frozenset(range(0, 16))
 def main_sequence():
     print("Main sequence")
     while True:
+        print("0998")
         minutes_menu = create_minutes_menu()
-        minutes = minutes_menu.get_users_choice()
+
+        # Breakout get_users_choice()
+        available_options_view = AvailableOptionsView(minutes_menu.options)
+        available_options_view.display()
+
+        minutes_menu.wait_for_selection()
+
+        view = MinutesSelectedView(minutes_menu)
+        view.display()
+
+        pause = Pause(seconds=1.5)
+        pause.wait_until_complete()
+
+        minutes = minutes_menu.selected_option.value
+        # End breakout
 
         multiplier_menu = create_multiplier_menu()
         multiplier = multiplier_menu.get_users_choice()
@@ -118,14 +133,13 @@ def create_minutes_menu():
 
 class MinutesMenu(Menu):
     def show_selected_option(self):
-        view = MinutesSelectedView(self.selected_option, self.unselected_keys)
-        view.display()
+        pass
 
 
 class MinutesSelectedView:
-    def __init__(self, option, unselected_keys):
-        self._option = option
-        self._unselected_keys = unselected_keys
+    def __init__(self, menu):
+        self._option = menu.selected_option
+        self._unselected_keys = menu.unselected_keys
 
     def display(self):
         set_key_colour(self._option.key_num, self._option.colour)
@@ -210,7 +224,7 @@ class TimerMonitor:
 
         self._views = [
             SimpleIndicatorView(key_num=0, colour="orange"),
-            SelectedOptionView(minutes_menu),
+            MinutesSelectedView(minutes_menu),
             SelectedOptionView(multiplier_menu),
             ProgressView(timer)
         ]
