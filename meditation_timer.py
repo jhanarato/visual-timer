@@ -41,7 +41,6 @@ class MainSession:
         self.timer = Timer()
 
     def run(self):
-        print("MainSession.run()")
         minutes_session = MenuSession(self.minutes_menu, MinutesSelectedView(self.minutes_menu))
         minutes_session.begin()
 
@@ -57,13 +56,11 @@ class MainSession:
         monitor.wait_for_timer()
 
         if not self.timer.is_cancelled():
-            print("Waiting to restart")
             set_all_keys_colour("orange")
             wait = KeypressWait()
             wait.wait()
 
     def clear(self):
-        print("MainSession.clear()")
         self.minutes_menu.clear_selection()
         self.multiplier_menu.clear_selection()
         self.timer = Timer()
@@ -401,6 +398,5 @@ def set_all_keys_colour(colour):
     keypad.set_all(*key_colours[colour])
 
 
-print("Starting MainSession")
 session = MainSession()
 session.loop()
