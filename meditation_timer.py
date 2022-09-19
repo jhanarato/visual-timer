@@ -27,43 +27,6 @@ key_colours = {"red": (255, 0, 0),
 all_keys = frozenset(range(0, 16))
 
 
-def main_sequence():
-    while True:
-        minutes_menu = Menu()
-        minutes_menu.options = [MenuOption(0, "red", 5),
-                                MenuOption(1, "green", 10),
-                                MenuOption(2, "blue", 15)]
-
-        minutes_session = MenuSession(minutes_menu,
-                                      MinutesSelectedView(minutes_menu))
-
-        minutes_session.begin()
-
-        multiplier_menu = Menu()
-        multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
-                                   for key_num in range(0, 16)]
-
-        multiplier_session = MenuSession(multiplier_menu,
-                                         MultiplierSelectedView(multiplier_menu))
-
-        multiplier_session.begin()
-
-        timer = Timer(minutes_menu.selected_option.value,
-                      multiplier_menu.selected_option.value)
-
-        timer.start()
-
-        monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
-        monitor.wait_for_timer()
-
-        if timer.is_cancelled():
-            continue
-
-        set_all_keys_colour("orange")
-        wait = KeypressWait()
-        wait.wait()
-
-
 class MainSession:
     def __init__(self):
         self.minutes_menu = Menu()
@@ -75,9 +38,10 @@ class MainSession:
         self.multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
                                         for key_num in range(0, 16)]
 
-        self.timer = Timer(0, 0)
+        self.timer = Timer()
 
-    def begin(self):
+    def run(self):
+        print("MainSession.run()")
         minutes_session = MenuSession(self.minutes_menu, MinutesSelectedView(self.minutes_menu))
         minutes_session.begin()
 
@@ -93,9 +57,21 @@ class MainSession:
         monitor.wait_for_timer()
 
         if not self.timer.is_cancelled():
+            print("Waiting to restart")
             set_all_keys_colour("orange")
             wait = KeypressWait()
             wait.wait()
+
+    def clear(self):
+        print("MainSession.clear()")
+        self.minutes_menu.clear_selection()
+        self.multiplier_menu.clear_selection()
+        self.timer = Timer()
+
+    def loop(self):
+        while True:
+            self.run()
+            self.clear()
 
 
 class MenuSession:
@@ -340,9 +316,9 @@ class ProgressView:
 
 
 class Timer:
-    def __init__(self, minutes, multiplier):
-        self.minutes = minutes
-        self.multiplier = multiplier
+    def __init__(self):
+        self.minutes = 0
+        self.multiplier = 0
         self.started = False
         self._cancelled = False
         self._start_time_seconds = 0
@@ -425,4 +401,6 @@ def set_all_keys_colour(colour):
     keypad.set_all(*key_colours[colour])
 
 
-main_sequence()
+print("Starting MainSession")
+session = MainSession()
+session.loop()
