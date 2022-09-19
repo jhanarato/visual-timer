@@ -28,7 +28,6 @@ all_keys = frozenset(range(0, 16))
 
 
 def main_sequence():
-    print("Main sequence")
     while True:
         # Minutes
         minutes_menu = create_minutes_menu()
@@ -86,7 +85,13 @@ class Menu:
     def options(self):
         return self._options.values()
 
-    def add_option(self, option):
+    @options.setter
+    def options(self, option_list):
+        for option in option_list:
+            self._add_option(option)
+        self.fill_missing_options()
+
+    def _add_option(self, option):
         self._options[option.key_num] = option
 
     @property
@@ -101,7 +106,7 @@ class Menu:
     def fill_missing_options(self):
         for key_num in self._unused_keys:
             not_an_option = MenuOption(key_num=key_num, colour="none", value=NOT_AN_OPTION_VALUE)
-            self.add_option(not_an_option)
+            self._add_option(not_an_option)
 
     def wait_for_selection(self):
         while True:
@@ -137,10 +142,11 @@ class MenuSelectionHandler:
 
 def create_minutes_menu():
     menu = Menu()
-    menu.add_option(MenuOption(0, "red", 5))
-    menu.add_option(MenuOption(1, "green", 10))
-    menu.add_option(MenuOption(2, "blue", 15))
-    menu.fill_missing_options()
+
+    menu.options = [MenuOption(0, "red", 5),
+                    MenuOption(1, "green", 10),
+                    MenuOption(2, "blue", 15)]
+
     return menu
 
 
@@ -159,9 +165,13 @@ class MinutesSelectedView:
 def create_multiplier_menu():
     menu = Menu()
 
+    options = []
+
     for index in range(0, 16):
         multiplier_value = index + 1
-        menu.add_option(MenuOption(index, "cyan", multiplier_value))
+        options.append(MenuOption(index, "cyan", multiplier_value))
+
+    menu.options = options
 
     return menu
 
