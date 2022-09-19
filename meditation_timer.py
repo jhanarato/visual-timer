@@ -53,8 +53,6 @@ def main_sequence():
 
         timer.start()
 
-        print(timer)
-
         monitor = TimerMonitor(minutes_menu, multiplier_menu, timer)
         monitor.wait_for_timer()
 
@@ -313,6 +311,8 @@ class Timer:
     def start(self):
         self.started = True
         self._start_time_seconds = time.monotonic()
+        # Debug logging.
+        print(self)
 
     def cancel(self):
         self._cancelled = True
