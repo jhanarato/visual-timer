@@ -43,17 +43,10 @@ def main_sequence():
         multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
                                    for key_num in range(0, 16)]
 
-        available_options_view = AvailableOptionsView(multiplier_menu.options)
-        available_options_view.display()
+        multiplier_session = MenuSession(multiplier_menu,
+                                         MultiplierSelectedView(multiplier_menu))
 
-        multiplier_handler = MenuSelectionHandler(multiplier_menu)
-        multiplier_handler.wait_for_selection()
-
-        view = MultiplierSelectedView(multiplier_menu)
-        view.display()
-
-        pause = Pause(seconds=1.5)
-        pause.wait_until_complete()
+        multiplier_session.begin()
 
         timer = Timer(minutes_menu.selected_option.value,
                       multiplier_menu.selected_option.value)
