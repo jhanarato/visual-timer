@@ -34,17 +34,10 @@ def main_sequence():
                                 MenuOption(1, "green", 10),
                                 MenuOption(2, "blue", 15)]
 
-        available_options_view = AvailableOptionsView(minutes_menu.options)
-        available_options_view.display()
+        minutes_session = MenuSession(minutes_menu,
+                                      MinutesSelectedView(minutes_menu))
 
-        minutes_handler = MenuSelectionHandler(minutes_menu)
-        minutes_handler.wait_for_selection()
-
-        view = MinutesSelectedView(minutes_menu)
-        view.display()
-
-        pause = Pause(seconds=1.5)
-        pause.wait_until_complete()
+        minutes_session.begin()
 
         multiplier_menu = Menu()
         multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
@@ -78,6 +71,24 @@ def main_sequence():
         set_all_keys_colour("orange")
         wait = KeypressWait()
         wait.wait()
+
+
+class MenuSession:
+    def __init__(self, menu, selected_view):
+        self._menu = menu
+        self._selected_view = selected_view
+
+    def begin(self):
+        available_options_view = AvailableOptionsView(self._menu.options)
+        available_options_view.display()
+
+        keypress_handler = MenuSelectionHandler(self._menu)
+        keypress_handler.wait_for_selection()
+
+        self._selected_view.display()
+
+        pause = Pause(seconds=1.5)
+        pause.wait_until_complete()
 
 
 class Menu:
@@ -154,13 +165,16 @@ class MenuSelectionHandler:
 
 class MinutesSelectedView:
     def __init__(self, menu):
-        self._option = menu.selected_option
-        self._unselected_keys = menu.unselected_keys
+        self._menu = menu
 
     def display(self):
-        set_key_colour(self._option.key_num, self._option.colour)
+        key_num = self._menu.selected_option.key_num
+        colour = self._menu.selected_option.colour
+        unselected_keys = self._menu.unselected_keys
 
-        for key_num in self._unselected_keys:
+        set_key_colour(key_num, colour)
+
+        for key_num in unselected_keys:
             set_key_colour(key_num, "none")
 
 
