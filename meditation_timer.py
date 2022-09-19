@@ -82,47 +82,58 @@ class MenuSession:
         pause.wait_until_complete()
 
 
-class Menu:
-    def __init__(self):
-        self._options = dict()
-        self.selected_option = MenuOption(key_num=NOT_A_KEY_NUMBER,
-                                          colour="none",
-                                          value=NOT_AN_OPTION_VALUE)
+MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
-    def get_option_at_key(self, key_num):
-        return self._options[key_num]
+
+class Menu:
+    _not_an_option = MenuOption(key_num=NOT_A_KEY_NUMBER,
+                                colour="none",
+                                value=NOT_AN_OPTION_VALUE)
+
+    def __init__(self, number_of_keys=16):
+        self.number_of_keys = number_of_keys
+        self._options = list()
+        self.selected_option = Menu._not_an_option
+
+    def clear_selection(self):
+        self.selected_option = Menu._not_an_option
 
     @property
     def options(self):
-        return self._options.values()
+        return self._options
 
     @options.setter
     def options(self, option_list):
         for option in option_list:
-            self._add_option(option)
-        self.fill_missing_options()
+            self._options.append(option)
 
-    def _add_option(self, option):
-        self._options[option.key_num] = option
+        self._add_missing_options()
+        self._options.sort(key=lambda opt: opt.key_num)
+        self._check_options()
 
-    @property
+    def _check_options(self):
+        number_of_options = len(self.options)
+        if number_of_options != self.number_of_keys:
+            raise Exception(f"Menu has {number_of_options} options. ")
+
+        for key_num in range(0, self.number_of_keys):
+            option_key_num = self.options[key_num].key_num
+            if option_key_num != key_num:
+                raise Exception(f"Option at index {key_num} has key_num = {option_key_num}")
+
+    def _used_keys(self):
+        return {option.key_num for option in self.options}
+
     def _unused_keys(self):
-        options_keys = set(self._options.keys())
-        return all_keys - options_keys
+        return all_keys - self._used_keys()
 
-    @property
-    def unselected_keys(self):
-        return all_keys - {self.selected_option.key_num}
-
-    def fill_missing_options(self):
-        for key_num in self._unused_keys:
-            not_an_option = MenuOption(key_num=key_num,
-                                       colour="none",
-                                       value=NOT_AN_OPTION_VALUE)
-            self._add_option(not_an_option)
-
-
-MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
+    def _add_missing_options(self):
+        for key_num in self._unused_keys():
+            self._options.append(
+                MenuOption(key_num=key_num,
+                           colour="none",
+                           value=NOT_AN_OPTION_VALUE)
+            )
 
 
 class MenuSelectionHandler:
@@ -148,7 +159,7 @@ class MenuSelectionHandler:
             keypad.update()
             key_num = self.selected_key_num
             if key_num in all_keys:
-                option = self._menu.get_option_at_key(key_num)
+                option = self._menu.options[key_num]
                 if option.value is not NOT_AN_OPTION_VALUE:
                     self._menu.selected_option = option
                     return
@@ -159,13 +170,13 @@ class MinutesSelectedView:
         self._menu = menu
 
     def display(self):
-        key_num = self._menu.selected_option.key_num
+        selected_key = self._menu.selected_option.key_num
         colour = self._menu.selected_option.colour
-        unselected_keys = self._menu.unselected_keys
+        other_keys = all_keys - {self._menu.selected_option.key_num}
 
-        set_key_colour(key_num, colour)
+        set_key_colour(selected_key, colour)
 
-        for key_num in unselected_keys:
+        for key_num in other_keys:
             set_key_colour(key_num, "none")
 
 
