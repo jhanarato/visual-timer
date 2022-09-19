@@ -87,6 +87,9 @@ class Menu:
                                           colour="none",
                                           value=NOT_AN_OPTION_VALUE)
 
+    def get_option_at_key(self, key_num):
+        return self._options[key_num]
+
     @property
     def options(self):
         return self._options.values()
@@ -143,7 +146,7 @@ class MenuSelectionHandler:
             keypad.update()
             key_num = self.selected_key_num
             if key_num in all_keys:
-                option = self._menu.options[key_num]
+                option = self._menu.get_option_at_key(key_num)
                 if option.value is not NOT_AN_OPTION_VALUE:
                     self._menu.selected_option = option
                     return
