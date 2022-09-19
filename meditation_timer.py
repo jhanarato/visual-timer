@@ -64,6 +64,40 @@ def main_sequence():
         wait.wait()
 
 
+class MainSession:
+    def __init__(self):
+        self.minutes_menu = Menu()
+        self.minutes_menu.options = [MenuOption(0, "red", 5),
+                                     MenuOption(1, "green", 10),
+                                     MenuOption(2, "blue", 15)]
+
+        self.multiplier_menu = Menu()
+        self.multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
+                                        for key_num in range(0, 16)]
+
+        self.timer = Timer(0, 0)
+
+    def begin(self):
+        minutes_session = MenuSession(self.minutes_menu, MinutesSelectedView(self.minutes_menu))
+        minutes_session.begin()
+
+        multiplier_session = MenuSession(self.multiplier_menu, MultiplierSelectedView(self.multiplier_menu))
+        multiplier_session.begin()
+
+        self.timer.minutes = self.minutes_menu.selected_option.value
+        self.timer.multiplier = self.multiplier_menu.selected_option.value
+
+        self.timer.start()
+
+        monitor = TimerMonitor(self.minutes_menu, self.multiplier_menu, self.timer)
+        monitor.wait_for_timer()
+
+        if not self.timer.is_cancelled():
+            set_all_keys_colour("orange")
+            wait = KeypressWait()
+            wait.wait()
+
+
 class MenuSession:
     def __init__(self, menu, selected_view):
         self._menu = menu
@@ -307,17 +341,11 @@ class ProgressView:
 
 class Timer:
     def __init__(self, minutes, multiplier):
+        self.minutes = minutes
+        self.multiplier = multiplier
         self.started = False
         self._cancelled = False
-        self._minutes = minutes
-        self._multiplier = multiplier
         self._start_time_seconds = 0
-
-    def get_minutes(self):
-        return self._minutes
-
-    def get_multiplier(self):
-        return self._multiplier
 
     def start(self):
         self.started = True
@@ -335,7 +363,7 @@ class Timer:
         return self.total_seconds() <= self.seconds_passed()
 
     def total_minutes(self):
-        return self._multiplier * self._minutes
+        return self.multiplier * self.minutes
 
     def total_seconds(self):
         return self.total_minutes() * 60
@@ -356,7 +384,7 @@ class Timer:
         return self.seconds_remaining() / self.total_seconds()
 
     def __str__(self):
-        return f"Timer set: {self._minutes} x {self._multiplier} = {self.total_minutes()} minutes"
+        return f"Timer set: {self.minutes} x {self.multiplier} = {self.total_minutes()} minutes"
 
 
 class KeypressWait:
