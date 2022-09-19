@@ -198,8 +198,6 @@ class AvailableOptionsView:
 
 class TimerMonitor:
     def __init__(self, minutes_menu, multiplier_menu, timer):
-        self.minutes_menu = minutes_menu
-        self.multiplier_menu = multiplier_menu
         self.timer = timer
 
         self._cancel_handler = CancelHandler()
