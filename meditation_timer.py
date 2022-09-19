@@ -37,7 +37,8 @@ def main_sequence():
         available_options_view = AvailableOptionsView(minutes_menu.options)
         available_options_view.display()
 
-        minutes_menu.wait_for_selection()
+        minutes_handler = MenuSelectionHandler(minutes_menu)
+        minutes_handler.wait_for_selection()
 
         view = MinutesSelectedView(minutes_menu)
         view.display()
@@ -52,7 +53,8 @@ def main_sequence():
         available_options_view = AvailableOptionsView(multiplier_menu.options)
         available_options_view.display()
 
-        multiplier_menu.wait_for_selection()
+        multiplier_handler = MenuSelectionHandler(multiplier_menu)
+        multiplier_handler.wait_for_selection()
 
         view = MultiplierSelectedView(multiplier_menu)
         view.display()
@@ -81,8 +83,9 @@ def main_sequence():
 class Menu:
     def __init__(self):
         self._options = dict()
-        self._selection_handler = MenuSelectionHandler()
-        self.selected_option = MenuOption(key_num=NOT_A_KEY_NUMBER, colour="none", value=NOT_AN_OPTION_VALUE)
+        self.selected_option = MenuOption(key_num=NOT_A_KEY_NUMBER,
+                                          colour="none",
+                                          value=NOT_AN_OPTION_VALUE)
 
     @property
     def options(self):
@@ -108,25 +111,18 @@ class Menu:
 
     def fill_missing_options(self):
         for key_num in self._unused_keys:
-            not_an_option = MenuOption(key_num=key_num, colour="none", value=NOT_AN_OPTION_VALUE)
+            not_an_option = MenuOption(key_num=key_num,
+                                       colour="none",
+                                       value=NOT_AN_OPTION_VALUE)
             self._add_option(not_an_option)
-
-    def wait_for_selection(self):
-        while True:
-            keypad.update()
-            key_num = self._selection_handler.selected_key_num
-            if key_num in all_keys:
-                option = self._options[key_num]
-                if option.value is not NOT_AN_OPTION_VALUE:
-                    self.selected_option = option
-                    return
 
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
 class MenuSelectionHandler:
-    def __init__(self):
+    def __init__(self, menu):
+        self._menu = menu
         self.selected_key_num = NOT_A_KEY_NUMBER
         self._enable_choice_on_keypress()
 
@@ -141,6 +137,16 @@ class MenuSelectionHandler:
         if len(pressed_list) == 1:
             pressed = pressed_list[0]
             self.selected_key_num = rotated_key_num[pressed]
+
+    def wait_for_selection(self):
+        while True:
+            keypad.update()
+            key_num = self.selected_key_num
+            if key_num in all_keys:
+                option = self._menu.options[key_num]
+                if option.value is not NOT_AN_OPTION_VALUE:
+                    self._menu.selected_option = option
+                    return
 
 
 class MinutesSelectedView:
