@@ -59,6 +59,9 @@ class PrimaryInteraction:
         self.timer.minutes = self.minutes_menu.selected_option.value
         self.timer.multiplier = self.multiplier_menu.selected_option.value
 
+        self.timer.start()
+        cancel_handler = CancelHandler(self.timer)
+
         timer_interaction = TimerInteraction(self.timer, self.timer_views)
         timer_interaction.begin()
 
@@ -97,13 +100,9 @@ class TimerInteraction:
     def __init__(self, timer, views):
         self._timer = timer
         self._views = views
-
-        self._cancel_handler = CancelHandler(timer)
         self._next_view_handler = NextViewHandler()
 
     def begin(self):
-        self._timer.start()
-
         for view in cycle(self._views):
             set_all_keys_colour("none")
 
