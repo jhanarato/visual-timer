@@ -48,7 +48,6 @@ class PrimaryInteraction:
         ]
 
     def run(self):
-        print("PrimaryInteraction.run()")
         minutes_interaction = MenuInteraction(self.minutes_menu,
                                               MinutesSelectedView(self.minutes_menu))
         minutes_interaction.begin()
@@ -64,7 +63,6 @@ class PrimaryInteraction:
         timer_interaction.begin()
 
         if self.timer.complete:
-            print("Timer complete")
             set_all_keys_colour("orange")
             wait = KeypressWait()
             wait.wait()
@@ -103,14 +101,10 @@ class TimerInteraction:
         self._cancel_handler = CancelHandler(timer)
         self._next_view_handler = NextViewHandler()
 
-        self._views = views
-
     def begin(self):
-        print("TimerInteraction.begin()")
         self._timer.start()
 
         for view in cycle(self._views):
-            # print("Next timer view")
             set_all_keys_colour("none")
 
             while not self._next_view_handler.pressed:
@@ -131,7 +125,6 @@ class CancelHandler:
             @keypad.on_hold(key)
             def handler(key):
                 self._timer.cancelled = True
-                print("Timer cancelled")
 
 
 class NextViewHandler:
