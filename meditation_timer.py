@@ -60,10 +60,14 @@ class PrimaryInteraction:
         self.timer.multiplier = self.multiplier_menu.selected_option.value
 
         self.timer.start()
+
         cancel_handler = CancelHandler(self.timer)
 
-        timer_interaction = TimerInteraction(self.timer, self.timer_views)
-        timer_interaction.begin()
+        timer_interaction = TimerViewCycle(self.timer, self.timer_views)
+
+        next_view_handler = NextViewHandler(timer_interaction)
+
+        timer_interaction.cycle_while_timer_running()
 
         if self.timer.complete:
             set_all_keys_colour("orange")
@@ -96,22 +100,35 @@ class MenuInteraction:
         pause.wait_until_complete()
 
 
-class TimerInteraction:
+class TimerViewCycle:
     def __init__(self, timer, views):
         self._timer = timer
-        self._views = views
-        self._next_view_handler = NextViewHandler()
+        self._views_iter = cycle(views)
+        self._current_view = self._next_view()
 
-    def begin(self):
-        for view in cycle(self._views):
-            set_all_keys_colour("none")
+    def _next_view(self):
+        set_all_keys_colour("none")
+        return next(self._views_iter)
 
-            while not self._next_view_handler.pressed:
-                view.display()
-                keypad.update()
+    def advance(self):
+        self._current_view = self._next_view()
 
-                if not self._timer.running:
-                    return
+    def cycle_while_timer_running(self):
+        while self._timer.running:
+            self._current_view.display()
+            keypad.update()
+
+
+class NextViewHandler:
+    def __init__(self, view_cycle):
+        self.view_cycle = view_cycle
+        self._enable_on_press()
+
+    def _enable_on_press(self):
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(key):
+                self.view_cycle.advance()
 
 
 class CancelHandler:
@@ -124,25 +141,6 @@ class CancelHandler:
             @keypad.on_hold(key)
             def handler(key):
                 self._timer.cancelled = True
-
-
-class NextViewHandler:
-    def __init__(self):
-        self._pressed = False
-        self._enable_on_press()
-
-    def _enable_on_press(self):
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                self._pressed = True
-
-    @property
-    def pressed(self):
-        is_pressed = self._pressed
-        if self._pressed:
-            self._pressed = False
-        return is_pressed
 
 
 class Timer:
