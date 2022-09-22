@@ -40,7 +40,15 @@ class PrimaryInteraction:
 
         self.timer = Timer()
 
+        self.timer_views = [
+            SimpleIndicatorView(key_num=0, colour="orange"),
+            MinutesSelectedView(self.minutes_menu),
+            MultiplierSelectedView(self.multiplier_menu),
+            ProgressView(self.timer)
+        ]
+
     def run(self):
+        print("PrimaryInteraction.run()")
         minutes_interaction = MenuInteraction(self.minutes_menu,
                                               MinutesSelectedView(self.minutes_menu))
         minutes_interaction.begin()
@@ -52,25 +60,21 @@ class PrimaryInteraction:
         self.timer.minutes = self.minutes_menu.selected_option.value
         self.timer.multiplier = self.multiplier_menu.selected_option.value
 
-        self.timer.start()
+        timer_interaction = TimerInteraction(self.timer, self.timer_views)
+        timer_interaction.begin()
 
-        monitor = TimerMonitor(self.minutes_menu, self.multiplier_menu, self.timer)
-        monitor.wait_for_timer()
-
-        if not self.timer.is_cancelled():
+        if self.timer.complete:
+            print("Timer complete")
             set_all_keys_colour("orange")
             wait = KeypressWait()
             wait.wait()
+
+        self.clear()
 
     def clear(self):
         self.minutes_menu.clear_selection()
         self.multiplier_menu.clear_selection()
         self.timer = Timer()
-
-    def loop(self):
-        while True:
-            self.run()
-            self.clear()
 
 
 class MenuInteraction:
@@ -91,51 +95,43 @@ class MenuInteraction:
         pause.wait_until_complete()
 
 
-class TimerMonitor:
-    def __init__(self, minutes_menu, multiplier_menu, timer):
-        self.timer = timer
+class TimerInteraction:
+    def __init__(self, timer, views):
+        self._timer = timer
+        self._views = views
 
-        self._cancel_handler = CancelHandler()
+        self._cancel_handler = CancelHandler(timer)
         self._next_view_handler = NextViewHandler()
 
-        self._views = [
-            SimpleIndicatorView(key_num=0, colour="orange"),
-            MinutesSelectedView(minutes_menu),
-            MultiplierSelectedView(multiplier_menu),
-            ProgressView(timer)
-        ]
+        self._views = views
 
-    def wait_for_timer(self):
-        for view in self.cycle(self._views):
+    def begin(self):
+        print("TimerInteraction.begin()")
+        self._timer.start()
+
+        for view in cycle(self._views):
+            # print("Next timer view")
             set_all_keys_colour("none")
+
             while not self._next_view_handler.pressed:
-                if self.timer.is_complete():
-                    return
-
-                if self._cancel_handler.cancelled:
-                    self.timer.cancel()
-                    return
-
                 view.display()
                 keypad.update()
 
-    def cycle(self, iterable):
-        """ A simple implementation of itertools.cycle() """
-        while True:
-            for element in iterable:
-                yield element
+                if not self._timer.running:
+                    return
 
 
 class CancelHandler:
-    def __init__(self):
-        self.cancelled = False
+    def __init__(self, timer):
+        self._timer = timer
         self.enable_on_hold()
 
     def enable_on_hold(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
             def handler(key):
-                self.cancelled = True
+                self._timer.cancelled = True
+                print("Timer cancelled")
 
 
 class NextViewHandler:
@@ -162,23 +158,22 @@ class Timer:
         self.minutes = 0
         self.multiplier = 0
         self.started = False
-        self._cancelled = False
+        self.cancelled = False
         self._start_time_seconds = 0
 
     def start(self):
         self.started = True
+        self.cancelled = False
         self._start_time_seconds = time.monotonic()
-        # Debug logging.
-        print(self)
+        print(f"Timer set: {self.minutes} x {self.multiplier} = {self.total_minutes()} minutes")
 
-    def cancel(self):
-        self._cancelled = True
-
-    def is_cancelled(self):
-        return self._cancelled
-
-    def is_complete(self):
+    @property
+    def complete(self):
         return self.total_seconds() <= self.seconds_passed()
+
+    @property
+    def running(self):
+        return self.started and not self.complete and not self.cancelled
 
     def total_minutes(self):
         return self.multiplier * self.minutes
@@ -200,9 +195,6 @@ class Timer:
 
     def fraction_remaining(self):
         return self.seconds_remaining() / self.total_seconds()
-
-    def __str__(self):
-        return f"Timer set: {self.minutes} x {self.multiplier} = {self.total_minutes()} minutes"
 
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
@@ -399,5 +391,13 @@ def set_all_keys_colour(colour):
     keypad.set_all(*key_colours[colour])
 
 
-session = PrimaryInteraction()
-session.loop()
+def cycle(iterable):
+    """ A simple implementation of itertools.cycle() """
+    while True:
+        for element in iterable:
+            yield element
+
+
+interaction = PrimaryInteraction()
+while True:
+    interaction.run()
