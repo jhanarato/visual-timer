@@ -29,6 +29,7 @@ all_keys = frozenset(range(0, 16))
 
 class PrimaryInteraction:
     def __init__(self):
+        print("fedd")
         self.minutes_menu = Menu()
         self.minutes_menu.options = [MenuOption(0, "red", 5),
                                      MenuOption(1, "green", 10),
@@ -61,13 +62,13 @@ class PrimaryInteraction:
 
         self.timer.start()
 
-        cancel_handler = CancelHandler(self.timer)
+        cancel = CancelAction(self.timer)
 
-        timer_interaction = TimerViewCycle(self.timer, self.timer_views)
+        timer_view_cycle = TimerViewCycle(self.timer, self.timer_views)
 
-        next_view_handler = NextViewHandler(timer_interaction)
+        next_view = NextViewAction(timer_view_cycle)
 
-        timer_interaction.cycle_while_timer_running()
+        timer_view_cycle.cycle_while_timer_running()
 
         if self.timer.complete:
             set_all_keys_colour("orange")
@@ -91,8 +92,8 @@ class MenuInteraction:
         available_options_view = AvailableOptionsView(self._menu.options)
         available_options_view.display()
 
-        keypress_handler = MenuSelectionHandler(self._menu)
-        keypress_handler.wait_for_selection()
+        select_action = OptionSelectAction(self._menu)
+        select_action.wait_for_selection()
 
         self._selected_view.display()
 
@@ -119,7 +120,7 @@ class TimerViewCycle:
             keypad.update()
 
 
-class NextViewHandler:
+class NextViewAction:
     def __init__(self, view_cycle):
         self.view_cycle = view_cycle
         self._enable_on_press()
@@ -131,7 +132,7 @@ class NextViewHandler:
                 self.view_cycle.advance()
 
 
-class CancelHandler:
+class CancelAction:
     def __init__(self, timer):
         self._timer = timer
         self.enable_on_hold()
@@ -241,7 +242,7 @@ class Menu:
             )
 
 
-class MenuSelectionHandler:
+class OptionSelectAction:
     def __init__(self, menu):
         self._menu = menu
         self.selected_key_num = NOT_A_KEY_NUMBER
