@@ -29,7 +29,6 @@ all_keys = frozenset(range(0, 16))
 
 class PrimaryInteraction:
     def __init__(self):
-        print("fedd")
         self.minutes_menu = Menu()
         self.minutes_menu.options = [MenuOption(0, "red", 5),
                                      MenuOption(1, "green", 10),
@@ -40,13 +39,6 @@ class PrimaryInteraction:
                                         for key_num in range(0, 16)]
 
         self.timer = Timer()
-
-        self.timer_views = [
-            SimpleIndicatorView(key_num=0, colour="orange"),
-            MinutesSelectedView(self.minutes_menu),
-            MultiplierSelectedView(self.multiplier_menu),
-            ProgressView(self.timer)
-        ]
 
     def run(self):
         minutes_interaction = MenuInteraction(self.minutes_menu,
@@ -64,7 +56,14 @@ class PrimaryInteraction:
 
         cancel = CancelAction(self.timer)
 
-        timer_view_cycle = TimerViewCycle(self.timer, self.timer_views)
+        timer_views = [
+            SimpleIndicatorView(key_num=0, colour="orange"),
+            MinutesSelectedView(self.minutes_menu),
+            MultiplierSelectedView(self.multiplier_menu),
+            ProgressView(self.timer)
+        ]
+
+        timer_view_cycle = TimerViewCycle(self.timer, timer_views)
 
         next_view = NextViewAction(timer_view_cycle)
 
