@@ -56,12 +56,7 @@ class PrimaryInteraction:
 
         cancel = CancelAction(self.timer)
 
-        timer_views = [
-            SimpleIndicatorView(key_num=0, colour="orange"),
-            MinutesSelectedView(self.minutes_menu),
-            MultiplierSelectedView(self.multiplier_menu),
-            ProgressView(self.timer)
-        ]
+        timer_views = self.create_timer_views()
 
         timer_view_cycle = TimerViewCycle(self.timer, timer_views)
 
@@ -75,6 +70,16 @@ class PrimaryInteraction:
             wait.wait()
 
         self.clear()
+
+    def create_timer_views(self):
+        timer_views = [
+            SimpleIndicatorView(key_num=0, colour="orange"),
+            MinutesSelectedView(self.minutes_menu),
+            MultiplierSelectedView(self.multiplier_menu),
+            ProgressView(self.timer)
+        ]
+
+        return timer_views
 
     def clear(self):
         self.minutes_menu.clear_selection()
