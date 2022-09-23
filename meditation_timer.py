@@ -112,7 +112,6 @@ class TimerViewCycle:
         self._current_view = self._next_view()
 
     def _next_view(self):
-        set_all_keys_colour("none")
         return next(self._views_iter)
 
     def advance(self):
@@ -324,11 +323,17 @@ class MultiplierSelectedView:
 
 class SimpleIndicatorView:
     def __init__(self, key_num, colour):
-        self._key_num = key_num
+        self._indicator_key_num = key_num
         self._colour = colour
 
+    def _unused_keys(self):
+        return all_keys - {self._indicator_key_num}
+
     def display(self):
-        set_key_colour(self._key_num, self._colour)
+        set_key_colour(self._indicator_key_num, self._colour)
+
+        for key_num in self._unused_keys():
+            set_key_colour(key_num, "none")
 
 
 class ProgressView:
