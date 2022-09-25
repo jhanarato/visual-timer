@@ -33,6 +33,10 @@ class PrimaryInteraction:
         self.multiplier_menu = Menu()
         self.timer = Timer()
 
+        self.cancel = CancelAction(self.timer)
+        self.timer_view_cycle = TimerViewCycle(self.timer, self.create_timer_views())
+        self.next_view = NextViewAction(self.timer_view_cycle)
+
         self.set_minutes_menu_options()
         self.set_multiplier_menu_options()
 
@@ -44,6 +48,16 @@ class PrimaryInteraction:
     def set_multiplier_menu_options(self):
         self.multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
                                         for key_num in range(0, 16)]
+
+    def create_timer_views(self):
+        timer_views = [
+            SimpleIndicatorView(key_num=0, colour="orange"),
+            MinutesSelectedView(self.minutes_menu),
+            MultiplierSelectedView(self.multiplier_menu),
+            ProgressView(self.timer)
+        ]
+
+        return timer_views
 
     def run(self):
         minutes_interaction = MenuInteraction(self.minutes_menu)
@@ -58,15 +72,10 @@ class PrimaryInteraction:
 
         self.timer.start()
 
-        cancel = CancelAction(self.timer)
+        self.cancel.enable()
+        self.next_view.enable()
 
-        timer_views = self.create_timer_views()
-
-        timer_view_cycle = TimerViewCycle(self.timer, timer_views)
-
-        next_view = NextViewAction(timer_view_cycle)
-
-        timer_view_cycle.cycle_while_timer_running()
+        self.timer_view_cycle.cycle_while_timer_running()
 
         if self.timer.complete:
             set_all_keys_colour("orange")
@@ -74,16 +83,6 @@ class PrimaryInteraction:
             wait.wait()
 
         self.clear()
-
-    def create_timer_views(self):
-        timer_views = [
-            SimpleIndicatorView(key_num=0, colour="orange"),
-            MinutesSelectedView(self.minutes_menu),
-            MultiplierSelectedView(self.multiplier_menu),
-            ProgressView(self.timer)
-        ]
-
-        return timer_views
 
     def clear(self):
         self.minutes_menu.clear_selection()
@@ -130,9 +129,8 @@ class TimerViewCycle:
 class NextViewAction:
     def __init__(self, view_cycle):
         self.view_cycle = view_cycle
-        self._enable_on_press()
 
-    def _enable_on_press(self):
+    def enable(self):
         for key in keypad.keys:
             @keypad.on_press(key)
             def handler(key):
@@ -142,9 +140,8 @@ class NextViewAction:
 class CancelAction:
     def __init__(self, timer):
         self._timer = timer
-        self.enable_on_hold()
 
-    def enable_on_hold(self):
+    def enable(self):
         for key in keypad.keys:
             @keypad.on_hold(key)
             def handler(key):
