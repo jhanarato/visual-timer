@@ -255,6 +255,25 @@ class Menu:
                            value=NOT_AN_OPTION_VALUE)
             )
 
+    def select(self, key_num):
+        if self.option_valid_at_key(key_num):
+            self.selected_option = self._options[key_num]
+
+    @property
+    def selection_made(self):
+        return self.selected_option.value != NOT_AN_OPTION_VALUE
+
+    def option_valid_at_key(self, key_num):
+        if key_num not in all_keys:
+            return False
+
+        option = self.options[key_num]
+
+        if option.value == NOT_AN_OPTION_VALUE:
+            return False
+
+        return True
+
 
 class OptionSelectAction:
     def __init__(self, menu):
@@ -275,14 +294,11 @@ class OptionSelectAction:
             self.selected_key_num = rotated_key_num[pressed]
 
     def wait_for_selection(self):
-        while True:
+        print("Smooth")
+        while not self._menu.selection_made:
+            if self._menu.option_valid_at_key(self.selected_key_num):
+                self._menu.select(self.selected_key_num)
             keypad.update()
-            key_num = self.selected_key_num
-            if key_num in all_keys:
-                option = self._menu.options[key_num]
-                if option.value is not NOT_AN_OPTION_VALUE:
-                    self._menu.selected_option = option
-                    return
 
 
 class AvailableOptionsView:
