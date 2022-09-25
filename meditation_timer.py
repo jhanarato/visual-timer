@@ -294,7 +294,6 @@ class OptionSelectAction:
             self.selected_key_num = rotated_key_num[pressed]
 
     def wait_for_selection(self):
-        print("Smooth")
         while not self._menu.selection_made:
             if self._menu.option_valid_at_key(self.selected_key_num):
                 self._menu.select(self.selected_key_num)
