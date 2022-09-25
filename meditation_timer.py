@@ -83,7 +83,7 @@ class PrimaryInteraction:
     def clear(self):
         self.minutes_menu.clear_selection()
         self.multiplier_menu.clear_selection()
-        self.timer = Timer()
+        self.timer.reset()
 
 
 class MenuInteraction:
@@ -167,6 +167,13 @@ class Timer:
     @property
     def running(self):
         return self.started and not self.complete and not self.cancelled
+
+    def reset(self):
+        self.minutes = 0
+        self.multiplier = 0
+        self.started = False
+        self.cancelled = False
+        self._start_time_seconds = 0
 
     def total_minutes(self):
         return self.multiplier * self.minutes
