@@ -41,15 +41,14 @@ class PrimaryInteraction:
         self.timer = Timer()
 
     def run(self):
-        minutes_interaction = MenuInteraction(self.minutes_menu,
-                                              MinutesSelectedView(self.minutes_menu))
+        minutes_interaction = MenuInteraction(self.minutes_menu)
+        minutes_interaction.selected_view = MinutesSelectedView(self.minutes_menu)
         minutes_interaction.begin()
-
-        multiplier_interaction = MenuInteraction(self.multiplier_menu,
-                                                 MultiplierSelectedView(self.multiplier_menu))
-        multiplier_interaction.begin()
-
         self.timer.minutes = self.minutes_menu.selected_option.value
+
+        multiplier_interaction = MenuInteraction(self.multiplier_menu)
+        multiplier_interaction.selected_view = MultiplierSelectedView(self.multiplier_menu)
+        multiplier_interaction.begin()
         self.timer.multiplier = self.multiplier_menu.selected_option.value
 
         self.timer.start()
@@ -88,9 +87,9 @@ class PrimaryInteraction:
 
 
 class MenuInteraction:
-    def __init__(self, menu, selected_view):
+    def __init__(self, menu):
         self._menu = menu
-        self._selected_view = selected_view
+        self.selected_view = TestPatternView()
 
     def begin(self):
         available_options_view = AvailableOptionsView(self._menu.options)
@@ -99,7 +98,7 @@ class MenuInteraction:
         select_action = OptionSelectAction(self._menu)
         select_action.wait_for_selection()
 
-        self._selected_view.display()
+        self.selected_view.display()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
