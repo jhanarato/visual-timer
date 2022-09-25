@@ -353,6 +353,25 @@ class ProgressView:
             set_key_colour(key_num, "blue")
 
 
+class TestPatternView:
+    def __init__(self):
+        self._pattern = [
+            0, 1, 0, 1,
+            1, 0, 1, 0,
+            0, 1, 0, 1,
+            1, 0, 1, 0
+        ]
+
+    def display(self):
+        for key_num in range(0, 16):
+            if self._pattern[key_num] == 0:
+                colour = "green"
+            else:
+                colour = "red"
+
+            set_key_colour(key_num, colour)
+
+
 class KeypressWait:
     def __init__(self):
         self._pressed = False
