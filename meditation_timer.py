@@ -30,15 +30,20 @@ all_keys = frozenset(range(0, 16))
 class PrimaryInteraction:
     def __init__(self):
         self.minutes_menu = Menu()
+        self.multiplier_menu = Menu()
+        self.timer = Timer()
+
+        self.set_minutes_menu_options()
+        self.set_multiplier_menu_options()
+
+    def set_minutes_menu_options(self):
         self.minutes_menu.options = [MenuOption(0, "red", 5),
                                      MenuOption(1, "green", 10),
                                      MenuOption(2, "blue", 15)]
 
-        self.multiplier_menu = Menu()
+    def set_multiplier_menu_options(self):
         self.multiplier_menu.options = [MenuOption(key_num, "cyan", key_num + 1)
                                         for key_num in range(0, 16)]
-
-        self.timer = Timer()
 
     def run(self):
         minutes_interaction = MenuInteraction(self.minutes_menu)
