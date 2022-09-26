@@ -1,0 +1,49 @@
+from vtimer.common import keypad, rotated_key_num
+from vtimer.menus import NOT_A_KEY_NUMBER
+
+
+class NextViewAction:
+    def __init__(self, view_cycle):
+        self.view_cycle = view_cycle
+
+    def enable(self):
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(key):
+                self.view_cycle.advance()
+
+
+class CancelAction:
+    def __init__(self, timer):
+        self._timer = timer
+
+    def enable(self):
+        for key in keypad.keys:
+            @keypad.on_hold(key)
+            def handler(key):
+                self._timer.cancelled = True
+
+
+class OptionSelectAction:
+    def __init__(self, menu):
+        self._menu = menu
+        self.selected_key_num = NOT_A_KEY_NUMBER
+        self._enable_choice_on_keypress()
+
+    def _enable_choice_on_keypress(self):
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(choice_key):
+                pressed_list = keypad.get_pressed()
+                self._on_press_select(pressed_list)
+
+    def _on_press_select(self, pressed_list):
+        if len(pressed_list) == 1:
+            pressed = pressed_list[0]
+            self.selected_key_num = rotated_key_num[pressed]
+
+    def wait_for_selection(self):
+        while not self._menu.selection_made:
+            if self._menu.option_valid_at_key(self.selected_key_num):
+                self._menu.select(self.selected_key_num)
+            keypad.update()

@@ -1,9 +1,10 @@
-from vtimer.common import keypad, rotated_key_num, cycle, set_key_colour, set_all_keys_colour
+from vtimer.actions import NextViewAction, CancelAction, OptionSelectAction
+from vtimer.common import keypad, set_all_keys_colour
 
-from vtimer.menus import Menu, MenuOption, NOT_A_KEY_NUMBER
+from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
 
-from vtimer.views import MinutesSelectedView, MultiplierSelectedView, AvailableOptionsView
+from vtimer.views import MinutesSelectedView, MultiplierSelectedView, AvailableOptionsView, TimerViewCycle
 from vtimer.views import SimpleIndicatorView, ProgressView, TestPatternView
 
 
@@ -89,71 +90,6 @@ class MenuInteraction:
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
-
-
-class TimerViewCycle:
-    def __init__(self, timer, views):
-        self._timer = timer
-        self._views_iter = cycle(views)
-        self._current_view = self._next_view()
-
-    def _next_view(self):
-        return next(self._views_iter)
-
-    def advance(self):
-        self._current_view = self._next_view()
-
-    def cycle_while_timer_running(self):
-        while self._timer.running:
-            self._current_view.display()
-            keypad.update()
-
-
-class NextViewAction:
-    def __init__(self, view_cycle):
-        self.view_cycle = view_cycle
-
-    def enable(self):
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                self.view_cycle.advance()
-
-
-class CancelAction:
-    def __init__(self, timer):
-        self._timer = timer
-
-    def enable(self):
-        for key in keypad.keys:
-            @keypad.on_hold(key)
-            def handler(key):
-                self._timer.cancelled = True
-
-
-class OptionSelectAction:
-    def __init__(self, menu):
-        self._menu = menu
-        self.selected_key_num = NOT_A_KEY_NUMBER
-        self._enable_choice_on_keypress()
-
-    def _enable_choice_on_keypress(self):
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(choice_key):
-                pressed_list = keypad.get_pressed()
-                self._on_press_select(pressed_list)
-
-    def _on_press_select(self, pressed_list):
-        if len(pressed_list) == 1:
-            pressed = pressed_list[0]
-            self.selected_key_num = rotated_key_num[pressed]
-
-    def wait_for_selection(self):
-        while not self._menu.selection_made:
-            if self._menu.option_valid_at_key(self.selected_key_num):
-                self._menu.select(self.selected_key_num)
-            keypad.update()
 
 
 class KeypressWait:
