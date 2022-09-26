@@ -1,5 +1,5 @@
-import vtimer.common
-from vtimer.menus import Menu, MenuOption
+from vtimer.common import all_keys
+from vtimer.menus import Menu, MenuOption, NOT_A_KEY_NUMBER
 
 import time
 import math
@@ -23,8 +23,6 @@ key_colours = {"red": (255, 0, 0),
                "cyan": (0, 255, 255),
                "orange": (255, 165, 0),
                "none": (0, 0, 0)}
-
-all_keys = frozenset(range(0, 16))
 
 
 class PrimaryInteraction:
@@ -202,7 +200,7 @@ class Timer:
 class OptionSelectAction:
     def __init__(self, menu):
         self._menu = menu
-        self.selected_key_num = vtimer.menus.NOT_A_KEY_NUMBER
+        self.selected_key_num = NOT_A_KEY_NUMBER
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
