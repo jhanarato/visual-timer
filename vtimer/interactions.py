@@ -3,7 +3,7 @@ from vtimer.util import set_all_keys_colour, KeypressWait, Pause
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
 
-from vtimer.views import SimpleIndicatorView,  ProgressView, TestPatternView
+from vtimer.views import SimpleIndicatorView,  ProgressView, TestPatternView, TimerCompleteView
 from vtimer.views import AvailableOptionsView, MinutesSelectedView, MultiplierSelectedView
 from vtimer.views import TimerViewCycle
 
@@ -59,7 +59,8 @@ class PrimaryInteraction:
         self.timer_view_cycle.cycle_while_timer_running()
 
         if self.timer.complete:
-            set_all_keys_colour("orange")
+            complete_view = TimerCompleteView()
+            complete_view.display()
             wait = KeypressWait()
             wait.wait()
 

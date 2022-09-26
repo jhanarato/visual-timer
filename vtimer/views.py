@@ -1,6 +1,6 @@
 import math
 
-from vtimer.util import all_keys, set_key_colour, cycle, keypad
+from vtimer.util import all_keys, set_key_colour, set_all_keys_colour, cycle, keypad
 
 
 class AvailableOptionsView:
@@ -99,6 +99,11 @@ class TestPatternView:
                 colour = "red"
 
             set_key_colour(key_num, colour)
+
+
+class TimerCompleteView:
+    def display(self):
+        set_all_keys_colour("orange")
 
 
 class TimerViewCycle:
