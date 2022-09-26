@@ -4,7 +4,7 @@ I've created a meditation timer using [Pimoroni's Keybow2040](https://shop.pimor
 
 ## Using the timer
 
-The basic setup of the device is described on [Pimoroni's github page](https://github.com/pimoroni/pmk-circuitpython). Once you have the keyboard working you can copy the `meditation_timer.py` file to `code.py` on the device. If all goes well, the first thing you'll see are three buttons - red, green and blue.
+The basic setup of the device is described on [Pimoroni's github page](https://github.com/pimoroni/pmk-circuitpython). Once you have the keyboard working you can copy the `code.py` file to the base directory on the device then copy the `vtimer` folder into the `lib` folder. If all goes well, the first thing you'll see are three buttons - red, green and blue.
 
 ![01-Minutes-Menu](https://user-images.githubusercontent.com/872786/190882966-d0f07cd8-c044-41d1-83ae-8b2452dda8a8.JPG)
 
@@ -48,3 +48,9 @@ Finally, when the timer is finished, all keys light up orange:
 ![08-Time-Up](https://user-images.githubusercontent.com/872786/190883541-73b66e04-9ebe-49cd-86e8-7b284364919e.JPG)
 
 A single click takes you back to the minutes menu.
+
+## Notes on the code
+
+I was reading Robert C. Martin's book, Clean Code, when I began this project. Using the principles within I first "Made it work", then "Made it right". The latter took most of the time. I particularly liked the chapter on emergent design and the code in this repository reflects that process. 
+
+The `code.py` file is minimalist and relies on the `vtimer` package to do the work. I ended up with a design based around the Model-View-Controller pattern. The code should be reasonably easy to read. The `interactions` module coordinates the user's interaction with the timer. `menus` and `timer` contain the abstractions at the heart of the code. `actions` takes care of keypress events and `views` display various patterns on the device LEDs. As with all the best code, there's a `utils` module that has everything I couldn't find a place for.
