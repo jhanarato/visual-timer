@@ -1,9 +1,9 @@
+from vtimer.util import KeypressWait, Pause
 from vtimer.actions import CancelAction, NextViewAction, OptionSelectAction
-from vtimer.util import set_all_keys_colour, KeypressWait, Pause
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
 
-from vtimer.views import SimpleIndicatorView,  ProgressView, TestPatternView, TimerCompleteView
+from vtimer.views import SimpleIndicatorView, ProgressView, TestPatternView, TimerCompleteView
 from vtimer.views import AvailableOptionsView, MinutesSelectedView, MultiplierSelectedView
 from vtimer.views import TimerViewCycle
 
