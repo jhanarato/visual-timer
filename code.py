@@ -1,29 +1,13 @@
-from vtimer.common import all_keys
+from vtimer.common import keypad, rotated_key_num, cycle, set_key_colour, set_all_keys_colour
+
 from vtimer.menus import Menu, MenuOption, NOT_A_KEY_NUMBER
 from vtimer.timer import Timer
 
-import math
+from vtimer.views import MinutesSelectedView, MultiplierSelectedView, AvailableOptionsView
+from vtimer.views import SimpleIndicatorView, ProgressView, TestPatternView
+
+
 import time
-
-# Import libraries for Pimoroni Mechanical Keypad
-from pmk.platform.keybow2040 import Keybow2040
-from pmk import PMK
-
-keybow2040 = Keybow2040()
-keypad = PMK(keybow2040)
-
-
-rotated_key_num = [0, 4, 8,  12,
-                   1, 5, 9,  13,
-                   2, 6, 10, 14,
-                   3, 7, 11, 15]
-
-key_colours = {"red": (255, 0, 0),
-               "green": (0, 255, 0),
-               "blue": (0, 0, 255),
-               "cyan": (0, 255, 255),
-               "orange": (255, 165, 0),
-               "none": (0, 0, 0)}
 
 
 class PrimaryInteraction:
@@ -172,104 +156,6 @@ class OptionSelectAction:
             keypad.update()
 
 
-class AvailableOptionsView:
-    def __init__(self, options):
-        self._options = options
-
-    def display(self):
-        for option in self._options:
-            set_key_colour(option.key_num, option.colour)
-
-
-class MinutesSelectedView:
-    def __init__(self, menu):
-        self._menu = menu
-
-    def display(self):
-        selected_key = self._menu.selected_option.key_num
-        colour = self._menu.selected_option.colour
-        other_keys = all_keys - {self._menu.selected_option.key_num}
-
-        set_key_colour(selected_key, colour)
-
-        for key_num in other_keys:
-            set_key_colour(key_num, "none")
-
-
-class MultiplierSelectedView:
-    def __init__(self, menu):
-        self._menu = menu
-
-    def display(self):
-        for key_num in self._keys_equal_to_or_less_than():
-            set_key_colour(key_num, "cyan")
-
-        for key_num in self._keys_greater_than():
-            set_key_colour(key_num, "none")
-
-    def _keys_equal_to_or_less_than(self):
-        key_le = set()
-
-        for option in self._menu.options:
-            if option.key_num <= self._menu.selected_option.key_num:
-                key_le.add(option.key_num)
-        return key_le
-
-    def _keys_greater_than(self):
-        return all_keys - self._keys_equal_to_or_less_than()
-
-
-class SimpleIndicatorView:
-    def __init__(self, key_num, colour):
-        self._indicator_key_num = key_num
-        self._colour = colour
-
-    def _unused_keys(self):
-        return all_keys - {self._indicator_key_num}
-
-    def display(self):
-        set_key_colour(self._indicator_key_num, self._colour)
-
-        for key_num in self._unused_keys():
-            set_key_colour(key_num, "none")
-
-
-class ProgressView:
-    def __init__(self, timer):
-        self.timer = timer
-
-    def display(self):
-        fraction = self.timer.fraction_remaining()
-        keys_to_be_lit = math.ceil(16 * fraction)
-        green_keys = set(range(0, keys_to_be_lit))
-        blue_keys = all_keys - green_keys
-
-        for key_num in green_keys:
-            set_key_colour(key_num, "green")
-
-        for key_num in blue_keys:
-            set_key_colour(key_num, "blue")
-
-
-class TestPatternView:
-    def __init__(self):
-        self._pattern = [
-            0, 1, 0, 1,
-            1, 0, 1, 0,
-            0, 1, 0, 1,
-            1, 0, 1, 0
-        ]
-
-    def display(self):
-        for key_num in range(0, 16):
-            if self._pattern[key_num] == 0:
-                colour = "green"
-            else:
-                colour = "red"
-
-            set_key_colour(key_num, colour)
-
-
 class KeypressWait:
     def __init__(self):
         self._pressed = False
@@ -299,22 +185,7 @@ class Pause:
             keypad.update()
 
 
-def set_key_colour(key_num, colour):
-    key_num = rotated_key_num.index(key_num)
-    keypad.keys[key_num].set_led(*key_colours[colour])
-
-
-def set_all_keys_colour(colour):
-    keypad.set_all(*key_colours[colour])
-
-
-def cycle(iterable):
-    """ A simple implementation of itertools.cycle() """
-    while True:
-        for element in iterable:
-            yield element
-
-
 interaction = PrimaryInteraction()
+
 while True:
     interaction.run()
