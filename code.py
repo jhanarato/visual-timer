@@ -1,6 +1,8 @@
+import vtimer.common
+from vtimer.menus import Menu, MenuOption
+
 import time
 import math
-import collections
 
 # Import libraries for Pimoroni Mechanical Keypad
 from pmk.platform.keybow2040 import Keybow2040
@@ -9,8 +11,6 @@ from pmk import PMK
 keybow2040 = Keybow2040()
 keypad = PMK(keybow2040)
 
-NOT_A_KEY_NUMBER = -2
-NOT_AN_OPTION_VALUE = -1
 
 rotated_key_num = [0, 4, 8,  12,
                    1, 5, 9,  13,
@@ -199,83 +199,10 @@ class Timer:
         return self.seconds_remaining() / self.total_seconds()
 
 
-MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
-
-
-class Menu:
-    _not_an_option = MenuOption(key_num=NOT_A_KEY_NUMBER,
-                                colour="none",
-                                value=NOT_AN_OPTION_VALUE)
-
-    def __init__(self, number_of_keys=16):
-        self.number_of_keys = number_of_keys
-        self._options = list()
-        self.selected_option = Menu._not_an_option
-
-    def clear_selection(self):
-        self.selected_option = Menu._not_an_option
-
-    @property
-    def options(self):
-        return self._options
-
-    @options.setter
-    def options(self, option_list):
-        for option in option_list:
-            self._options.append(option)
-
-        self._add_missing_options()
-        self._options.sort(key=lambda opt: opt.key_num)
-        self._check_options()
-
-    def _check_options(self):
-        number_of_options = len(self.options)
-        if number_of_options != self.number_of_keys:
-            raise Exception(f"Menu has {number_of_options} options. ")
-
-        for key_num in range(0, self.number_of_keys):
-            option_key_num = self.options[key_num].key_num
-            if option_key_num != key_num:
-                raise Exception(f"Option at index {key_num} has key_num = {option_key_num}")
-
-    def _used_keys(self):
-        return {option.key_num for option in self.options}
-
-    def _unused_keys(self):
-        return all_keys - self._used_keys()
-
-    def _add_missing_options(self):
-        for key_num in self._unused_keys():
-            self._options.append(
-                MenuOption(key_num=key_num,
-                           colour="none",
-                           value=NOT_AN_OPTION_VALUE)
-            )
-
-    def select(self, key_num):
-        if self.option_valid_at_key(key_num):
-            self.selected_option = self._options[key_num]
-
-    @property
-    def selection_made(self):
-        return self.selected_option.value != NOT_AN_OPTION_VALUE
-
-    def option_valid_at_key(self, key_num):
-        if key_num not in all_keys:
-            return False
-
-        option = self.options[key_num]
-
-        if option.value == NOT_AN_OPTION_VALUE:
-            return False
-
-        return True
-
-
 class OptionSelectAction:
     def __init__(self, menu):
         self._menu = menu
-        self.selected_key_num = NOT_A_KEY_NUMBER
+        self.selected_key_num = vtimer.menus.NOT_A_KEY_NUMBER
         self._enable_choice_on_keypress()
 
     def _enable_choice_on_keypress(self):
