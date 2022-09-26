@@ -1,6 +1,6 @@
 import math
 
-from vtimer.common import all_keys, set_key_colour, cycle, keypad
+from vtimer.util import all_keys, set_key_colour, cycle, keypad
 
 
 class AvailableOptionsView:

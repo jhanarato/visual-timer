@@ -1,6 +1,6 @@
 import collections
 
-from vtimer.common import all_keys
+from vtimer.util import all_keys
 
 NOT_A_KEY_NUMBER = -2
 NOT_AN_OPTION_VALUE = -1
