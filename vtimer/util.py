@@ -38,20 +38,6 @@ def set_all_keys_colour(colour):
     keypad.set_all(*key_colours[colour])
 
 
-class KeypressWait:
-    def __init__(self):
-        self._pressed = False
-
-        for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                self._pressed = True
-
-    def wait(self):
-        while not self._pressed:
-            keypad.update()
-
-
 class Pause:
     def __init__(self, seconds):
         self._seconds_to_pause_for = seconds

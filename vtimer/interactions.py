@@ -1,5 +1,5 @@
-from vtimer.util import KeypressWait, Pause
-from vtimer.actions import CancelAction, NextViewAction, OptionSelectAction
+from vtimer.util import Pause
+from vtimer.actions import CancelAction, NextViewAction, OptionSelectAction, KeypressWaitAction
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
 
@@ -61,7 +61,7 @@ class PrimaryInteraction:
         if self.timer.complete:
             complete_view = TimerCompleteView()
             complete_view.display()
-            wait = KeypressWait()
+            wait = KeypressWaitAction()
             wait.wait()
 
         self.clear()

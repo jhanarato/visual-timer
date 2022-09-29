@@ -47,3 +47,17 @@ class OptionSelectAction:
             if self._menu.option_valid_at_key(self.selected_key_num):
                 self._menu.select(self.selected_key_num)
             keypad.update()
+
+
+class KeypressWaitAction:
+    def __init__(self):
+        self._pressed = False
+
+        for key in keypad.keys:
+            @keypad.on_press(key)
+            def handler(key):
+                self._pressed = True
+
+    def wait(self):
+        while not self._pressed:
+            keypad.update()
