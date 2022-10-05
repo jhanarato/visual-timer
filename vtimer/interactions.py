@@ -70,6 +70,7 @@ class PrimaryInteraction:
         self.minutes_menu.clear_selection()
         self.multiplier_menu.clear_selection()
         self.timer.reset()
+        self.timer_view_cycle.reset()
 
 
 class MenuInteraction:

@@ -109,13 +109,18 @@ class TimerCompleteView:
 class TimerViewCycle:
     def __init__(self, timer, views):
         self._timer = timer
-        self._views_iter = cycle(views)
+        self._views = views
+        self._views_iter = cycle(self._views)
         self._current_view = self._next_view()
 
     def _next_view(self):
         return next(self._views_iter)
 
     def advance(self):
+        self._current_view = self._next_view()
+
+    def reset(self):
+        self._views_iter = cycle(self._views)
         self._current_view = self._next_view()
 
     def cycle_while_timer_running(self):
