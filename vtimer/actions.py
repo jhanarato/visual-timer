@@ -34,10 +34,11 @@ class OptionSelectAction:
 
     def _enable_choice_on_keypress(self):
         for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(choice_key):
-                pressed_list = keypad.get_pressed()
-                self._on_press_select(pressed_list)
+            key.press_function = self
+
+    def __call__(self, key):
+        pressed_list = keypad.get_pressed()
+        self._on_press_select(pressed_list)
 
     def _on_press_select(self, pressed_list):
         if len(pressed_list) == 1:
