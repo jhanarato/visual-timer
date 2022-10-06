@@ -55,12 +55,16 @@ class OptionSelectAction:
 class KeypressWaitAction:
     def __init__(self):
         self._pressed = False
+        self.enable()
 
+    def __call__(self, key):
+        self._pressed = True
+
+    def enable(self):
         for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                self._pressed = True
+            key.press_function = self
 
     def wait(self):
+        print("waiting")
         while not self._pressed:
             keypad.update()
