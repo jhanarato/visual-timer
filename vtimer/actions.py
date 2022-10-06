@@ -6,22 +6,24 @@ class NextViewAction:
     def __init__(self, view_cycle):
         self.view_cycle = view_cycle
 
+    def __call__(self, key):
+        self.view_cycle.advance()
+
     def enable(self):
         for key in keypad.keys:
-            @keypad.on_press(key)
-            def handler(key):
-                self.view_cycle.advance()
+            key.press_function = self
 
 
 class CancelAction:
     def __init__(self, timer):
         self._timer = timer
 
+    def __call__(self, key):
+        self._timer.cancelled = True
+
     def enable(self):
         for key in keypad.keys:
-            @keypad.on_hold(key)
-            def handler(key):
-                self._timer.cancelled = True
+            key.hold_function = self
 
 
 class OptionSelectAction:
