@@ -1,4 +1,5 @@
 from vtimer.util import Pause
+from vtimer.actions import enable_keypress_action, enable_hold_action
 from vtimer.actions import CancelAction, NextViewAction, OptionSelectAction, KeypressWaitAction
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
@@ -53,8 +54,8 @@ class PrimaryInteraction:
 
         self.timer.start()
 
-        self.cancel.enable()
-        self.next_view.enable()
+        enable_hold_action(self.cancel)
+        enable_keypress_action(self.next_view)
 
         self.timer_view_cycle.cycle_while_timer_running()
 

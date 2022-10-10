@@ -2,28 +2,30 @@ from vtimer.util import keypad, rotated_key_num
 from vtimer.menus import NOT_A_KEY_NUMBER
 
 
+def enable_keypress_action(action):
+    for key in keypad.keys:
+        key.press_function = action.invoke
+
+
+def enable_hold_action(action):
+    for key in keypad.keys:
+        key.hold_function = action.invoke
+
+
 class NextViewAction:
     def __init__(self, view_cycle):
         self.view_cycle = view_cycle
 
-    def __call__(self, key):
+    def invoke(self, key):
         self.view_cycle.advance()
-
-    def enable(self):
-        for key in keypad.keys:
-            key.press_function = self
 
 
 class CancelAction:
     def __init__(self, timer):
         self._timer = timer
 
-    def __call__(self, key):
+    def invoke(self, key):
         self._timer.cancelled = True
-
-    def enable(self):
-        for key in keypad.keys:
-            key.hold_function = self
 
 
 class OptionSelectAction:
@@ -34,9 +36,9 @@ class OptionSelectAction:
 
     def _enable_choice_on_keypress(self):
         for key in keypad.keys:
-            key.press_function = self
+            key.press_function = self.invoke
 
-    def __call__(self, key):
+    def invoke(self, key):
         pressed_list = keypad.get_pressed()
         self._on_press_select(pressed_list)
 
@@ -57,14 +59,13 @@ class KeypressWaitAction:
         self._pressed = False
         self.enable()
 
-    def __call__(self, key):
+    def invoke(self, key):
         self._pressed = True
 
     def enable(self):
         for key in keypad.keys:
-            key.press_function = self
+            key.press_function = self.invoke
 
     def wait(self):
-        print("waiting")
         while not self._pressed:
             keypad.update()
