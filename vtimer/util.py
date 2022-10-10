@@ -29,6 +29,15 @@ def cycle(iterable):
             yield element
 
 
+def partial(func, *args, **keywords):
+    """ An implementation of functools.partial() from the Adafruit website"""
+    def newfunc(*fargs, **fkeywords):
+        newkeywords = keywords.copy()
+        newkeywords.update(fkeywords)
+        return func(*(args + fargs), **newkeywords)
+    return newfunc
+
+
 def set_key_colour(key_num, colour):
     key_num = rotated_key_num.index(key_num)
     keypad.keys[key_num].set_led(*key_colours[colour])
