@@ -84,9 +84,11 @@ class MenuInteraction:
         available_options_view.display()
 
         select_action = OptionSelectAction(self._menu)
+        enable_keypress_action(select_action)
         select_action.wait_for_selection()
 
         self.selected_view.display()
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
+        print("Interaction ended 1010")

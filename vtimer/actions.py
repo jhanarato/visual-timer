@@ -32,11 +32,6 @@ class OptionSelectAction:
     def __init__(self, menu):
         self._menu = menu
         self.selected_key_num = NOT_A_KEY_NUMBER
-        self._enable_choice_on_keypress()
-
-    def _enable_choice_on_keypress(self):
-        for key in keypad.keys:
-            key.press_function = self.invoke
 
     def invoke(self, key):
         pressed_list = keypad.get_pressed()
