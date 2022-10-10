@@ -63,6 +63,7 @@ class PrimaryInteraction:
             complete_view = TimerCompleteView()
             complete_view.display()
             wait = KeypressWaitAction()
+            enable_keypress_action(wait)
             wait.wait()
 
         self.clear()

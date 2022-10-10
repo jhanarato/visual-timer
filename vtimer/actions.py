@@ -52,14 +52,9 @@ class OptionSelectAction:
 class KeypressWaitAction:
     def __init__(self):
         self._pressed = False
-        self.enable()
 
     def invoke(self, key):
         self._pressed = True
-
-    def enable(self):
-        for key in keypad.keys:
-            key.press_function = self.invoke
 
     def wait(self):
         while not self._pressed:
