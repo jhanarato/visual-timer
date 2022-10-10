@@ -92,4 +92,3 @@ class MenuInteraction:
 
         pause = Pause(seconds=1.5)
         pause.wait_until_complete()
-        print("Interaction ended 1010")

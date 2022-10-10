@@ -34,13 +34,7 @@ class OptionSelectAction:
         self.selected_key_num = NOT_A_KEY_NUMBER
 
     def invoke(self, key):
-        pressed_list = keypad.get_pressed()
-        self._on_press_select(pressed_list)
-
-    def _on_press_select(self, pressed_list):
-        if len(pressed_list) == 1:
-            pressed = pressed_list[0]
-            self.selected_key_num = rotated_key_num[pressed]
+        self.selected_key_num = rotated_key_num[key.number]
 
     def wait_for_selection(self):
         while not self._menu.selection_made:
