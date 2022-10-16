@@ -1,0 +1,2 @@
+class FakeKeypad:
+    pass
