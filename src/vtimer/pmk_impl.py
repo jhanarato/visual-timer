@@ -11,10 +11,10 @@ class Keypad:
         key.hold_function = fn
 
     def set_led_colour(self, key_num, colour):
-        self._pmk.keys[key_num].set_led(colour)
+        self._pmk.keys[key_num].set_led(*colour)
 
     def set_all_keys_colour(self, colour):
-        self._pmk.set_all(colour)
+        self._pmk.set_all(*colour)
 
     def update(self):
         self._pmk.update()
