@@ -1,6 +1,7 @@
 from vtimer.util import Pause
 from vtimer.actions import enable_keypress_action, enable_hold_action
-from vtimer.actions import CancelAction, NextViewAction, OptionSelectAction, KeypressWaitAction
+from vtimer.actions import wait_for_selection
+from vtimer.actions import CancelAction, NextViewAction, SelectMenuOptionAction, KeypressWaitAction
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer
 
@@ -84,9 +85,9 @@ class MenuInteraction:
         available_options_view = AvailableOptionsView(self._menu.options)
         available_options_view.display()
 
-        select_action = OptionSelectAction(self._menu)
+        select_action = SelectMenuOptionAction(self._menu)
         enable_keypress_action(select_action)
-        select_action.wait_for_selection()
+        wait_for_selection(self._menu)
 
         self.selected_view.display()
 

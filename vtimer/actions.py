@@ -28,19 +28,17 @@ class CancelAction:
         self._timer.cancelled = True
 
 
-class OptionSelectAction:
+class SelectMenuOptionAction:
     def __init__(self, menu):
         self._menu = menu
-        self.selected_key_num = NOT_A_KEY_NUMBER
 
     def invoke(self, key):
-        self.selected_key_num = rotated_key_num[key.number]
+        self._menu.select(rotated_key_num[key.number])
 
-    def wait_for_selection(self):
-        while not self._menu.selection_made:
-            if self._menu.option_valid_at_key(self.selected_key_num):
-                self._menu.select(self.selected_key_num)
-            keypad.update()
+
+def wait_for_selection(menu):
+    while not menu.selection_made:
+        keypad.update()
 
 
 class KeypressWaitAction:
