@@ -1,5 +1,4 @@
 from vtimer.util import keypad, rotated_key_num
-from vtimer.menus import NOT_A_KEY_NUMBER
 
 
 def enable_keypress_action(action):
