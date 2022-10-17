@@ -1,7 +1,7 @@
 not_implemented_message = "Implementation must be provided before calling "
 
 
-class AbstractKeypad:
+class KeypadInterface:
     def __init__(self):
         pass
 

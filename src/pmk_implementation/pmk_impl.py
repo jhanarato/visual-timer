@@ -14,7 +14,7 @@ class Keypad:
         key = self._pmk.keys[key_num]
         key.hold_function = fn
 
-    def set_led_colour(self, key_num, colour):
+    def set_key_colour(self, key_num, colour):
         self._pmk.keys[key_num].set_led(*colour)
 
     def set_all_keys_colour(self, colour):

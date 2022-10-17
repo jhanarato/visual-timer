@@ -1,8 +1,8 @@
-from vtimer import set_keypad_implementation
+import vtimer
 from vtimer.interactions import PrimaryInteraction
-from pmk_implementation import pmk_impl
+from pmk_implementation.pmk_impl import get_keypad
 
-set_keypad_implementation(pmk_impl)
+vtimer.keypad = get_keypad()
 
 interaction = PrimaryInteraction()
 

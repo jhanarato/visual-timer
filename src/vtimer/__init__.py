@@ -1,8 +1,3 @@
-from vtimer.keypad import AbstractKeypad
+from vtimer.keypad_interface import KeypadInterface
 
-keypad = AbstractKeypad()
-
-
-def set_keypad_implementation(impl):
-    global keypad
-    keypad = impl
+keypad = KeypadInterface()
