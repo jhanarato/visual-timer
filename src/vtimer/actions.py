@@ -1,14 +1,15 @@
-from vtimer.util import keypad, rotated_key_num
+import vtimer
+from vtimer.util import rotated_key_num, all_keys
 
 
 def enable_keypress_action(action):
-    for key in keypad.keys:
-        key.press_function = action.invoke
+    for key_num in all_keys:
+        vtimer.keypad.set_keypress_function(key_num, action.invoke)
 
 
 def enable_hold_action(action):
-    for key in keypad.keys:
-        key.hold_function = action.invoke
+    for key_num in all_keys:
+        vtimer.keypad.set_keyhold_function(key_num, action.invoke)
 
 
 class NextViewAction:
@@ -37,7 +38,7 @@ class SelectMenuOptionAction:
 
 def wait_for_selection(menu):
     while not menu.selection_made:
-        keypad.update()
+        vtimer.keypad.update()
 
 
 class KeypressWaitAction:
@@ -49,4 +50,4 @@ class KeypressWaitAction:
 
     def wait(self):
         while not self._pressed:
-            keypad.update()
+            vtimer.keypad.update()

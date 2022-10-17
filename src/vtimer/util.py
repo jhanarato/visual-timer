@@ -1,10 +1,6 @@
 # Import libraries for Pimoroni Mechanical Keypad
 import time
-
-from pmk.platform.keybow2040 import Keybow2040
-from pmk import PMK
-
-keypad = PMK(Keybow2040())
+import vtimer
 
 all_keys = frozenset(range(0, 16))
 
@@ -40,11 +36,11 @@ def partial(func, *args, **keywords):
 
 def set_key_colour(key_num, colour):
     key_num = rotated_key_num.index(key_num)
-    keypad.keys[key_num].set_led(*key_colours[colour])
+    vtimer.keypad.set_key_colour(key_num, key_colours[colour])
 
 
 def set_all_keys_colour(colour):
-    keypad.set_all(*key_colours[colour])
+    vtimer.keypad.set_all_keys_colour(key_colours[colour])
 
 
 class Pause:
@@ -59,4 +55,4 @@ class Pause:
 
     def wait_until_complete(self):
         while not self.complete():
-            keypad.update()
+            vtimer.keypad.update()

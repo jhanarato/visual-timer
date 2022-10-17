@@ -1,6 +1,6 @@
 import math
-
-from vtimer.util import all_keys, set_key_colour, set_all_keys_colour, cycle, keypad
+import vtimer
+from vtimer.util import all_keys, set_key_colour, set_all_keys_colour, cycle
 
 
 class AvailableOptionsView:
@@ -126,4 +126,4 @@ class TimerViewCycle:
     def cycle_while_timer_running(self):
         while self._timer.running:
             self._current_view.display()
-            keypad.update()
+            vtimer.keypad.update()
