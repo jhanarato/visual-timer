@@ -1,3 +1,7 @@
+from pmk.platform.keybow2040 import Keybow2040
+from pmk import PMK
+
+
 class Keypad:
     def __init__(self, pmk):
         self._pmk = pmk
@@ -18,3 +22,9 @@ class Keypad:
 
     def update(self):
         self._pmk.update()
+
+
+def get_keypad():
+    keybow2040 = Keybow2040()
+    pmk = PMK(keybow2040)
+    return Keypad(pmk)

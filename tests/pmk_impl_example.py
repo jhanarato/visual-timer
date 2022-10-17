@@ -1,15 +1,8 @@
 """ This file can be copied to code.py to demonstrate the workings of our pmk wrapper """
 import time
-from pmk.platform.keybow2040 import Keybow2040
-from pmk import PMK
-from vtimer.pmk_impl import Keypad
+from pmk_implementation.pmk_impl import get_keypad
 
-# Set up the PMK library
-keybow2040 = Keybow2040()
-pmk = PMK(keybow2040)
-
-# Inject into the Keypad instance
-keypad = Keypad(pmk)
+keypad = get_keypad()
 
 red = (255, 0, 0)
 blue = (0, 0, 255)
