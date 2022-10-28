@@ -9,6 +9,11 @@ NOT_AN_OPTION_VALUE = -1
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
 
+class TooManyOptionsError(Exception):
+    def __init__(self, number_of_options):
+        self.number_of_options = number_of_options
+
+
 class Menu:
     _not_an_option = MenuOption(key_num=NOT_A_KEY_NUMBER,
                                 colour="none",
@@ -38,7 +43,7 @@ class Menu:
     def _check_options(self):
         number_of_options = len(self.options)
         if number_of_options != self.number_of_keys:
-            raise Exception(f"Menu has {number_of_options} options. ")
+            raise TooManyOptionsError(number_of_options)
 
         for key_num in range(0, self.number_of_keys):
             option_key_num = self.options[key_num].key_num
