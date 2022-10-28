@@ -1,3 +1,7 @@
+# This code is taken from Arjan Eggles' better python repository
+# https://github.com/ArjanCodes/betterpython
+# Copyright 2021
+
 subscribers = dict()
 
 

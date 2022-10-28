@@ -42,3 +42,8 @@ def test_with_partial():
     events.post_event("test_event", 100)
 
     assert value_holder.value == 100
+
+
+def test_keypress_logger():
+
+    assert False
