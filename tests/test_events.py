@@ -64,6 +64,14 @@ def test_subscribe_twice(reset_subscriptions):
     events.post_event("test_event", None)
 
 
-def test_keypress_logger(reset_subscriptions):
+def test_handler_captures_variable(reset_subscriptions):
+    a_variable = None
 
-    assert False
+    def handler(data):
+        nonlocal a_variable
+        a_variable = data
+
+    events.subscribe("test_event", handler)
+    events.post_event("test_event", 123)
+
+    assert a_variable == 123

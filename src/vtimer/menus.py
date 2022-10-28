@@ -1,5 +1,6 @@
 import collections
 
+from vtimer import events
 from vtimer.util import all_keys
 
 NOT_A_KEY_NUMBER = -2
@@ -12,6 +13,11 @@ MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"]
 class TooManyOptionsError(Exception):
     def __init__(self, number_of_options):
         self.number_of_options = number_of_options
+
+
+class SelectionMadeEvent:
+    def __init__(self, value_selected):
+        self.value_selected = value_selected
 
 
 class Menu:
@@ -67,6 +73,8 @@ class Menu:
     def select(self, key_num):
         if self.option_valid_at_key(key_num):
             self.selected_option = self._options[key_num]
+            event = SelectionMadeEvent(self.selected_option.value)
+            events.post_event("menu_selection_made", event)
 
     @property
     def selection_made(self):
