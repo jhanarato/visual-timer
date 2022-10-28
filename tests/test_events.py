@@ -1,4 +1,5 @@
 from vtimer import events
+from vtimer.util import partial
 
 
 def test_subscribe():
@@ -22,3 +23,22 @@ def test_post_event():
     events.post_event("test_event", 123)
 
     assert handler.value == 123
+
+
+def test_with_partial():
+    class ValueHolder:
+        def __init__(self):
+            self.value = 0
+
+    def handler(value_holder, value):
+        value_holder.value = value
+
+    value_holder = ValueHolder()
+    value_holder.value = 50
+
+    handler_with_holder = partial(handler, value_holder)
+
+    events.subscribe("test_event", handler_with_holder)
+    events.post_event("test_event", 100)
+
+    assert value_holder.value == 100
