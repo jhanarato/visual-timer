@@ -36,11 +36,6 @@ class SelectMenuOptionAction:
         self._menu.select(rotated_key_num[key.number])
 
 
-def wait_for_selection(menu):
-    while not menu.selection_made:
-        vtimer.keypad.update()
-
-
 class KeypressWaitAction:
     def __init__(self):
         self._pressed = False

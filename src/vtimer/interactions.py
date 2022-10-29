@@ -1,6 +1,6 @@
 from vtimer.util import Pause
 from vtimer.actions import enable_keypress_action, enable_hold_action
-from vtimer.actions import wait_for_selection
+from vtimer.waiting import wait_for_selection
 from vtimer.actions import CancelAction, NextViewAction, SelectMenuOptionAction, KeypressWaitAction
 from vtimer.menus import Menu, MenuOption
 from vtimer.timer import Timer

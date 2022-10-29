@@ -5,6 +5,7 @@ from test_events import reset_subscriptions
 from vtimer.menus import Menu, MenuOption, TooManyOptionsError, SelectionMadeEvent
 from vtimer import events
 
+
 def test_create_menu():
     menu = Menu()
     assert len(menu.options) == 0
