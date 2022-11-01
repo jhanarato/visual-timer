@@ -9,6 +9,14 @@ class FakeKey:
     def __init__(self, number):
         self.number = number
         self.rgb = None
+        self.keypress_handler = None
+        self.keyhold_handler = None
+
+    def press(self):
+        self.keypress_handler(self)
+
+    def hold(self):
+        self.keyhold_handler(self)
 
 
 class FakeKeypad:
@@ -16,10 +24,10 @@ class FakeKeypad:
         self.keys = [FakeKey(number) for number in range(0, number_of_keys)]
 
     def set_keypress_function(self, key_num, fn):
-        raise NotImplementedError(not_implemented_message + "set_keypress_function")
+        self.keys[key_num].keypress_handler = fn
 
     def set_keyhold_function(self, key_num, fn):
-        raise NotImplementedError(not_implemented_message + "set_keyhold_function")
+        self.keys[key_num].keyhold_handler = fn
 
     def set_key_colour(self, key_num, colour):
         self.keys[key_num].rgb = colour

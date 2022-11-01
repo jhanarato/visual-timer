@@ -43,3 +43,31 @@ def test_set_all_keys_colour():
 
     for key in keypad.keys:
         assert key.rgb == (255, 0, 0)
+
+
+def test_set_keypress_function():
+    key_num_pressed = None
+
+    def handler(key):
+        nonlocal key_num_pressed
+        key_num_pressed = key.number
+
+    keypad = FakeKeypad()
+    keypad.set_keypress_function(7, handler)
+    keypad.keys[7].press()
+
+    assert key_num_pressed == 7
+
+
+def test_set_keyhold_function():
+    key_num_held = None
+
+    def handler(key):
+        nonlocal key_num_held
+        key_num_held = key.number
+
+    keypad = FakeKeypad()
+    keypad.set_keyhold_function(2, handler)
+    keypad.keys[2].hold()
+
+    assert key_num_held == 2
