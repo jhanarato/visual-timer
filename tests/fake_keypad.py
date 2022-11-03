@@ -19,11 +19,9 @@ class FakeKey:
         self.held = False
 
     def press(self):
-        self.keypress_handler(self)
         self.pressed = True
 
     def hold(self):
-        self.keyhold_handler(self)
         self.held = True
 
 
@@ -47,16 +45,11 @@ class FakeKeypad:
             key.rgb = colour
 
     def update(self):
-        vtimer.events.post_event("menu_selection_made", vtimer.menus.SelectionMadeEvent(10))
+        # vtimer.events.post_event("menu_selection_made", vtimer.menus.SelectionMadeEvent(10))
 
         self.increment_update_count()
         self.call_handlers()
         self.reset_keys()
-
-    def reset_keys(self):
-        for key in self.keys:
-            key.pressed = False
-            key.held = False
 
     def increment_update_count(self):
         self.number_of_updates += 1
@@ -72,4 +65,9 @@ class FakeKeypad:
                 key.keypress_handler(key)
             if key.keyhold_handler:
                 key.keyhold_handler(key)
+
+    def reset_keys(self):
+        for key in self.keys:
+            key.pressed = False
+            key.held = False
 
