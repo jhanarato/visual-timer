@@ -19,11 +19,9 @@ class FakeKey:
         self.held = False
 
     def press(self):
-        self.keypress_handler(self)
         self.pressed = True
 
     def hold(self):
-        self.keyhold_handler(self)
         self.held = True
 
 
@@ -53,11 +51,6 @@ class FakeKeypad:
         self.call_handlers()
         self.reset_keys()
 
-    def reset_keys(self):
-        for key in self.keys:
-            key.pressed = False
-            key.held = False
-
     def increment_update_count(self):
         self.number_of_updates += 1
         if self.number_of_updates > self.max_updates:
@@ -72,4 +65,9 @@ class FakeKeypad:
                 key.keypress_handler(key)
             if key.keyhold_handler:
                 key.keyhold_handler(key)
+
+    def reset_keys(self):
+        for key in self.keys:
+            key.pressed = False
+            key.held = False
 

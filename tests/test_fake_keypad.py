@@ -56,6 +56,7 @@ def test_set_keypress_function():
     keypad = FakeKeypad()
     keypad.set_keypress_function(7, handler)
     keypad.keys[7].press()
+    keypad.update()
 
     assert key_num_pressed == 7
 
@@ -70,6 +71,7 @@ def test_set_keyhold_function():
     keypad = FakeKeypad()
     keypad.set_keyhold_function(2, handler)
     keypad.keys[2].hold()
+    keypad.update()
 
     assert key_num_held == 2
 
