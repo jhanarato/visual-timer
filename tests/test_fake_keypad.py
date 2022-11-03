@@ -1,5 +1,6 @@
 import pytest
 
+import fake_keypad
 from fake_keypad import FakeKeypad
 
 import vtimer.util
@@ -71,3 +72,20 @@ def test_set_keyhold_function():
     keypad.keys[2].hold()
 
     assert key_num_held == 2
+
+
+def test_number_of_updates():
+    keypad = FakeKeypad(max_updates=2)
+    keypad.update()
+    assert keypad.number_of_updates == 1
+    keypad.update()
+    assert keypad.number_of_updates == 2
+
+
+def test_too_many_updates():
+    keypad = FakeKeypad(max_updates=2)
+    keypad.update()
+    keypad.update()
+
+    with pytest.raises(fake_keypad.TooManyUpdatesError):
+        keypad.update()

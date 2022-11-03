@@ -2,7 +2,11 @@ from vtimer.keypad_interface import KeypadInterface
 import vtimer.menus
 import vtimer.events
 
-not_implemented_message = "Implementation must be provided before calling "
+
+class TooManyUpdatesError(Exception):
+    def __init__(self, maximum, number):
+        self.maximum = maximum
+        self.number = number
 
 
 class FakeKey:
@@ -20,8 +24,10 @@ class FakeKey:
 
 
 class FakeKeypad:
-    def __init__(self, number_of_keys=16):
+    def __init__(self, number_of_keys=16, max_updates=1):
         self.keys = [FakeKey(number) for number in range(0, number_of_keys)]
+        self.number_of_updates = 0
+        self.max_updates = max_updates
 
     def set_keypress_function(self, key_num, fn):
         self.keys[key_num].keypress_handler = fn
@@ -38,3 +44,7 @@ class FakeKeypad:
 
     def update(self):
         vtimer.events.post_event("menu_selection_made", vtimer.menus.SelectionMadeEvent(10))
+
+        self.number_of_updates += 1
+        if self.number_of_updates > self.max_updates:
+            raise TooManyUpdatesError(self.max_updates, self.number_of_updates)
