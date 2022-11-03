@@ -15,9 +15,10 @@ class FakeKey:
         self.rgb = None
         self.keypress_handler = None
         self.keyhold_handler = None
+        self.pressed = False
 
     def press(self):
-        self.keypress_handler(self)
+        self.pressed = True
 
     def hold(self):
         self.keyhold_handler(self)
@@ -48,3 +49,6 @@ class FakeKeypad:
         self.number_of_updates += 1
         if self.number_of_updates > self.max_updates:
             raise TooManyUpdatesError(self.max_updates, self.number_of_updates)
+
+        for key in self.keys:
+            key.pressed = False

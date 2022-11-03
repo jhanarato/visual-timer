@@ -89,3 +89,19 @@ def test_too_many_updates():
 
     with pytest.raises(fake_keypad.TooManyUpdatesError):
         keypad.update()
+
+
+def test_press_key():
+    def press_handler(key):
+        pass
+
+    keypad = FakeKeypad()
+    keypad.set_keypress_function(0, press_handler)
+
+    _key = keypad.keys[0]
+
+    assert not _key.pressed
+    _key.press()
+    assert _key.pressed
+    keypad.update()
+    assert not _key.pressed
