@@ -1,4 +1,5 @@
-import vtimer.events
+import vtimer
+
 from vtimer.menus import Menu, MenuOption
 from vtimer.waiting import wait_for_selection
 
