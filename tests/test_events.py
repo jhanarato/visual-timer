@@ -1,5 +1,6 @@
 import pytest
 
+import vtimer.events
 from vtimer import events
 from vtimer.util import partial
 
@@ -75,3 +76,9 @@ def test_handler_captures_variable(reset_subscriptions):
     events.post_event("test_event", 123)
 
     assert a_variable == 123
+
+
+def test_event_observer(reset_subscriptions):
+    observer = vtimer.events.Observer("test_event")
+    vtimer.events.post_event("test_event", 123)
+    assert observer.has_seen
