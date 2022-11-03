@@ -50,8 +50,7 @@ class FakeKeypad:
         vtimer.events.post_event("menu_selection_made", vtimer.menus.SelectionMadeEvent(10))
 
         self.increment_update_count()
-        self.call_keypress_handlers()
-        self.call_keyhold_handlers()
+        self.call_handlers()
         self.reset_keys()
 
     def reset_keys(self):
@@ -62,12 +61,15 @@ class FakeKeypad:
     def increment_update_count(self):
         self.number_of_updates += 1
         if self.number_of_updates > self.max_updates:
-            raise TooManyUpdatesError(self.max_updates, self.number_of_updates)
+            raise TooManyUpdatesError(
+                self.max_updates,
+                self.number_of_updates
+            )
 
-    def call_keypress_handlers(self):
-        if self.keys[0].keypress_handler:
-            self.keys[0].keypress_handler(self.keys[0])
+    def call_handlers(self):
+        for key in self.keys:
+            if key.keypress_handler:
+                key.keypress_handler(key)
+            if key.keyhold_handler:
+                key.keyhold_handler(key)
 
-    def call_keyhold_handlers(self):
-        if self.keys[0].keyhold_handler:
-            self.keys[0].keyhold_handler(self.keys[0])

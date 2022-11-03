@@ -123,7 +123,7 @@ def test_hold_key():
     assert not _key.held
 
 
-def test_call_keypress_handlers_on_update():
+def test_call_keypress_handler_on_update():
     key_pressed = None
 
     def press_handler(key):
@@ -137,7 +137,7 @@ def test_call_keypress_handlers_on_update():
     assert key_pressed.number == 0
 
 
-def test_call_keyhold_handlers_on_update():
+def test_call_keyhold_handler_on_update():
     key_held = None
 
     def press_handler(key):
