@@ -25,7 +25,8 @@ class Menu:
                                 colour="none",
                                 value=NOT_AN_OPTION_VALUE)
 
-    def __init__(self, number_of_keys=16):
+    def __init__(self, number_of_keys=16, name="anonymous"):
+        self.name = name
         self.number_of_keys = number_of_keys
         self._options = list()
         self.selected_option = Menu._not_an_option

@@ -45,3 +45,7 @@ def test_making_selection_posts_event(reset_subscriptions):
     menu.select(0)
 
     assert captured_event.value_selected == 3
+
+
+def test_can_create_menu_with_name():
+    menu = Menu(name="a_name")
