@@ -21,7 +21,7 @@ def test_post_and_subscribe(reset_subscriptions):
 
 def test_keypress_event_emitted(reset_subscriptions):
     vtimer.keypad = FakeKeypad()
-    key = vtimer.keypad.keys[15]
+    key = vtimer.keypad.keys[10]
 
     handler = Handler()
     events.subscribe("keypress", handler)
@@ -32,5 +32,4 @@ def test_keypress_event_emitted(reset_subscriptions):
     key.press()
     vtimer.keypad.update()
 
-    # TODO: Figure out why 15 is the only number that works.
-    assert handler.event == 15
+    assert handler.event == 10
