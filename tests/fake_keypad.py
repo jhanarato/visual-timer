@@ -24,6 +24,9 @@ class FakeKey:
     def hold(self):
         self.held = True
 
+    def __repr__(self):
+        return f"FakeKey({self.number})"
+
 
 class FakeKeypad:
     def __init__(self, number_of_keys=16, max_updates=1):
