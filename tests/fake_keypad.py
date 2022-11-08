@@ -64,9 +64,9 @@ class FakeKeypad:
 
     def call_handlers(self):
         for key in self.keys:
-            if key.keypress_handler:
+            if key.keypress_handler and key.pressed:
                 key.keypress_handler(key)
-            if key.keyhold_handler:
+            if key.keyhold_handler and key.held:
                 key.keyhold_handler(key)
 
     def reset_keys(self):

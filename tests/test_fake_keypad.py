@@ -126,6 +126,8 @@ def test_hold_key():
 
 
 def test_call_keypress_handler_on_update():
+    key_num = 5
+
     key_pressed = None
 
     def press_handler(key):
@@ -133,24 +135,30 @@ def test_call_keypress_handler_on_update():
         key_pressed = key
 
     keypad = FakeKeypad()
-    keypad.set_keypress_function(0, press_handler)
-    assert not key_pressed
+    keypad.set_keypress_function(key_num, press_handler)
+
+    keypad.keys[key_num].press()
     keypad.update()
-    assert key_pressed.number == 0
+
+    assert key_pressed.number == key_num
 
 
 def test_call_keyhold_handler_on_update():
+    key_num = 5
+
     key_held = None
 
-    def press_handler(key):
+    def hold_handler(key):
         nonlocal key_held
         key_held = key
 
     keypad = FakeKeypad()
-    keypad.set_keyhold_function(0, press_handler)
-    assert not key_held
+    keypad.set_keyhold_function(key_num, hold_handler)
+
+    keypad.keys[key_num].hold()
     keypad.update()
-    assert key_held.number == 0
+
+    assert key_held.number == key_num
 
 
 def test_handler_not_called_if_not_pressed():
