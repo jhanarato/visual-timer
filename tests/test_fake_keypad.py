@@ -151,3 +151,39 @@ def test_call_keyhold_handler_on_update():
     assert not key_held
     keypad.update()
     assert key_held.number == 0
+
+
+def test_handler_not_called_if_not_pressed():
+    key_pressed = None
+
+    def press_handler(key):
+        nonlocal key_pressed
+        key_pressed = key
+
+    keypad = FakeKeypad()
+    keypad.set_keypress_function(0, press_handler)
+
+    keypad.update()
+
+    assert key_pressed is None
+
+
+def test_event_15_problem():
+    not_15 = 14
+
+    key_pressed = None
+
+    def press_handler(key):
+        nonlocal key_pressed
+        key_pressed = key
+
+    vtimer.keypad = FakeKeypad()
+
+    for key_num in vtimer.util.all_keys:
+        vtimer.keypad.set_keypress_function(key_num, press_handler)
+
+    key = vtimer.keypad.keys[not_15]
+    key.press()
+    vtimer.keypad.update()
+
+    assert key_pressed.number == not_15
