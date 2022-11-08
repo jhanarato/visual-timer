@@ -2,7 +2,8 @@ from fake_keypad import FakeKeypad
 from vtimer import events
 import vtimer
 
-from test_events import Handler, reset_subscriptions
+from test_events import reset_subscriptions
+from helpers import Handler
 from vtimer.actions import PressEmitter, enable_keypress_action
 
 
