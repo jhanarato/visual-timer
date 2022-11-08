@@ -1,4 +1,5 @@
 import vtimer
+from vtimer import events
 from vtimer.util import rotated_key_num, all_keys
 
 
@@ -46,3 +47,11 @@ class KeypressWaitAction:
     def wait(self):
         while not self._pressed:
             vtimer.keypad.update()
+
+
+class PressEmitter:
+    def __init__(self):
+        pass
+
+    def invoke(self, key):
+        events.post_event("keypress", key.number)
