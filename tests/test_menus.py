@@ -26,9 +26,10 @@ def test_select_missing_option():
 
 
 def test_too_many_options():
-    with pytest.raises(TooManyOptionsError):
+    with pytest.raises(TooManyOptionsError) as excinfo:
         menu = Menu(number_of_keys=0)
         menu.options = [MenuOption(0, "blue", 7)]
+    assert excinfo.value.number_of_options == 16
 
 
 def test_making_selection_posts_event(reset_subscriptions):
