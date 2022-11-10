@@ -15,9 +15,9 @@ class TooManyOptionsError(Exception):
         self.number_of_options = number_of_options
 
 
-class SelectionMadeEvent:
-    def __init__(self, value_selected):
-        self.value_selected = value_selected
+class SelectionEvent:
+    def __init__(self, option):
+        self.option = option
 
 
 class Menu:
@@ -74,7 +74,7 @@ class Menu:
     def select(self, key_num):
         if self.option_valid_at_key(key_num):
             self.selected_option = self._options[key_num]
-            event = SelectionMadeEvent(self.selected_option.value)
+            event = SelectionEvent(self.selected_option)
             events.post_event("menu_selection_made", event)
 
     @property
