@@ -1,5 +1,6 @@
 import vtimer
 import vtimer.events
+import vtimer.menus
 
 
 def wait_for_selection(menu):
@@ -9,7 +10,7 @@ def wait_for_selection(menu):
         nonlocal selection_made
         selection_made = True
 
-    vtimer.events.subscribe("menu_selection_made", handle)
+    vtimer.events.subscribe(vtimer.menus.MENU_SELECTION_EVENT, handle)
 
     while not selection_made:
         vtimer.keypad.update()

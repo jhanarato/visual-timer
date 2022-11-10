@@ -5,7 +5,7 @@ from vtimer.util import all_keys
 
 NOT_A_KEY_NUMBER = -2
 NOT_AN_OPTION_VALUE = -1
-
+MENU_SELECTION_EVENT = "menu_selection_made"
 
 MenuOption = collections.namedtuple("MenuOption", ["key_num", "colour", "value"])
 
@@ -75,7 +75,7 @@ class Menu:
         if self.option_valid_at_key(key_num):
             self.selected_option = self._options[key_num]
             event = SelectionEvent(self.selected_option)
-            events.post_event("menu_selection_made", event)
+            events.post_event(MENU_SELECTION_EVENT, event)
 
     @property
     def selection_made(self):
