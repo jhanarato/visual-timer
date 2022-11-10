@@ -2,7 +2,7 @@ import pytest
 
 from test_events import reset_subscriptions, Handler
 
-from vtimer.menus import Menu, MenuOption, TooManyOptionsError, SelectionEvent
+from vtimer.menus import Menu, MenuOption, TooManyOptionsError
 from vtimer import events
 
 
