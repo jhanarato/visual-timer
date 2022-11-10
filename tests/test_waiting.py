@@ -21,4 +21,3 @@ def test_wait_for_selection_ends_on_menu_event(reset_subscriptions):
 
     vtimer.waiting.wait_for_selection(menu)
 
-
