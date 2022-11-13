@@ -1,9 +1,11 @@
+import pytest
+
 import vtimer
 
 from vtimer.menus import Menu, MenuOption
 from vtimer.waiting import wait_for_selection
 
-from fake_keypad import FakeKeypad
+from fake_keypad import FakeKeypad, MaxUpdatesException
 from test_events import reset_subscriptions
 
 
@@ -21,3 +23,9 @@ def test_wait_for_selection_ends_on_menu_event(reset_subscriptions):
 
     vtimer.waiting.wait_for_selection(menu)
 
+
+def test_wait_until_selection_waits(reset_subscriptions):
+    menu = Menu()
+    vtimer.keypad = FakeKeypad()
+    with pytest.raises(MaxUpdatesException):
+        vtimer.waiting.wait_for_selection(menu)

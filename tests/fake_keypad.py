@@ -3,7 +3,7 @@ import vtimer.menus
 import vtimer.events
 
 
-class TooManyUpdatesError(Exception):
+class MaxUpdatesException(Exception):
     def __init__(self, maximum, number):
         self.maximum = maximum
         self.number = number
@@ -57,7 +57,7 @@ class FakeKeypad:
     def increment_update_count(self):
         self.number_of_updates += 1
         if self.number_of_updates > self.max_updates:
-            raise TooManyUpdatesError(
+            raise MaxUpdatesException(
                 self.max_updates,
                 self.number_of_updates
             )

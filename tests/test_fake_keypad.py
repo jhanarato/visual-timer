@@ -89,7 +89,7 @@ def test_too_many_updates():
     keypad.update()
     keypad.update()
 
-    with pytest.raises(fake_keypad.TooManyUpdatesError):
+    with pytest.raises(fake_keypad.MaxUpdatesException):
         keypad.update()
 
 

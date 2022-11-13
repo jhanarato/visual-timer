@@ -27,7 +27,7 @@ class Observer:
         self.has_seen = True
 
 
-class Handler:
+class EventHandler:
     def __init__(self):
         self._event = None
 
@@ -40,3 +40,6 @@ class Handler:
             raise Exception("No event has arrived")
 
         return self._event
+
+    def has_event(self):
+        return self._event is not None
