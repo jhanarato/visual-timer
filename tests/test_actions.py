@@ -7,12 +7,6 @@ from vtimer.events import EventHandler
 from vtimer.actions import PressEmitter, enable_keypress_action
 
 
-def test_post_and_subscribe(reset_subscriptions):
-    handler = EventHandler("event")
-    events.post_event("event", 123)
-    assert handler.event == 123
-
-
 def test_keypress_event_emitted(reset_subscriptions):
     vtimer.keypad = FakeKeypad()
     key = vtimer.keypad.keys[10]
