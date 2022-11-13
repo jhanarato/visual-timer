@@ -87,7 +87,7 @@ class MenuInteraction:
 
         select_action = SelectMenuOptionAction(self._menu)
         enable_keypress_action(select_action)
-        wait_for_selection(self._menu)
+        wait_for_selection()
 
         self.selected_view.display()
 

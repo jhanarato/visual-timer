@@ -3,7 +3,7 @@ import pytest
 from test_events import reset_subscriptions
 from vtimer.events import EventHandler
 
-from vtimer.menus import Menu, MenuOption, TooManyOptionsError
+from vtimer.menus import Menu, MenuOption, TooManyOptionsError, MENU_SELECTION_EVENT
 from vtimer import events
 
 
@@ -34,9 +34,7 @@ def test_too_many_options():
 
 
 def test_making_selection_posts_event(reset_subscriptions):
-    handler = EventHandler()
-    events.subscribe("menu_selection_made", handler)
-
+    handler = EventHandler(MENU_SELECTION_EVENT)
     menu = Menu()
     menu.options = [MenuOption(0, "blue", 3)]
     menu.select(0)

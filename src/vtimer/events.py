@@ -19,8 +19,9 @@ def post_event(event_type: str, data):
 
 
 class EventHandler:
-    def __init__(self):
+    def __init__(self, event_type):
         self._event = None
+        subscribe(event_type, self)
 
     def __call__(self, event):
         self._event = event
