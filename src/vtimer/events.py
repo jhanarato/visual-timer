@@ -18,15 +18,6 @@ def post_event(event_type: str, data):
         fn(data)
 
 
-class Observer:
-    def __init__(self, event_type):
-        subscribe(event_type, self.receive)
-        self.has_seen = False
-
-    def receive(self, event):
-        self.has_seen = True
-
-
 class EventHandler:
     def __init__(self):
         self._event = None
