@@ -51,7 +51,7 @@ class KeypressWaitAction:
             vtimer.keypad.update()
 
 
-class PressEmitter:
+class KeypressEmitter:
     def __init__(self):
         enable_keypress_action(self)
 
