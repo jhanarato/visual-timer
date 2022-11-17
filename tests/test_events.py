@@ -34,3 +34,10 @@ def test_exception_on_event_overwrite(reset_subscriptions):
     events.post_event(TEST_EVENT, 123)
     with pytest.raises(EventOverwriteException):
         events.post_event(TEST_EVENT, 321)
+
+def test_no_exception_if_event_retreived(reset_subscriptions):
+    handler = EventHandler(TEST_EVENT)
+    events.post_event(TEST_EVENT, 123)
+    _ = handler.event
+    events.post_event(TEST_EVENT, 321)
+    assert handler.event == 321

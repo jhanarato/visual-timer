@@ -34,7 +34,9 @@ class EventHandler:
         if self._event is None:
             raise Exception("No event has arrived")
 
-        return self._event
+        event = self._event
+        self._event = None
+        return event
 
     def has_event(self):
         return self._event is not None
