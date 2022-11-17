@@ -32,7 +32,7 @@ class EventHandler:
     @property
     def event(self):
         if self._event is None:
-            raise Exception("No event has arrived")
+            raise NoEventAvailableException
 
         event = self._event
         self._event = None
@@ -43,4 +43,7 @@ class EventHandler:
 
 
 class EventOverwriteException(Exception):
+    pass
+
+class NoEventAvailableException(Exception):
     pass

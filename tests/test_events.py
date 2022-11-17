@@ -2,7 +2,7 @@ import pytest
 
 import vtimer.events
 from vtimer import events
-from vtimer.events import EventHandler, EventOverwriteException
+from vtimer.events import EventHandler, EventOverwriteException, NoEventAvailableException
 
 TEST_EVENT = "test_event"
 
@@ -29,7 +29,7 @@ def test_subscribe_twice(reset_subscriptions):
     events.post_event(TEST_EVENT, None)
 
 
-def test_exception_on_event_overwrite(reset_subscriptions):
+def test_event_overwrite(reset_subscriptions):
     handler = EventHandler(TEST_EVENT)
     events.post_event(TEST_EVENT, 123)
     with pytest.raises(EventOverwriteException):
@@ -41,3 +41,8 @@ def test_no_exception_if_event_retreived(reset_subscriptions):
     _ = handler.event
     events.post_event(TEST_EVENT, 321)
     assert handler.event == 321
+
+def test_no_event_available(reset_subscriptions):
+    handler = EventHandler(TEST_EVENT)
+    with pytest.raises(NoEventAvailableException):
+        _ = handler.event
