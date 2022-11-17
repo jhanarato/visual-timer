@@ -14,7 +14,6 @@ def test_keypress_event_emitted(reset_subscriptions):
 
     handler = EventHandler(KEYPRESS_EVENT)
     emitter = PressEmitter()
-    enable_keypress_action(emitter)
 
     key.press()
     vtimer.keypad.update()
@@ -28,7 +27,6 @@ def test_any_key_event_emitted(reset_subscriptions):
 
     handler = EventHandler(ANY_KEYPRESS_EVENT)
     emitter = PressEmitter()
-    enable_keypress_action(emitter)
 
     key.press()
     vtimer.keypad.update()

@@ -53,7 +53,7 @@ class KeypressWaitAction:
 
 class PressEmitter:
     def __init__(self):
-        pass
+        enable_keypress_action(self)
 
     def invoke(self, key):
         events.post_event(KEYPRESS_EVENT, key.number)
