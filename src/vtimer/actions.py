@@ -3,6 +3,7 @@ from vtimer import events
 from vtimer.util import rotated_key_num, all_keys
 
 KEYPRESS_EVENT = "keypress"
+ANY_KEYPRESS_EVENT = "any-keypress"
 
 def enable_keypress_action(action):
     for key_num in all_keys:
@@ -56,3 +57,4 @@ class PressEmitter:
 
     def invoke(self, key):
         events.post_event(KEYPRESS_EVENT, key.number)
+        events.post_event(ANY_KEYPRESS_EVENT, key.number)
