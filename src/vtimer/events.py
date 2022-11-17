@@ -24,6 +24,9 @@ class EventHandler:
         subscribe(event_type, self)
 
     def __call__(self, event):
+        if self._event:
+            raise EventOverwriteException
+
         self._event = event
 
     @property
@@ -35,3 +38,7 @@ class EventHandler:
 
     def has_event(self):
         return self._event is not None
+
+
+class EventOverwriteException(Exception):
+    pass
