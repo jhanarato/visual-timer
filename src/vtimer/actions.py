@@ -3,6 +3,7 @@ from vtimer import events
 from vtimer.util import rotated_key_num, all_keys
 
 KEYPRESS_EVENT = "keypress"
+KEYHOLD_EVENT = "keyhold"
 ANY_KEYPRESS_EVENT = "any-keypress"
 
 def enable_keypress_action(action):
@@ -53,8 +54,38 @@ class KeypressWaitAction:
 
 class KeypressEmitter:
     def __init__(self):
-        enable_keypress_action(self)
+        for key_num in all_keys:
+            vtimer.keypad.set_keypress_function(key_num, self.invoke_press)
 
-    def invoke(self, key):
+        for key_num in all_keys:
+            vtimer.keypad.set_keyhold_function(key_num, self.invoke_hold)
+
+    def invoke_press(self, key):
         events.post_event(KEYPRESS_EVENT, key.number)
         events.post_event(ANY_KEYPRESS_EVENT, key.number)
+
+    def invoke_hold(self, key):
+        events.post_event(KEYHOLD_EVENT, key.number)
+
+
+class KeyListener:
+    def __init__(self):
+        self.key_pressed = False
+        self.any_key_pressed = False
+        self.key_held = False
+
+        self.subscribe()
+
+    def subscribe(self):
+        events.subscribe(KEYPRESS_EVENT, self.on_keypress)
+        events.subscribe(ANY_KEYPRESS_EVENT, self.on_any_keypress)
+        events.subscribe(KEYHOLD_EVENT, self.on_keyhold)
+
+    def on_keypress(self, key_num):
+        self.key_pressed = True
+
+    def on_any_keypress(self, key_num):
+        self.any_key_pressed = True
+
+    def on_keyhold(self, key_num):
+        self.key_held = True
