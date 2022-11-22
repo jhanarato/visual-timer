@@ -71,21 +71,15 @@ class KeypressEmitter:
 class KeyListener:
     def __init__(self):
         self.key_pressed = False
-        self.any_key_pressed = False
         self.key_held = False
-
         self.subscribe()
 
     def subscribe(self):
         events.subscribe(KEYPRESS_EVENT, self.on_keypress)
-        events.subscribe(ANY_KEYPRESS_EVENT, self.on_any_keypress)
         events.subscribe(KEYHOLD_EVENT, self.on_keyhold)
 
     def on_keypress(self, key_num):
         self.key_pressed = True
-
-    def on_any_keypress(self, key_num):
-        self.any_key_pressed = True
 
     def on_keyhold(self, key_num):
         self.key_held = True

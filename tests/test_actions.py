@@ -21,29 +21,12 @@ def test_keypress_event_emitted(reset_subscriptions):
     assert handler.event == 10
 
 
-def test_any_key_event_emitted(reset_subscriptions):
-    vtimer.keypad = FakeKeypad()
-    key = vtimer.keypad.keys[10]
-
-    handler = EventHandler(ANY_KEYPRESS_EVENT)
-    emitter = KeypressEmitter()
-
-    key.press()
-    vtimer.keypad.update()
-
-    assert handler.event
-
 def test_keypress_listener_press_handled(reset_subscriptions):
     listener = KeyListener()
     emitter = KeypressEmitter()
     emitter.invoke_press(FakeKey(0))
     assert listener.key_pressed
 
-def test_keypress_listener_any_key_handled(reset_subscriptions):
-    listener = KeyListener()
-    emitter = KeypressEmitter()
-    emitter.invoke_press(FakeKey(0))
-    assert listener.any_key_pressed
 
 def test_key_listener_hold(reset_subscriptions):
     listener = KeyListener()
